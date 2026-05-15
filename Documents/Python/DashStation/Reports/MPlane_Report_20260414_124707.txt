@@ -1,0 +1,17 @@
+========== 원격 폴더 실시간 감시 시작: 192.168.9.123:/mplane_automation/conformance_test/log/nDLPU ==========
+원격 서버에 연결되었습니다. 초기 파일 목록을 확인합니다...
+
+
+▶ 신규 원격 파일 감지: CONF_CHECK_260414_12-46-51.log. 내용 기록 대기 중...
+   파일 다운로드 및 분석 시작...
+   Overall Result: [ PASS ]
+-----------------------------------------------------------------------
+
+--- [ Software Management Validation ] ---
+   Info: No <install> RPC found in log.
+
+--- [ Fault Management: Alarm Notification Validation ] ---
+   Result: [ UNKNOWN ] - No alarm notifications found in log.
+
+--- [ Generic: RPC Error Validation ] ---
+   Result: [ PASS ] - No <rpc-error> instances found.

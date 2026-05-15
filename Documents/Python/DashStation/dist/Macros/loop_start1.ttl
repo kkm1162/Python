@@ -1,0 +1,55 @@
+:loop_start
+
+pause 170
+wait 'nDLPU login:'
+
+pause 3
+
+sendln 'solid'
+
+pause 3
+
+sendln 'ngenesisQ!@'
+
+pause 3
+
+sendln 'sudo su -'
+
+pause 3
+
+sendln 'ngenesisQ!@'
+
+pause 10
+
+sendln 'oru-container-shell'
+
+pause 2
+
+; 2. 에러 문구 또는 정상 동작 확인을 위한 대기
+; "Error response from daemon: No such container: oru1" 문구가 뜰 때까지 기다림
+; 10초 동안 응답이 없으면(timeout) 다시 루프를 돕니다.
+
+timeout = 10
+wait 'Error response from daemon: No such container: oru1'
+
+; 3. wait 명령의 결과 확인 (result 변수 활용)
+; result = 1 : 기다리던 문자열을 찾음
+; result = 0 : 타임아웃 발생 (문자열을 못 찾음)
+if result = 1 then
+    messagebox "에러가 발생하여 매크로를 중단합니다: oru1 컨테이너를 찾을 수 없습니다." "매크로 중단"
+    end
+else
+    ; 에러가 없으면 잠시 대기 후 루프 재시작 (과부하 방지)
+
+
+pause 2
+
+sendln 'show system detail'
+
+pause 2
+
+sendln 'reset system user-config'
+
+pause 2
+
+goto loop_start

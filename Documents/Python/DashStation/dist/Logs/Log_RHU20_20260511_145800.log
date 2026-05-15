@@ -1,0 +1,1599 @@
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.15.0-139-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+Expanded Security Maintenance for Infrastructure is not enabled.
+
+7 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+219 additional security updates can be applied with ESM Infra.
+Learn more about enabling ESM Infra service for Ubuntu 20.04 at
+https://ubuntu.com/20-04
+
+New release '22.04.5 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+Your Hardware Enablement Stack (HWE) is supported until April 2025.
+Last login: Mon May 11 14:56:24 2026 from 192.168.80.58
+]0;slab@slab: ~slab@slab:~$ minicom5 root
+[m)0[H[J[m[7m[61;1H[K[?25h[?0c[?25l[?1c                                                                                                                                       [?25h[?0c[?25h[?0c[?25l[?1cCTRL-A Z for help | 115200 8N1 | NOR | Minicom 2.7.1 | VT102 | Offline | ttyUSB5                                                       [?25h[?0c[1;1H[61;1H[?25l[?1cCTRL-A Z for help | 115200 8N1 | NOR | Minicom 2.7.1 | VT102 | Offline | ttyUSB5                                                       [?25h[?0c[1;1H
+[mWelcome to minicom 2.7.1
+
+OPTIONS: I18n 
+Compiled on Dec 23 2019, 02:06:26.
+Port /dev/ttyUSB5, 14:57:36
+
+Press CTRL-A Z for help on special keys
+
+[8;58H[?25l[?1c+----------------------+[9;58H|    Leave Minicom?    |[10;58H|               No     |[11;58H+----------------------+[10;79H[?25l[?1c[10;61H[m[7m   Yes  [?25h[?0c[8;1H[mPress CTRL-A Z for help on special keys                                          [9;1H                                                                                 [10;1H                                                                                 [11;1H                                                                                 [10;1H[?25h[?0c[?25h[?0c[H[J[?25h[?0c]0;slab@slab: ~slab@slab:~$ 1minicom5 root[K[K[K[K[K
+[m)0[H[J[m[7m[61;1H[K[?25h[?0c[?25l[?1c                                                                                                                                       [?25h[?0c[?25h[?0c[?25l[?1cCTRL-A Z for help | 115200 8N1 | NOR | Minicom 2.7.1 | VT102 | Offline | ttyUSB5                                                       [?25h[?0c[1;1H[61;1H[?25l[?1cCTRL-A Z for help | 115200 8N1 | NOR | Minicom 2.7.1 | VT102 | Offline | ttyUSB5                                                       [?25h[?0c[1;1H
+[mWelcome to minicom 2.7.1
+
+OPTIONS: I18n 
+Compiled on Dec 23 2019, 02:06:26.
+Port /dev/ttyUSB5, 14:58:14
+
+Press CTRL-A Z for help on special keys
+
+sysrq: SysRq : HELP : loglevel(0-9) reboot(b) crash(c) terminate-all-tasks(e) memory-full-oom-kill(f) kill-all-tasks(i) thaw-filesystems[10;136H([10;136Hj[10;136H)[10;136H [10;136Hs[10;136Ha[10;136Hk[10;136H([10;136Hk[10;136H)[10;136H [10;136Hs[10;136Hh[10;136Ho[10;136Hw[10;136H-[10;136Hb[10;136Ha[10;136Hc[10;136Hk[10;136Ht[10;136Hr[10;136Ha[10;136Hc[10;136He[10;136H-[10;136Ha[10;136Hl[10;136Hl[10;136H-[10;136Ha[10;136Hc[10;136Ht[10;136Hi[10;136Hv[10;136He[10;136H-[10;136Hc[10;136Hp[10;136Hu[10;136Hs[10;136H([10;136Hl[10;136H)[10;136H [10;136Hs[10;136Hh[10;136Ho[10;136Hw[10;136H-[10;136Hm[10;136He[10;136Hm[10;136Ho[10;136Hr[10;136Hy[10;136H-[10;136Hu[10;136Hs[10;136Ha[10;136Hg[10;136He[10;136H([10;136Hm[10;136H)[10;136H [10;136Hn[10;136Hi[10;136Hc[10;136He[10;136H-[10;136Ha[10;136Hl[10;136Hl[10;136H-[10;136HR[10;136HT[10;136H-[10;136Ht[10;136Ha[10;136Hs[10;136Hk[10;136Hs[10;136H([10;136Hn[10;136H)[10;136H [10;136Hp[10;136Ho[10;136Hw[10;136He[10;136Hr[10;136Ho[10;136Hf[10;136Hf[10;136H([10;136Ho[10;136H)[10;136H [10;136Hs[10;136Hh[10;136Ho[10;136Hw[10;136H-[10;136Hr[10;136He[10;136Hg[10;136Hi[10;136Hs[10;136Ht[10;136He[10;136Hr[10;136Hs[10;136H([10;136Hp[10;136H)[10;136H [10;136Hs[10;136Hh[10;136Ho[10;136Hw[10;136H-[10;136Ha[10;136Hl[10;136Hl[10;136H-[10;136Ht[10;136Hi[10;136Hm[10;136He[10;136Hr[10;136Hs[10;136H([10;136Hq[10;136H)[10;136H [10;136Hu[10;136Hn[10;136Hr[10;136Ha[10;136Hw[10;136H([10;136Hr[10;136H)[10;136H [10;136Hs[10;136Hy[10;136Hn[10;136Hc[10;136H([10;136Hs[10;136H)[10;136H [10;136Hs[10;136Hh[10;136Ho[10;136Hw[10;136H-[10;136Ht[10;136Ha[10;136Hs[10;136Hk[10;136H-[10;136Hs[10;136Ht[10;136Ha[10;136Ht[10;136He[10;136Hs[10;136H([10;136Ht[10;136H)[10;136H [10;136Hu[10;136Hn[10;136Hm[10;136Ho[10;136Hu[10;136Hn[10;136Ht[10;136H([10;136Hu[10;136H)[10;136H [10;136Hs[10;136Hh[10;136Ho[10;136Hw[10;136H-[10;136Hb[10;136Hl[10;136Ho[10;136Hc[10;136Hk[10;136He[10;136Hd[10;136H-[10;136Ht[10;136Ha[10;136Hs[10;136Hk[10;136Hs[10;136H([10;136Hw[10;136H)[10;136H [10;136H
+
+Authorized uses only. All activity may be monitored and reported.
+
+rhu-xx login: root
+Password: 
+Last login: Mon May 11 05:56:47 UTC 2026 on ttyPS0
+Security & OS hardening are being applied.
+[1;1H[60;136H[18;1Hroot@rhu-xx:~# 
+root@rhu-xx:~# 
+root@rhu-xx:~# 
+root@rhu-xx:~# vtysh 
+
+Hello, this is ORAN-FW (version 0.0.1-ga3830e3-dirty).
+Copyright 2019-2028 SOLiD Inc.
+
+rhu-xx# show pack    
+alarm           cpsu            eeprom          interface       net             running-config  sync            user
+certificate     ddr             environment     inventory       netconf         startup-config  system          version
+cli             debug           eth-forward     logging         pmic            sts             transceiver     watchdog
+commandtree     device          hub             ncl             reset           sw              uplane          ymodule
+rhu-xx# show hub 
+apihub      diag        mac-table   poe         ru-link     rx_enable   statistics  vlan        
+combine     mac         phy         port        ru2du       shdcell     ul          vlan_pass   
+rhu-xx# show hub 
+apihub      diag        mac-table   poe         ru-link     rx_enable   statistics  vlan        
+combine     mac         phy         port        ru2du       shdcell     ul          vlan_pass   
+rhu-xx# show hub statistics 
+cc   du   ps0  ru0  ru1  ru2  ru3  ru4  ru5  ru6  
+rhu-xx# show hub statistics 
+cc   du   ps0  ru0  ru1  ru2  ru3  ru4  ru5  ru6  
+rhu-xx# show hub statistics du  
+------------------------------------------------------------------------------
+PORT : du
+in-unicast-pkts                : 175 
+in-broadcast-pkts              : 1265 
+in-multicast-pkts              : 14708 
+in-octets                      : 1129281 
+in-total-pkts                  : 16148 
+in-fixed-pkts                  : 14281 
+in-ucplane-pkts                : 0 
+in-drop-pkts                   : 0 
+out-unicast-pkts               : 156 
+out-broadcast-pkts             : 2414 
+out-multicast-pkts             : 7627 
+out-octets                     : 1134638 
+out-total-pkts                 : 10208 
+out-fixed-pkts                 : 0 
+out-ucplane-pkts               : 0 
+out-drop-pkts                  : 0 
+rhu-xx#  show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 175 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14708 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 1129281 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 16148 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 14281 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 2416 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7627 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1135170 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 10210 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub port link enable [1;60r[60;1H
+[1;61r[60;1Hsucceed to control link : enable.[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub vlan slot 0 1 10      [1;60r[60;1H
+[1;61r[60;1H  <0-4096>  vlan id (if 0,  not used vlan)[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub vlan slot 0 1000 [1;60r[60;1H
+[1;61r[60;1H  WORD  ether type,  ex) 0xAEFE (if 0,  not used eth-type)[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub vlan slot 0 1000 ae  0xaefe [1;60r[60;1H
+[1;61r[60;1H  <0-1>  TestMode : <0-1>[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub vlan slot 0 1000 0xaefe 0 1 [1;60r[60;1H
+[1;61r[60;1H  <0-1>  DropMode : <0-1>[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub vlan slot 0 1000 0xaefe 0   1  -    0 1[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# start-shell [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# ifconfig[1;60r[60;1H
+[1;61r[60;1Heth0      Link encap:Ethernet  HWaddr DC:C1:01:00:79:D9  [1;60r[60;1H
+[1;61r[60;1H          inet addr:192.168.20.24  Bcast:192.168.20.255  Mask:255.255.255.0[1;60r[60;1H
+[1;61r[60;1H          UP BROADCAST MULTICAST  MTU:1500  Metric:1[1;60r[60;1H
+[1;61r[60;1H          RX packets:0 errors:0 dropped:0 overruns:0 frame:0[1;60r[60;1H
+[1;61r[60;1H          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0[1;60r[60;1H
+[1;61r[60;1H          collisions:0 txqueuelen:1000 [1;60r[60;1H
+[1;61r[60;1H          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)[1;60r[60;1H
+[1;61r[60;1H          Interrupt:30 [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Heth1      Link encap:Ethernet  HWaddr DC:C1:01:00:79:DA  [1;60r[60;1H
+[1;61r[60;1H          inet6 addr: fe80::dec1:1ff:fe00:79da/64 Scope:Link[1;60r[60;1H
+[1;61r[60;1H          UP BROADCAST RUNNING PROMISC MULTICAST  MTU:1500  Metric:1[1;60r[60;1H
+[1;61r[60;1H          RX packets:16447 errors:0 dropped:0 overruns:0 frame:0[1;60r[60;1H
+[1;61r[60;1H          TX packets:3590 errors:0 dropped:0 overruns:0 carrier:0[1;60r[60;1H
+[1;61r[60;1H          collisions:0 txqueuelen:1000 [1;60r[60;1H
+[1;61r[60;1H          RX bytes:919932 (898.3 KiB)  TX bytes:757502 (739.7 KiB)[1;60r[60;1H
+[1;61r[60;1H          Interrupt:31 [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Heth1.0    Link encap:Ethernet  HWaddr DC:C1:01:00:79:DA  [1;60r[60;1H
+[1;61r[60;1H          inet6 addr: fe80::dec1:1ff:fe00:79da/64 Scope:Link[1;60r[60;1H
+[1;61r[60;1H          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1[1;60r[60;1H
+[1;61r[60;1H          RX packets:16447 errors:0 dropped:14326 overruns:0 frame:0[1;60r[60;1H
+[1;61r[60;1H          TX packets:300 errors:0 dropped:0 overruns:0 carrier:0[1;60r[60;1H
+[1;61r[60;1H          collisions:0 txqueuelen:1000 [1;60r[60;1H
+[1;61r[60;1H          RX bytes:919932 (898.3 KiB)  TX bytes:39890 (38.9 KiB)[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hlo        Link encap:Local Loopback  [1;60r[60;1H
+[1;61r[60;1H          inet addr:127.0.0.1  Mask:255.0.0.0[1;60r[60;1H
+[1;61r[60;1H          inet6 addr: ::1/128 Scope:Host[1;60r[60;1H
+[1;61r[60;1H          UP LOOPBACK RUNNING  MTU:65536  Metric:1[1;60r[60;1H
+[1;61r[60;1H          RX packets:21 errors:0 dropped:0 overruns:0 frame:0[1;60r[60;1H
+[1;61r[60;1H          TX packets:21 errors:0 dropped:0 overruns:0 carrier:0[1;60r[60;1H
+[1;61r[60;1H          collisions:0 txqueuelen:1000 [1;60r[60;1H
+[1;61r[60;1H          RX bytes:3232 (3.1 KiB)  TX bytes:3232 (3.1 KiB)[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# vtysh [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HHello, this is ORAN-FW (version 0.0.1-ga3830e3-dirty).[1;60r[60;1H
+[1;61r[60;1HCopyright 2019-2028 SOLiD Inc.[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show pack    tart-shell rhu-xx# hub vlan slot 0 1000 0xaefe 0 1rhu-xx# hub [P[P[P[P[P[P[P[P[P[Pport link enable rhu-xx# show hub statistics durhu-xx# show [P[P[P[P[P[P[P[P[P[Psystem hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 175 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14708 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 1129281 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 16148 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 14281 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 2454 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7631 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1145518 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 10252 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# 1show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 175 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14708 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 1129281 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 16148 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 14281 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 2468 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7632 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1149302 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 10267 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 175 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14708 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 1129281 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 16148 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 14281 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 2502 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7634 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1158466 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 10303 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 175 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14708 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 1129281 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 16148 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 14281 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 2502 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7635 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1158526 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 10304 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 175 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14708 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 1129281 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 16148 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 14281 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 2510 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7635 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1160654 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 10312 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 175 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14708 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 1129281 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 16148 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 14281 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 2512 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7635 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1161186 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 10314 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 175 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14708 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 1129281 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 16148 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 14281 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 2512 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7635 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1161186 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 10314 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 175 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14708 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 1129281 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 16148 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 14281 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 2514 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7635 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1161718 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 10316 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 314097121 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 20103339762 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 314113199 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 314111285 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3558 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7722 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1444642 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11447 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 334231144 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 21391917362 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 334247225 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 334245310 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3558 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7722 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1444642 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11447 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 339412317 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 21723512434 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 339428398 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 339426483 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3558 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7722 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1444642 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11447 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 344971253 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 22079282354 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 344987302 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 344985388 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3558 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7722 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1444642 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11447 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 352767491 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 22578241458 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 352783539 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 352781631 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3558 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7722 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1444642 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11447 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 513208986 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 32846498482 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 513225055 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 513223152 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3614 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7727 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1459838 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11508 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 519548249 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 33252210610 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 519564306 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 519562392 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3614 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7727 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1459838 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11508 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 524178858 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 33548570290 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 524194909 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 524193024 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3616 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7727 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1460370 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11510 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 527936659 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 33789069362 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 527952724 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 527950825 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3616 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7727 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1460370 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11510 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 531435767 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 34013013234 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 531451848 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 531449933 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3616 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7727 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1460370 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11510 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 535084851 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 1265 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 14723 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 34246554610 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 535100932 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 535099017 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 156 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 3616 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7727 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1460370 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11510 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show      ts  start-shell [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# ifconfig[1;60r[60;1H
+[1;61r[60;1Heth0      Link encap:Ethernet  HWaddr DC:C1:01:00:79:D9  [1;60r[60;1H
+[1;61r[60;1H          inet addr:192.168.20.24  Bcast:192.168.20.255  Mask:255.255.255.0[1;60r[60;1H
+[1;61r[60;1H          UP BROADCAST MULTICAST  MTU:1500  Metric:1[1;60r[60;1H
+[1;61r[60;1H          RX packets:0 errors:0 dropped:0 overruns:0 frame:0[1;60r[60;1H
+[1;61r[60;1H          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0[1;60r[60;1H
+[1;61r[60;1H          collisions:0 txqueuelen:1000 [1;60r[60;1H
+[1;61r[60;1H          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)[1;60r[60;1H
+[1;61r[60;1H          Interrupt:30 [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Heth1      Link encap:Ethernet  HWaddr DC:C1:01:00:79:DA  [1;60r[60;1H
+[1;61r[60;1H          inet6 addr: fe80::dec1:1ff:fe00:79da/64 Scope:Link[1;60r[60;1H
+[1;61r[60;1H          UP BROADCAST RUNNING PROMISC MULTICAST  MTU:1500  Metric:1[1;60r[60;1H
+[1;61r[60;1H          RX packets:16462 errors:0 dropped:15 overruns:0 frame:0[1;60r[60;1H
+[1;61r[60;1H          TX packets:4874 errors:0 dropped:0 overruns:0 carrier:0[1;60r[60;1H
+[1;61r[60;1H          collisions:0 txqueuelen:1000 [1;60r[60;1H
+[1;61r[60;1H          RX bytes:920987 (899.4 KiB)  TX bytes:1083994 (1.0 MiB)[1;60r[60;1H
+[1;61r[60;1H          Interrupt:31 [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Heth1.0    Link encap:Ethernet  HWaddr DC:C1:01:00:79:DA  [1;60r[60;1H
+[1;61r[60;1H          inet6 addr: fe80::dec1:1ff:fe00:79da/64 Scope:Link[1;60r[60;1H
+[1;61r[60;1H          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1[1;60r[60;1H
+[1;61r[60;1H          RX packets:16447 errors:0 dropped:14326 overruns:0 frame:0[1;60r[60;1H
+[1;61r[60;1H          TX packets:300 errors:0 dropped:0 overruns:0 carrier:0[1;60r[60;1H
+[1;61r[60;1H          collisions:0 txqueuelen:1000 [1;60r[60;1H
+[1;61r[60;1H          RX bytes:919932 (898.3 KiB)  TX bytes:39890 (38.9 KiB)[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hlo        Link encap:Local Loopback  [1;60r[60;1H
+[1;61r[60;1H          inet addr:127.0.0.1  Mask:255.0.0.0[1;60r[60;1H
+[1;61r[60;1H          inet6 addr: ::1/128 Scope:Host[1;60r[60;1H
+[1;61r[60;1H          UP LOOPBACK RUNNING  MTU:65536  Metric:1[1;60r[60;1H
+[1;61r[60;1H          RX packets:21 errors:0 dropped:0 overruns:0 frame:0[1;60r[60;1H
+[1;61r[60;1H          TX packets:21 errors:0 dropped:0 overruns:0 carrier:0[1;60r[60;1H
+[1;61r[60;1H          collisions:0 txqueuelen:1000 [1;60r[60;1H
+[1;61r[60;1H          RX bytes:3232 (3.1 KiB)  TX bytes:3232 (3.1 KiB)[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# macb ff0e0000.ethernet eth0: link up (1000/Full)[1;60r[60;1H
+[1;61r[60;1HIPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# scp solid@192.1638  8.20.50:/tmp/ORAN_HUB_DTU_ZUP_TOP.bin /tmp/[1;60r[60;1H
+[1;61r[60;1HThe authenticity of host '192.168.20.50 (192.168.20.50)' can't be established.[1;60r[60;1H
+[1;61r[60;1HED25519 key fingerprint is SHA256:v6N/47gjL5fE6jKT4iBcqvs3WCB1gFMWznoD+lDiupo.[1;60r[60;1H
+[1;61r[60;1HThis key is not known by any other names[1;60r[60;1H
+[1;61r[60;1HAre you sure you want to continue connecting (yes/no/[fingerprint])? yes[1;60r[60;1H
+[1;61r[60;1HWarning: Permanently added '192.168.20.50' (ED25519) to the list of known hosts.[1;60r[60;1H
+[1;61r[60;1Hsolid@192.168.20.50's password: [1;60r[60;1H
+[1;61r[60;1HORAN_HUB_DTU_ZUP_TOP.bin                                                                                0%    0     0.0KB/s   --:-- ETAORAN_HUB_DTU_ZUP_TOP.bin                                                                              100%   28MB  65.8MB/s   00:00    [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# cd /software/[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:/software# ls -al[1;60r[60;1H
+[1;61r[60;1Htotal 60[1;60r[60;1H
+[1;61r[60;1Hdrwxr-xr-x    5 root     root          4096 May 11 05:46 [m[1m.[m/[1;60r[60;1H
+[1;61r[60;1Hdrwxr-xr-x   22 root     root           500 May 11 05:46 [m[1m..[m/[1;60r[60;1H
+[1;61r[60;1H-rw-r-----    1 root     root            88 Jan 13 06:59 .BOOT_CS[1;60r[60;1H
+[1;61r[60;1H-rw-r-----    1 root     root            10 Jan 13 06:59 .BOOT_VERSION[1;60r[60;1H
+[1;61r[60;1H-rw-r-----    1 root     admin            9 May 11 05:46 .boot_cause.current[1;60r[60;1H
+[1;61r[60;1H-rw-r--r--    1 root     root             0 Jun 21  2024 .nosecure[1;60r[60;1H
+[1;61r[60;1H-rw-r--r--    1 root     root             0 Nov 22  2024 .skip_netconf_callhome_max_attempts[1;60r[60;1H
+[1;61r[60;1H-rwxr-x---    1 root     root          2021 Jan 13 06:59 [m[1mactivate_slot.sh[m*[1;60r[60;1H
+[1;61r[60;1Hlrwxrwxrwx    1 root     root             5 Jan 13 06:59 [m[1mactivated[m -> [m[1mfirst[m/[1;60r[60;1H
+[1;61r[60;1H-rw-r-----    1 root     root             0 Jan 13 06:59 activated_first[1;60r[60;1H
+[1;61r[60;1H-rwxr-xr-x    1 root     root             0 Jan  1  1970 [m[1mboot_first[m*[1;60r[60;1H
+[1;61r[60;1H-rw-r--r--    1 root     root             0 Mar  8  2021 fac_set[1;60r[60;1H
+[1;61r[60;1Hlrwxrwxrwx    1 root     admin            8 Mar  8  2021 [m[1mfactory[m -> [m[1m/factory[m/[1;60r[60;1H
+[1;61r[60;1Hdrwxr-x---    3 root     admin         4096 Jan 13 06:59 [m[1mfirst[m/[1;60r[60;1H
+[1;61r[60;1Hdrwx------    2 root     root         16384 Mar  8  2021 [m[1mlost+found[m/[1;60r[60;1H
+[1;61r[60;1Hlrwxrwxrwx    1 root     root             5 May 11 05:46 [m[1mnow[m -> [m[1mfirst[m/[1;60r[60;1H
+[1;61r[60;1Hlrwxrwxrwx    1 root     root             6 Jan 13 06:59 [m[1mprevious[m -> [m[1msecond[m/[1;60r[60;1H
+[1;61r[60;1H-rw-r-----    1 root     root             0 Jan 13 06:59 previous_second[1;60r[60;1H
+[1;61r[60;1Hdrwxr-x---    3 root     admin         4096 Jan 12 06:34 [m[1msecond[m/[1;60r[60;1H
+[1;61r[60;1H-rw-r--r--    1 root     root             0 Nov 22  2024 skip_netconf_callhome_max_attempts[1;60r[60;1H
+[1;61r[60;1H-rwxr-xr-x    1 root     root             0 Jan  1  1970 [m[1mstart[m*[1;60r[60;1H
+[1;61r[60;1H-rw-r-----    1 root     admin            0 May 11 05:46 success[1;60r[60;1H
+[1;61r[60;1H-rwxr-x---    1 root     root         15120 Jan 13 06:59 [m[1mupdate_slot.sh[m*[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:/software# [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:/software# cd ~    cd -[1;60r[60;1H
+[1;61r[60;1H/home/root[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# ls -al[1;60r[60;1H
+[1;61r[60;1Htotal 16[1;60r[60;1H
+[1;61r[60;1Hdrwx------    3 root     root           140 May 11 07:52 [m[1m.[m/[1;60r[60;1H
+[1;61r[60;1Hdrwxr-xr-x    4 root     root            80 Aug 14  2025 [m[1m..[m/[1;60r[60;1H
+[1;61r[60;1H-rw-------    1 root     root            33 May 11 07:51 .bash_history[1;60r[60;1H
+[1;61r[60;1H-rw-r--r--    1 root     root           432 Aug 14  2025 .bashrc[1;60r[60;1H
+[1;61r[60;1H-rw-------    1 root     root           152 May 11 07:48 .history_quagga[1;60r[60;1H
+[1;61r[60;1H-rw-r--r--    1 root     root           241 Aug 14  2025 .profile[1;60r[60;1H
+[1;61r[60;1Hdrwx------    2 root     root            80 May 11 07:52 [m[1m.ssh[m/[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# cp /tmp/[1;60r[60;1H
+[1;61r[60;1H.appd_start_count         .pmic_boot_cause          .temp_gen_dir/            bootmode.txt              ru_software/[1;60r[60;1H
+[1;61r[60;1H.hw_id                    .pse_ver                  .temp_vendor_cert/        ru_faillog/               ru_timezone[1;60r[60;1H
+[1;61r[60;1H.hw_version               .storage_code             ORAN_HUB_DTU_ZUP_TOP.bin  ru_log/                   ru_trace_log/[1;60r[60;1H
+[1;61r[60;1H.netopeer_run             .storage_sts              beamforming/              ru_pm/                    transceiver/[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# cp /tmp/ORAN_HUB_DTU_ZUP_TOP.bin /ETC/    usr/local/etc/    fpga/[1;60r[60;1H
+[1;61r[60;1HVERSION         bitstream.bin   update_fpga.sh  [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# cp /tmp/ORAN_HUB_DTU_ZUP_TOP.bin /usr/local/fpga/[1;60r[60;1H
+[1;61r[60;1HVERSION         bitstream.bin   update_fpga.sh  [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# cp /tmp/ORAN_HUB_DTU_ZUP_TOP.bin /usr/local/fpga/[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# cd /usr/local/fpga/[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:/usr/local/fpga# ll[1;60r[60;1H
+[1;61r[60;1Htotal 57348[1;60r[60;1H
+[1;61r[60;1H-rw-r--r--    1 root     root      29353104 May 11 07:55 ORAN_HUB_DTU_ZUP_TOP.bin[1;60r[60;1H
+[1;61r[60;1H-rwxr-x---    1 root     admin           20 Jan 13 06:59 [m[1mVERSION[m*[1;60r[60;1H
+[1;61r[60;1H-rwxr-x---    1 root     admin     29354688 Jan 13 06:59 [m[1mbitstream.bin[m*[1;60r[60;1H
+[1;61r[60;1H-rwxr-x---    1 root     admin         4072 Jan 13 06:59 [m[1mupdate_fpga.sh[m*[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:/usr/local/fpga# cp bitstream.bin bitstream.bin  _backup[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:/usr/local/fpga# cp ORAN_HUB_DTU_ZUP_TOP.bin bitstream.bin[1;60r[60;1H
+[1;61r[60;1Hcp: overwrite 'bitstream.bin'? wy^H^H^H        y[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:/usr/local/fpga# ls -al[1;60r[60;1H
+[1;61r[60;1Htotal 86024[1;60r[60;1H
+[1;61r[60;1Hdrwxr-xr-x    2 root     admin         4096 May 11 07:55 [m[1m.[m/[1;60r[60;1H
+[1;61r[60;1Hdrwxr-x---    7 root     admin         4096 Jan 13 06:59 [m[1m..[m/[1;60r[60;1H
+[1;61r[60;1H-rw-r--r--    1 root     root      29353104 May 11 07:55 ORAN_HUB_DTU_ZUP_TOP.bin[1;60r[60;1H
+[1;61r[60;1H-rwxr-x---    1 root     admin           20 Jan 13 06:59 [m[1mVERSION[m*[1;60r[60;1H
+[1;61r[60;1H-rw-r--r--    1 root     root      29353104 May 11 07:55 bitstream.bin[1;60r[60;1H
+[1;61r[60;1H-rwxr-x---    1 root     root      29354688 May 11 07:55 [m[1mbitstream.bin_backup[m*[1;60r[60;1H
+[1;61r[60;1H-rwxr-x---    1 root     admin         4072 Jan 13 06:59 [m[1mupdate_fpga.sh[m*[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:/usr/local/fpga# sync[1;60r[60;1H
+[1;61r[60;1Hsyroot@rhu-xx:/usr/local/fpga# sync[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:/usr/local/fpga# reboot[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HBroadcast message from root@rhu-xx (ttyPS0) (Mon May 11 07:55:55 2026):[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HThe system is going down for reboot NOW![1;60r[60;1H
+[1;61r[60;1HINIT: Switching——ΩÅrunlevel: 6[1;60r[60;1H
+[1;61r[60;1HINIT: Sending processes the TERM signal[1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:/usr/local/fpga#  * Stopping O-RAN RHU watchdog daemon watchdogd[1;60r[60;1H
+[1;61r[60;1Hstopped process in pidfile '/var/run/watchdogd.pid' (pid 2502)[1;60r[60;1H
+[1;61r[60;1H * Stopping O-RAN RHU daemon appd[1;60r[60;1H
+[1;61r[60;1Hstopped process in pidfile '/var/run/appd.pid' (pid 2498)[1;60r[60;1H
+[1;61r[60;1HStopping haveged: [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HStopping OpenBSD Secure Shell server: sshdstopped /usr/sbin/sshd (pid 2467)[1;60r[60;1H
+[1;61r[60;1H.[1;60r[60;1H
+[1;61r[60;1Haudit: type=1305 audit(1778486160.059:715): audit_pid=0 old=2472 auid=4294967295 ses=4294967295 res=1[1;60r[60;1H
+[1;61r[60;1HStopping system message bus: dbus.[1;60r[60;1H
+[1;61r[60;1HStopping syslogd/klogd: stopped syslogd (pid 2483)[1;60r[60;1H
+[1;61r[60;1Hstopped klogd (pid 2486)[1;60r[60;1H
+[1;61r[60;1Hdone[1;60r[60;1H
+[1;61r[60;1HStopping tcf-agent: OK[1;60r[60;1H
+[1;61r[60;1HStopping random number generator daemon.[1;60r[60;1H
+[1;61r[60;1HDeconfiguring network interfaces... done.[1;60r[60;1H
+[1;61r[60;1H * Stopping YANG-based data store sysrepod[1;60r[60;1H
+[1;61r[60;1Hstopped process in pidfile '/var/run/sysrepod.pid' (pid 2490)[1;60r[60;1H
+[1;61r[60;1H ! Writing boot cause: USER-TRIGGERED-RESTART[1;60r[60;1H
+[1;61r[60;1HSending all processes the TERM signal...[1;60r[60;1H
+[1;61r[60;1HTerminated[1;60r[60;1H
+[1;61r[60;1HSending all processes the KILL signal...[1;60r[60;1H
+[1;61r[60;1HUnmounting remote filesystems...[1;60r[60;1H
+[1;61r[60;1HDeactivating swap...[1;60r[60;1H
+[1;61r[60;1HUnmounting local filesystems...[1;60r[60;1H
+[1;61r[60;1HRebooting... reboot: Restarting system[1;60r[60;1H
+[1;61r[60;1HBooting Linux on physical CPU 0x0000000000 [0x410fd034][1;60r[60;1H
+[1;61r[60;1HLinux version 4.19.0 (oe-user@oe-host) (gcc version 8.2.0 (GCC)) #1 SMP Thu Aug 14 03:06:44 UTC 2025[1;60r[60;1H
+[1;61r[60;1HMachine model: ZynqMP ORAN_HUB_DTU_ZUP[1;60r[60;1H
+[1;61r[60;1Hefi: Getting EFI parameters from FDT:[1;60r[60;1H
+[1;61r[60;1Hefi: UEFI not found.[1;60r[60;1H
+[1;61r[60;1Hcma: Reserved 256 MiB at 0x000000006bc00000[1;60r[60;1H
+[1;61r[60;1Hpsci: probing for conduit method from DT.[1;60r[60;1H
+[1;61r[60;1Hpsci: PSCIv1.1 detected in firmware.[1;60r[60;1H
+[1;61r[60;1Hpsci: Using standard PSCI v0.2 function IDs[1;60r[60;1H
+[1;61r[60;1Hpsci: MIGRATE_INFO_TYPE not supported.[1;60r[60;1H
+[1;61r[60;1Hpsci: SMC Calling Convention v1.1[1;60r[60;1H
+[1;61r[60;1Hrandom: get_random_bytes called from start_kernel+0x94/0x3f8 with crng_init=0[1;60r[60;1H
+[1;61r[60;1Hpercpu: Embedded 22 pages/cpu @(____ptrval____) s51416 r8192 d30504 u90112[1;60r[60;1H
+[1;61r[60;1HDetected VIPT I-cache on CPU0[1;60r[60;1H
+[1;61r[60;1HCPU features: enabling workaround for ARM erratum 845719[1;60r[60;1H
+[1;61r[60;1HSpeculative Store Bypass Disable mitigation not required[1;60r[60;1H
+[1;61r[60;1HCPU features: detected: Kernel page table isolation (KPTI)[1;60r[60;1H
+[1;61r[60;1HBuilt 1 zonelists, mobility grouping on.  Total pages: 1033987[1;60r[60;1H
+[1;61r[60;1HKernel command line: uio_pdrv_genirq.of_id=generic-uio console=ttyPS0,115200 ubootver=0.2.05[1;60r[60;1H
+[1;61r[60;1HDentry cache hash table entries: 524288 (order: 10, 4194304 bytes)[1;60r[60;1H
+[1;61r[60;1HInode-cache hash table entries: 262144 (order: 9, 2097152 bytes)[1;60r[60;1H
+[1;61r[60;1Hsoftware IO TLB: mapped [mem 0x67c00000-0x6bc00000] (64MB)[1;60r[60;1H
+[1;61r[60;1HMemory: 3489312K/4193280K available (9724K kernel code, 590K rwdata, 4740K rodata, 512K init, 301K bss, 441824K reserved, 262144K cma-re[60;136Hs[60;136He[60;136Hr[60;136Hv[60;136He[60;136Hd[60;136H)[60;136H[1;60r[60;1H
+[1;61r[60;1Hrcu: Hierarchical RCU implementation.[1;60r[60;1H
+[1;61r[60;1Hrcu: [60;9HRCU restricting CPUs from NR_CPUS=8 to nr_cpu_ids=4.[1;60r[60;1H
+[1;61r[60;1Hrcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=4[1;60r[60;1H
+[1;61r[60;1HNR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0[1;60r[60;1H
+[1;61r[60;1HGIC: Adjusting CPU interface base to 0x00000000f902f000[1;60r[60;1H
+[1;61r[60;1HGIC: Using split EOI/Deactivate mode[1;60r[60;1H
+[1;61r[60;1Harch_timer: cp15 timer(s) running at 33.33MHz (phys).[1;60r[60;1H
+[1;61r[60;1Hclocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x7b00c47c0, max_idle_ns: 440795202120 ns[1;60r[60;1H
+[1;61r[60;1Hsched_clock: 56 bits at 33MHz, resolution 30ns, wraps every 2199023255541ns[1;60r[60;1H
+[1;61r[60;1HConsole: colour dummy device 80x25[1;60r[60;1H
+[1;61r[60;1HCalibrating delay loop (skipped), value calculated using timer frequency.. 66.66 BogoMIPS (lpj=133333)[1;60r[60;1H
+[1;61r[60;1Hpid_max: default: 32768 minimum: 301[1;60r[60;1H
+[1;61r[60;1HMount-cache hash table entries: 8192 (order: 4, 65536 bytes)[1;60r[60;1H
+[1;61r[60;1HMountpoint-cache hash table entries: 8192 (order: 4, 65536 bytes)[1;60r[60;1H
+[1;61r[60;1HASID allocator initialised with 32768 entries[1;60r[60;1H
+[1;61r[60;1Hrcu: Hierarchical SRCU implementation.[1;60r[60;1H
+[1;61r[60;1HEFI services will not be available.[1;60r[60;1H
+[1;61r[60;1Hsmp: Bringing up secondary CPUs ...[1;60r[60;1H
+[1;61r[60;1HDetected VIPT I-cache on CPU1[1;60r[60;1H
+[1;61r[60;1HCPU1: Booted secondary processor 0x0000000001 [0x410fd034][1;60r[60;1H
+[1;61r[60;1HDetected VIPT I-cache on CPU2[1;60r[60;1H
+[1;61r[60;1HCPU2: Booted secondary processor 0x0000000002 [0x410fd034][1;60r[60;1H
+[1;61r[60;1HDetected VIPT I-cache on CPU3[1;60r[60;1H
+[1;61r[60;1HCPU3: Booted secondary processor 0x0000000003 [0x410fd034][1;60r[60;1H
+[1;61r[60;1Hsmp: Brought up 1 node, 4 CPUs[1;60r[60;1H
+[1;61r[60;1HSMP: Total of 4 processors activated.[1;60r[60;1H
+[1;61r[60;1HCPU features: detected: 32-bit EL0 Support[1;60r[60;1H
+[1;61r[60;1HCPU: All CPU(s) started at EL2[1;60r[60;1H
+[1;61r[60;1Halternatives: patching kernel code[1;60r[60;1H
+[1;61r[60;1Hdevtmpfs: initialized[1;60r[60;1H
+[1;61r[60;1Hclocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns[1;60r[60;1H
+[1;61r[60;1Hfutex hash table entries: 1024 (order: 4, 65536 bytes)[1;60r[60;1H
+[1;61r[60;1Hxor: measuring software checksum speed[1;60r[60;1H
+[1;61r[60;1H   8regs     :  2606.000 MB/sec[1;60r[60;1H
+[1;61r[60;1H   8regs_prefetch:  2251.000 MB/sec[1;60r[60;1H
+[1;61r[60;1H   32regs    :  2989.000 MB/sec[1;60r[60;1H
+[1;61r[60;1H   32regs_prefetch:  2533.000 MB/sec[1;60r[60;1H
+[1;61r[60;1Hxor: using function: 32regs (2989.000 MB/sec)[1;60r[60;1H
+[1;61r[60;1Hpinctrl core: initialized pinctrl subsystem[1;60r[60;1H
+[1;61r[60;1HNET: Registered protocol family 16[1;60r[60;1H
+[1;61r[60;1Haudit: initializing netlink subsys (disabled)[1;60r[60;1H
+[1;61r[60;1Haudit: type=2000 audit(0.172:1): state=initialized audit_enabled=0 res=1[1;60r[60;1H
+[1;61r[60;1Hvdso: 2 pages (1 code @ (____ptrval____), 1 data @ (____ptrval____))[1;60r[60;1H
+[1;61r[60;1Hhw-breakpoint: found 6 breakpoint and 4 watchpoint registers.[1;60r[60;1H
+[1;61r[60;1HDMA: preallocated 256 KiB pool for atomic allocations[1;60r[60;1H
+[1;61r[60;1HHugeTLB registered 2.00 MiB page size, pre-allocated 0 pages[1;60r[60;1H
+[1;61r[60;1Hraid6: int64x1  gen()   485 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: int64x1  xor()   486 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: int64x2  gen()   737 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: int64x2  xor()   649 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: int64x4  gen()  1067 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: int64x4  xor()   801 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: int64x8  gen()  1268 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: int64x8  xor()   829 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: neonx1   gen()   795 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: neonx1   xor()   944 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: neonx2   gen()  1227 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: neonx2   xor()  1268 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: neonx4   gen()  1613 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: neonx4   xor()  1541 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: neonx8   gen()  1697 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: neonx8   xor()  1594 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: using algorithm neonx8 gen() 1697 MB/s[1;60r[60;1H
+[1;61r[60;1Hraid6: .... xor() 1594 MB/s, rmw enabled[1;60r[60;1H
+[1;61r[60;1Hraid6: using neon recovery algorithm[1;60r[60;1H
+[1;61r[60;1HSCSI subsystem initialized[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver usbfs[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver hub[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new device driver usb[1;60r[60;1H
+[1;61r[60;1Hmedia: Linux media interface: v0.10[1;60r[60;1H
+[1;61r[60;1Hvideodev: Linux video capture interface: v2.00[1;60r[60;1H
+[1;61r[60;1Hpps_core: LinuxPPS API ver. 1 registered[1;60r[60;1H
+[1;61r[60;1Hpps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>[1;60r[60;1H
+[1;61r[60;1HPTP clock support registered[1;60r[60;1H
+[1;61r[60;1HEDAC MC: Ver: 3.0.0[1;60r[60;1H
+[1;61r[60;1Hzynqmp-ipi-mbox mailbox@ff990400: Probed ZynqMP IPI Mailbox driver.[1;60r[60;1H
+[1;61r[60;1HFPGA manager framework[1;60r[60;1H
+[1;61r[60;1HBluetooth: Core ver 2.22[1;60r[60;1H
+[1;61r[60;1HNET: Registered protocol family 31[1;60r[60;1H
+[1;61r[60;1HBluetooth: HCI device and connection manager initialized[1;60r[60;1H
+[1;61r[60;1HBluetooth: HCI socket layer initialized[1;60r[60;1H
+[1;61r[60;1HBluetooth: L2CAP socket layer initialized[1;60r[60;1H
+[1;61r[60;1HBluetooth: SCO socket layer initialized[1;60r[60;1H
+[1;61r[60;1Hclocksource: Switched to clocksource arch_sys_counter[1;60r[60;1H
+[1;61r[60;1HVFS: Disk quotas dquot_6.6.0[1;60r[60;1H
+[1;61r[60;1HVFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)[1;60r[60;1H
+[1;61r[60;1HNET: Registered protocol family 2[1;60r[60;1H
+[1;61r[60;1Htcp_listen_portaddr_hash hash table entries: 2048 (order: 3, 32768 bytes)[1;60r[60;1H
+[1;61r[60;1HTCP established hash table entries: 32768 (order: 6, 262144 bytes)[1;60r[60;1H
+[1;61r[60;1HTCP bind hash table entries: 32768 (order: 7, 524288 bytes)[1;60r[60;1H
+[1;61r[60;1HTCP: Hash tables configured (established 32768 bind 32768)[1;60r[60;1H
+[1;61r[60;1HUDP hash table entries: 2048 (order: 4, 65536 bytes)[1;60r[60;1H
+[1;61r[60;1HUDP-Lite hash table entries: 2048 (order: 4, 65536 bytes)[1;60r[60;1H
+[1;61r[60;1HNET: Registered protocol family 1[1;60r[60;1H
+[1;61r[60;1HRPC: Registered named UNIX socket transport module.[1;60r[60;1H
+[1;61r[60;1HRPC: Registered udp transport module.[1;60r[60;1H
+[1;61r[60;1HRPC: Registered tcp transport module.[1;60r[60;1H
+[1;61r[60;1HRPC: Registered tcp NFSv4.1 backchannel transport module.[1;60r[60;1H
+[1;61r[60;1HTrying to unpack rootfs image as initramfs...[1;60r[60;1H
+[1;61r[60;1HFreeing initrd memory: 33396K[1;60r[60;1H
+[1;61r[60;1Hhw perfevents: no interrupt-affinity property for /pmu, guessing.[1;60r[60;1H
+[1;61r[60;1Hhw perfevents: enabled with armv8_pmuv3 PMU driver, 7 counters available[1;60r[60;1H
+[1;61r[60;1Hworkingset: timestamp_bits=62 max_order=20 bucket_order=0[1;60r[60;1H
+[1;61r[60;1HNFS: Registering the id_resolver key type[1;60r[60;1H
+[1;61r[60;1HKey type id_resolver registered[1;60r[60;1H
+[1;61r[60;1HKey type id_legacy registered[1;60r[60;1H
+[1;61r[60;1Hnfs4filelayout_init: NFSv4 File Layout Driver Registering...[1;60r[60;1H
+[1;61r[60;1Hjffs2: version 2.2. (NAND) (SUMMARY)  ¬¬© 2001-2006 Red Hat, Inc.[1;60r[60;1H
+[1;61r[60;1HBlock layer SCSI generic (bsg) driver version 0.4 loaded (major 247)[1;60r[60;1H
+[1;61r[60;1Hio scheduler noop registered[1;60r[60;1H
+[1;61r[60;1Hio scheduler deadline registered[1;60r[60;1H
+[1;61r[60;1Hio scheduler cfq registered (default)[1;60r[60;1H
+[1;61r[60;1Hio scheduler mq-deadline registered[1;60r[60;1H
+[1;61r[60;1Hio scheduler kyber registered[1;60r[60;1H
+[1;61r[60;1Hcacheinfo: Unable to detect cache hierarchy for CPU 0[1;60r[60;1H
+[1;61r[60;1Hbrd: module loaded[1;60r[60;1H
+[1;61r[60;1Hloop: module loaded[1;60r[60;1H
+[1;61r[60;1Hlibphy: Fixed MDIO Bus: probed[1;60r[60;1H
+[1;61r[60;1Htun: Universal TUN/TAP device driver, 1.6[1;60r[60;1H
+[1;61r[60;1HCAN device driver interface[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver asix[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver ax88179_178a[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver cdc_ether[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver net1080[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver cdc_subset[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver zaurus[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver cdc_ncm[1;60r[60;1H
+[1;61r[60;1Hehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver[1;60r[60;1H
+[1;61r[60;1Hehci-pci: EHCI PCI platform driver[1;60r[60;1H
+[1;61r[60;1Hehci-platform: EHCI generic platform driver[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver cdc_wdm[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver uas[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver usb-storage[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver sisusb[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver lvs[1;60r[60;1H
+[1;61r[60;1Hmousedev: PS/2 mouse device common for all mice[1;60r[60;1H
+[1;61r[60;1Hrtc_zynqmp ffa60000.rtc: rtc core: registered ffa60000.rtc as rtc0[1;60r[60;1H
+[1;61r[60;1Hi2c /dev entries driver[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver uvcvideo[1;60r[60;1H
+[1;61r[60;1HUSB Video Class driver (1.1.1)[1;60r[60;1H
+[1;61r[60;1HEDAC MC: ECC not enabled[1;60r[60;1H
+[1;61r[60;1HEDAC DEVICE0: Giving out device to module edac controller cache_err: DEV edac (POLLED)[1;60r[60;1H
+[1;61r[60;1HEDAC DEVICE1: Giving out device to module zynqmp-ocm-edac controller zynqmp_ocm: DEV ff960000.memory-controller (INTERRUPT)[1;60r[60;1H
+[1;61r[60;1Hsdhci: Secure Digital Host Controller Interface driver[1;60r[60;1H
+[1;61r[60;1Hsdhci: Copyright(c) Pierre Ossman[1;60r[60;1H
+[1;61r[60;1Hsdhci-pltfm: SDHCI platform and OF driver helper[1;60r[60;1H
+[1;61r[60;1Hledtrig-cpu: registered to indicate activity on CPUs[1;60r[60;1H
+[1;61r[60;1Hzynqmp_firmware_probe Platform Management API v1.1[1;60r[60;1H
+[1;61r[60;1Hzynqmp_firmware_probe Trustzone version v1.0[1;60r[60;1H
+[1;61r[60;1Hzynqmp-pinctrl firmware:zynqmp-firmware:pinctrl: zynqmp pinctrl initialized[1;60r[60;1H
+[1;61r[60;1Hzynqmp_clk_mux_get_parent() getparent failed for clock: lpd_wdt, ret = -22[1;60r[60;1H
+[1;61r[60;1Hsecurefw securefw: DMA mask not set[1;60r[60;1H
+[1;61r[60;1Hsecurefw securefw: securefw probed[1;60r[60;1H
+[1;61r[60;1Husbcore: registered new interface driver usbhid[1;60r[60;1H
+[1;61r[60;1Husbhid: USB HID core driver[1;60r[60;1H
+[1;61r[60;1HARM CCI_400_r1 PMU driver probed[1;60r[60;1H
+[1;61r[60;1Hfpga_manager fpga0: Xilinx ZynqMP FPGA Manager registered[1;60r[60;1H
+[1;61r[60;1Hpktgen: Packet Generator for packet performance testing. Version: 2.75[1;60r[60;1H
+[1;61r[60;1HInitializing XFRM netlink socket[1;60r[60;1H
+[1;61r[60;1HNET: Registered protocol family 10[1;60r[60;1H
+[1;61r[60;1HSegment Routing with IPv6[1;60r[60;1H
+[1;61r[60;1Hsit: IPv6, IPv4 and MPLS over IPv4 tunneling driver[1;60r[60;1H
+[1;61r[60;1HNET: Registered protocol family 17[1;60r[60;1H
+[1;61r[60;1HNET: Registered protocol family 15[1;60r[60;1H
+[1;61r[60;1Hbridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.[1;60r[60;1H
+[1;61r[60;1Hcan: controller area network core (rev 20170425 abi 9)[1;60r[60;1H
+[1;61r[60;1HNET: Registered protocol family 29[1;60r[60;1H
+[1;61r[60;1Hcan: raw protocol (rev 20170425)[1;60r[60;1H
+[1;61r[60;1Hcan: broadcast manager protocol (rev 20170425 t)[1;60r[60;1H
+[1;61r[60;1Hcan: netlink gateway (rev 20170425) max_hops=1[1;60r[60;1H
+[1;61r[60;1HBluetooth: RFCOMM TTY layer initialized[1;60r[60;1H
+[1;61r[60;1HBluetooth: RFCOMM socket layer initialized[1;60r[60;1H
+[1;61r[60;1HBluetooth: RFCOMM ver 1.11[1;60r[60;1H
+[1;61r[60;1HBluetooth: BNEP (Ethernet Emulation) ver 1.3[1;60r[60;1H
+[1;61r[60;1HBluetooth: BNEP filters: protocol multicast[1;60r[60;1H
+[1;61r[60;1HBluetooth: BNEP socket layer initialized[1;60r[60;1H
+[1;61r[60;1HBluetooth: HIDP (Human Interface Emulation) ver 1.2[1;60r[60;1H
+[1;61r[60;1HBluetooth: HIDP socket layer initialized[1;60r[60;1H
+[1;61r[60;1H8021q: 802.1Q VLAN Support v1.8[1;60r[60;1H
+[1;61r[60;1HKey type dns_resolver registered[1;60r[60;1H
+[1;61r[60;1Hregistered taskstats version 1[1;60r[60;1H
+[1;61r[60;1HBtrfs loaded, crc32c=crc32c-generic[1;60r[60;1H
+[1;61r[60;1Hff000000.serial: ttyPS0 at MMIO 0xff000000 (irq = 42, base_baud = 6249999) is a xuartps[1;60r[60;1H
+[1;61r[60;1Hconsole [ttyPS0] enabled[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma fd500000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma fd510000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma fd520000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma fd530000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma fd540000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma fd550000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma fd560000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma fd570000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma ffa80000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma ffa90000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma ffaa0000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma ffab0000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma ffac0000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma ffad0000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma ffae0000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hxilinx-zynqmp-dma ffaf0000.dma: ZynqMP DMA driver Probe success[1;60r[60;1H
+[1;61r[60;1Hmacb ff0e0000.ethernet: Not enabling partial store and forward[1;60r[60;1H
+[1;61r[60;1Hlibphy: MACB_mii_bus: probed[1;60r[60;1H
+[1;61r[60;1Hf22:: phy_device_create [1;60r[60;1H
+[1;61r[60;1Hf22:: phy_probe 2[1;60r[60;1H
+[1;61r[60;1HTI DP83867 ff0e0000.ethernet-ffffffff:05: attached PHY driver [TI DP83867] (mii_bus:phy_addr=ff0e0000.ethernet-ffffffff:05, irq=POLL)[1;60r[60;1H
+[1;61r[60;1Hmacb ff0e0000.ethernet eth0: Cadence GEM rev 0x50070106 at 0xff0e0000 irq 30 (00:0a:35:00:22:01)[1;60r[60;1H
+[1;61r[60;1Hmacb ff0b0000.ethernet: Not enabling partial store and forward[1;60r[60;1H
+[1;61r[60;1Hmacb ff0b0000.ethernet: invalid hw address, using random[1;60r[60;1H
+[1;61r[60;1Hf22:: phy_device_create [1;60r[60;1H
+[1;61r[60;1Hlibphy: MACB_mii_bus: probed[1;60r[60;1H
+[1;61r[60;1Hf22:: phy_device_create [1;60r[60;1H
+[1;61r[60;1Hf22:: phy_probe 2[1;60r[60;1H
+[1;61r[60;1Hf22:: genphy_config_init [1;60r[60;1H
+[1;61r[60;1HGeneric PHY fixed-0:00: attached PHY driver [Generic PHY] (mii_bus:phy_addr=fixed-0:00, irq=POLL)[1;60r[60;1H
+[1;61r[60;1Hmacb ff0b0000.ethernet eth1: Cadence GEM rev 0x50070106 at 0xff0b0000 irq 31 (ba:d9:99:2c:1b:82)[1;60r[60;1H
+[1;61r[60;1Hxilinx-axipmon ffa00000.perf-monitor: Probed Xilinx APM[1;60r[60;1H
+[1;61r[60;1Hxilinx-axipmon fd0b0000.perf-monitor: Probed Xilinx APM[1;60r[60;1H
+[1;61r[60;1Hxilinx-axipmon fd490000.perf-monitor: Probed Xilinx APM[1;60r[60;1H
+[1;61r[60;1Hxilinx-axipmon ffa10000.perf-monitor: Probed Xilinx APM[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-0: Added multiplexed i2c bus 2[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-0: Added multiplexed i2c bus 3[1;60r[60;1H
+[1;61r[60;1Hat24 4-0050: 8192 byte 24c64 EEPROM, writable, 1 bytes/write[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-0: Added multiplexed i2c bus 4[1;60r[60;1H
+[1;61r[60;1Hlm75 5-0048: hwmon0: sensor 'tmp112'[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-0: Added multiplexed i2c bus 5[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-0: Added multiplexed i2c bus 6[1;60r[60;1H
+[1;61r[60;1Htps65086 7-005e: Device: TPS650864, OTP: B, Rev: 0[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-0: Added multiplexed i2c bus 7[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-8: Added multiplexed i2c bus 9[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-8: Added multiplexed i2c bus 10[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-8: Added multiplexed i2c bus 11[1;60r[60;1H
+[1;61r[60;1Hadt7470 12-002e: adt7470 chip found[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-8: Added multiplexed i2c bus 12[1;60r[60;1H
+[1;61r[60;1Hlm75 13-0048: hwmon3: sensor 'tmp112'[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-8: Added multiplexed i2c bus 13[1;60r[60;1H
+[1;61r[60;1Hpca953x 14-0020: 14-0020 supply vcc not found, using dummy regulator[1;60r[60;1H
+[1;61r[60;1Hpca953x 14-0020: Linked as a consumer to regulator.0[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-8: Added multiplexed i2c bus 14[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-8: Added multiplexed i2c bus 15[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-8: Added multiplexed i2c bus 16[1;60r[60;1H
+[1;61r[60;1Hpca954x 8-0070: registered 8 multiplexed busses for I2C switch pca9548[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-0: Added multiplexed i2c bus 8[1;60r[60;1H
+[1;61r[60;1Hi2c i2c-0: Added multiplexed i2c bus 17[1;60r[60;1H
+[1;61r[60;1Hpca954x 0-0074: registered 8 multiplexed busses for I2C switch pca9548[1;60r[60;1H
+[1;61r[60;1Hcdns-i2c ff020000.i2c: 400 kHz mmio ff020000 irq 33[1;60r[60;1H
+[1;61r[60;1Hcdns-i2c ff030000.i2c: 400 kHz mmio ff030000 irq 34[1;60r[60;1H
+[1;61r[60;1Hmmc0: SDHCI controller on ff160000.mmc [ff160000.mmc] using ADMA 64-bit[1;60r[60;1H
+[1;61r[60;1Hmmc1: SDHCI controller on ff170000.mmc [ff170000.mmc] using ADMA 64-bit[1;60r[60;1H
+[1;61r[60;1Hrtc_zynqmp ffa60000.rtc: setting system clock to 2026-05-11 07:56:32 UTC (1778486192)[1;60r[60;1H
+[1;61r[60;1HFreeing unused kernel memory: 512K[1;60r[60;1H
+[1;61r[60;1Hmmc0: new HS200 MMC card at address 0001[1;60r[60;1H
+[1;61r[60;1Hmmcblk0: mmc0:0001 DG4008 7.28 GiB [1;60r[60;1H
+[1;61r[60;1Hmmcblk0boot0: mmc0:0001 DG4008 partition 1 4.00 MiB[1;60r[60;1H
+[1;61r[60;1Hmmcblk0boot1: mmc0:0001 DG4008 partition 2 4.00 MiB[1;60r[60;1H
+[1;61r[60;1Hmmcblk0rpmb: mmc0:0001 DG4008 partition 3 4.00 MiB, chardev (245:0)[1;60r[60;1H
+[1;61r[60;1H mmcblk0: p1 p2 p3 p4 < p5 p6 >[1;60r[60;1H
+[1;61r[60;1HRun /init as init process[1;60r[60;1H
+[1;61r[60;1HINIT: version 2.88 booting[1;60r[60;1H
+[1;61r[60;1HFAT-fs (mmcblk0p1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.[1;60r[60;1H
+[1;61r[60;1HEXT4-fs: Warning: mounting with data=journal disables delayed allocation and O_DIRECT support![1;60r[60;1H
+[1;61r[60;1HEXT4-fs (mmcblk0p2): mounted filesystem with journalled data mode. Opts: data=journal[1;60r[60;1H
+[1;61r[60;1Hrandom: fast init done[1;60r[60;1H
+[1;61r[60;1HEXT4-fs (mmcblk0p3): mounted filesystem with journalled data mode. Opts: data=journal[1;60r[60;1H
+[1;61r[60;1HEXT4-fs (mmcblk0p5): mounted filesystem with journalled data mode. Opts: data=journal[1;60r[60;1H
+[1;61r[60;1HEXT4-fs (mmcblk0p6): mounted filesystem with ordered data mode. Opts: data=ordered[1;60r[60;1H
+[1;61r[60;1HStarting udev[1;60r[60;1H
+[1;61r[60;1Hudevd[1693]: starting version 3.2.5[1;60r[60;1H
+[1;61r[60;1Hrandom: udevd: uninitialized urandom read (16 bytes read)[1;60r[60;1H
+[1;61r[60;1Hrandom: udevd: uninitialized urandom read (16 bytes read)[1;60r[60;1H
+[1;61r[60;1Hrandom: udevd: uninitialized urandom read (16 bytes read)[1;60r[60;1H
+[1;61r[60;1Hudevd[1694]: starting eudev-3.2.5[1;60r[60;1H
+[1;61r[60;1HChecking ext4 file system... (/dev/mmcblk0p4)[1;60r[60;1H
+[1;61r[60;1He2fsck 1.44.3 (10-July-2018)[1;60r[60;1H
+[1;61r[60;1He2fsck: Attempt to read block from filesystem resulted in short read while trying to open /dev/mmcblk0p4[1;60r[60;1H
+[1;61r[60;1HCould this be a zero-length partition?[1;60r[60;1H
+[1;61r[60;1HRemounting eMMC partitions...[1;60r[60;1H
+[1;61r[60;1Hmount: mounting /dev/mmcblk0p7 on /storage failed: No such file or directory[1;60r[60;1H
+[1;61r[60;1H### Starting normal boot procedure ...[1;60r[60;1H
+[1;61r[60;1H! Applying security & OS hardening configurations...[1;60r[60;1H
+[1;61r[60;1H ! (1/4)...[1;60r[60;1H
+[1;61r[60;1Hkernel.randomize_va_space = 2[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.all.send_redirects = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.default.send_redirects = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.all.accept_redirects = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.default.accept_redirects = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv6.conf.all.accept_redirects = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv6.conf.default.accept_redirects = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.icmp_ignore_bogus_error_responses = 1[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.all.forwarding = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.default.forwarding = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv6.conf.all.forwarding = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv6.conf.default.forwarding = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.all.rp_filter = 1[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.default.rp_filter = 1[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.all.proxy_arp = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.default.proxy_arp = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.all.arp_accept = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.default.arp_accept = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.icmp_echo_ignore_broadcasts = 1[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.all.accept_source_route = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.default.accept_source_route = 0[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.all.log_martians = 1[1;60r[60;1H
+[1;61r[60;1Hnet.ipv4.conf.default.log_martians = 1[1;60r[60;1H
+[1;61r[60;1H ! (2/4)...[1;60r[60;1H
+[1;61r[60;1H ! (3/4)...[1;60r[60;1H
+[1;61r[60;1HNo rules[1;60r[60;1H
+[1;61r[60;1Henabled 0[1;60r[60;1H
+[1;61r[60;1Hfailure 1[1;60r[60;1H
+[1;61r[60;1Hpid 0[1;60r[60;1H
+[1;61r[60;1Hrate_limit 0[1;60r[60;1H
+[1;61r[60;1Hbacklog_limit 8192[1;60r[60;1H
+[1;61r[60;1Hlost 0[1;60r[60;1H
+[1;61r[60;1Hbacklog 0[1;60r[60;1H
+[1;61r[60;1Hbacklog_wait_time 15000[1;60r[60;1H
+[1;61r[60;1Henabled 0[1;60r[60;1H
+[1;61r[60;1Hfailure 1[1;60r[60;1H
+[1;61r[60;1Hpid 0[1;60r[60;1H
+[1;61r[60;1Hrate_limit 0[1;60r[60;1H
+[1;61r[60;1Hbacklog_limit 8192[1;60r[60;1H
+[1;61r[60;1Hlost 0[1;60r[60;1H
+[1;61r[60;1Hbacklog 0[1;60r[60;1H
+[1;61r[60;1Hbacklog_wait_time 0[1;60r[60;1H
+[1;61r[60;1Henabled 0[1;60r[60;1H
+[1;61r[60;1Hfailure 1[1;60r[60;1H
+[1;61r[60;1Hpid 0[1;60r[60;1H
+[1;61r[60;1Hrate_limit 0[1;60r[60;1H
+[1;61r[60;1Hbacklog_limit 8192[1;60r[60;1H
+[1;61r[60;1Hlost 0[1;60r[60;1H
+[1;61r[60;1Hbacklog 0[1;60r[60;1H
+[1;61r[60;1Hbacklog_wait_time 0[1;60r[60;1H
+[1;61r[60;1H ! (4/4)... completed[1;60r[60;1H
+[1;61r[60;1H ! OLD_NOW_SLOT_NAME=first[1;60r[60;1H
+[1;61r[60;1H ! ACTIVATED_SLOT_NAME=first[1;60r[60;1H
+[1;61r[60;1H ! PREVIOUS_SLOT_NAME=second[1;60r[60;1H
+[1;61r[60;1H ! FACTORY_SLOT_NAME=factory[1;60r[60;1H
+[1;61r[60;1H ! BOOT_SLOT_NAME=first[1;60r[60;1H
+[1;61r[60;1H ! NEW_NOW_SLOT_NAME=first[1;60r[60;1H
+[1;61r[60;1HSecure Boot Flash File Check[1;60r[60;1H
+[1;61r[60;1H/var/ru_software/now[1;60r[60;1H
+[1;61r[60;1Hlrwxrwxrwx    1 root     root             5 May 11 07:56 /var/ru_software/now -> first[1;60r[60;1H
+[1;61r[60;1Hmd5sum /var/ru_software/now/file_list | grep "218ec953bfc6248916a86121516b949d"[1;60r[60;1H
+[1;61r[60;1H218ec953bfc6248916a86121516b949d  /var/ru_software/now/file_list[1;60r[60;1H
+[1;61r[60;1HSoftware Secure Boot Verification Check OK[1;60r[60;1H
+[1;61r[60;1Hmd5sum: WARNING: 1 of 449 computed checksums did NOT match[1;60r[60;1H
+[1;61r[60;1H./local/fpga/bitstream.bin: FAILED[1;60r[60;1H
+[1;61r[60;1HSecure Boot Software file Verification Check Error[1;60r[60;1H
+[1;61r[60;1Hnosecure reboot[1;60r[60;1H
+[1;61r[60;1H### First time watchdog trigger ###[1;60r[60;1H
+[1;61r[60;1HDefault disable ETH port...[1;60r[60;1H
+[1;61r[60;1HHW ID(3) = [1 : 1][1;60r[60;1H
+[1;61r[60;1H ! Reading boot cause: USER-TRIGGERED-RESTART[1;60r[60;1H
+[1;61r[60;1H ! RHU clock chip initialize (HWv3)..[1;60r[60;1H
+[1;61r[60;1H=================================================[1;60r[60;1H
+[1;61r[60;1H=========== IDT Clock Set (V1.001)   ============[1;60r[60;1H
+[1;61r[60;1H=================================================[1;60r[60;1H
+[1;61r[60;1Hline count : 183[1;60r[60;1H
+[1;61r[60;1HImport Set file IDT 8A34001 : /usr/local/etc/vtysh.default/HWv3_rhu_clock.conf[1;60r[60;1H
+[1;61r[60;1H ! Updating fpga image...[1;60r[60;1H
+[1;61r[60;1Hthe format of this bitstream.bin is "data"[1;60r[60;1H
+[1;61r[60;1H ! Updating fpga-manager flags[1;60r[60;1H
+[1;61r[60;1H/usr/local/fpga/bitstream.bin :[1;60r[60;1H
+[1;61r[60;1H   key_source         = 0xFFFFFFFF[1;60r[60;1H
+[1;61r[60;1H   fpga_manager_flags = 0[1;60r[60;1H
+[1;61r[60;1H ! Copying FPGA image to firmware library[1;60r[60;1H
+[1;61r[60;1H ! Writing FPGA image[1;60r[60;1H
+[1;61r[60;1Hfpga_manager fpga0: writing bitstream.bin to Xilinx ZynqMP FPGA Manager[1;60r[60;1H
+[1;61r[60;1H ! Writing completed.[1;60r[60;1H
+[1;61r[60;1H ! FPGA writing success![1;60r[60;1H
+[1;61r[60;1H### Get PL image version[1;60r[60;1H
+[1;61r[60;1H************************[1;60r[60;1H
+[1;61r[60;1H    PL ver.:93032018[1;60r[60;1H
+[1;61r[60;1H************************[1;60r[60;1H
+[1;61r[60;1H Reinitializing SYSREPO persist & running data...[1;60r[60;1H
+[1;61r[60;1H initializing SYSREPO persist data...[1;60r[60;1H
+[1;61r[60;1H initializing SYSREPO running data...[1;60r[60;1H
+[1;61r[60;1H ! L2 address config...[1;60r[60;1H
+[1;61r[60;1HL2 address 'dc:c1:01:00:79:da' is going to be set to eth1[1;60r[60;1H
+[1;61r[60;1HIPv6: ADDRCONF(NETDEV_UP): eth1: link is not ready[1;60r[60;1H
+[1;61r[60;1HL2 address 'dc:c1:01:00:79:d9' is going to be set to eth0[1;60r[60;1H
+[1;61r[60;1HIPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready[1;60r[60;1H
+[1;61r[60;1Hsucceed to change timezone : UTC:0[1;60r[60;1H
+[1;61r[60;1Hmacb ff0b0000.ethernet eth1: unable to generate target frequency: 125000000 Hz[1;60r[60;1H
+[1;61r[60;1Hmacb ff0b0000.ethernet eth1: link up (1000/Full)[1;60r[60;1H
+[1;61r[60;1HIPv6: ADDRCONF(NETDEV_CHANGE): eth1: link becomes ready[1;60r[60;1H
+[1;61r[60;1Hmacb ff0e0000.ethernet eth0: link up (1000/Full)[1;60r[60;1H
+[1;61r[60;1HIPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready[1;60r[60;1H
+[1;61r[60;1H### PSE SW verion check & Patch ###[1;60r[60;1H
+[1;61r[60;1HATTiny WDT Disable[1;60r[60;1H
+[1;61r[60;1Hcurr ver : 3.5.4[1;60r[60;1H
+[1;61r[60;1HATTiny WDT Enable[1;60r[60;1H
+[1;61r[60;1HDefault network config eth0,eth1...[1;60r[60;1H
+[1;61r[60;1H ! enabled ETH port...[1;60r[60;1H
+[1;61r[60;1HIPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready[1;60r[60;1H
+[1;61r[60;1Hmacb ff0e0000.ethernet eth0: link up (1000/Full)[1;60r[60;1H
+[1;61r[60;1HIPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready[1;60r[60;1H
+[1;61r[60;1Haxis-fifo driver loaded with parameters read_timeout = 1000, write_timeout = 1000[1;60r[60;1H
+[1;61r[60;1Haxis_fifo 80500000.AXIS_FIFO: axis-fifo created at 0x0000000080500000 mapped to 0x0xffffff80100c0000, irq=44, major=243, minor=0[1;60r[60;1H
+[1;61r[60;1Huartlite 80b00000.serial: Checking id 0[1;60r[60;1H
+[1;61r[60;1H80b00000.serial: ttyUL0 at MMIO 0x80b00000 (irq = 46, base_baud = 0) is a uartlite[1;60r[60;1H
+[1;61r[60;1Huartlite 80b10000.serial: Checking id 0[1;60r[60;1H
+[1;61r[60;1H80b10000.serial: ttyUL1 at MMIO 0x80b10000 (irq = 47, base_baud = 0) is a uartlite[1;60r[60;1H
+[1;61r[60;1H ! Symbolic link /etc/udhcpc.d/50default...[1;60r[60;1H
+[1;61r[60;1H*********************************************[1;60r[60;1H
+[1;61r[60;1H**PTP4L version : V03.13.04[1;60r[60;1H
+[1;61r[60;1H*********************************************[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HRun PTP4L Daemon![1;60r[60;1H
+[1;61r[60;1H#############################################################################[1;60r[60;1H
+[1;61r[60;1HApiHub version : V10.55, Poe SW version : V01.02, Poe Config version : V01.00[1;60r[60;1H
+[1;61r[60;1H#############################################################################[1;60r[60;1H
+[1;61r[60;1HConfiguring packages on first boot....[1;60r[60;1H
+[1;61r[60;1H (This may take several minutes. Please do not power off the machine.)[1;60r[60;1H
+[1;61r[60;1HRunning postinst /etc/rpm-postinsts/100-sysvinit-inittab...[1;60r[60;1H
+[1;61r[60;1Hupdate-rc.d: /etc/init.d/run-postinsts exists during rc.d purge (continuing)[1;60r[60;1H
+[1;61r[60;1H Removing anINIT: Entering runlevel: 5[1;60r[60;1H
+[1;61r[60;1HConfiguring network interfaces... done.[1;60r[60;1H
+[1;61r[60;1HStarting system message bus: dbus.[1;60r[60;1H
+[1;61r[60;1HStarting random number generator daemonUnable to open file: /dev/tpm0[1;60r[60;1H
+[1;61r[60;1Hcan't open any entropy source[1;60r[60;1H
+[1;61r[60;1HMaybe RNG device modules are not loaded[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1H.[1;60r[60;1H
+[1;61r[60;1HStarting haveged: haveged: listening socket at 3[1;60r[60;1H
+[1;61r[60;1Hhaveged: haveged starting up[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hhaveged: haveged: ver: 1.9.4; arch: generic; vend: ; build: (gcc 8.2.0 CTV); collect: 128K[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hhaveged: haveged: cpu: (VC); data: 16K (D); inst: 16K (D); idx: 11/40; sz: 15528/64688[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hhaveged: haveged: tot tests(BA8): A:1/1 B:1/1 continuous tests(B):  last entropy estimate 7.9981[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hhaveged: haveged: fills: 0, generated: 0 [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hrandom: crng init done[1;60r[60;1H
+[1;61r[60;1Hrandom: 7 urandom warning(s) missed due to ratelimiting[1;60r[60;1H
+[1;61r[60;1HStarting OpenBSD Secure Shell server: sshd[1;60r[60;1H
+[1;61r[60;1HHOST_KEYS: /data/etc/ssh/ssh_host_ecdsa_key[1;60r[60;1H
+[1;61r[60;1HKEY_SIZE=384[1;60r[60;1H
+[1;61r[60;1Hdone.[1;60r[60;1H
+[1;61r[60;1HStarting syslogd/klogd: done[1;60r[60;1H
+[1;61r[60;1H * Starting YANG-based data store sysrepod[1;60r[60;1H
+[1;61r[60;1H * Starting O-RAN RHU daemon appd[1;60r[60;1H
+[1;61r[60;1H * Starting O-RAN RHU watchdog daemon watchdogd[1;60r[60;1H
+[1;61r[60;1HFunction Initializing..eth1.0: port 1(eth1) entered blocking state[1;60r[60;1H
+[1;61r[60;1Heth1.0: port 1(eth1) entered disabled state[1;60r[60;1H
+[1;61r[60;1Hdevice eth1 entered promiscuous mode[1;60r[60;1H
+[1;61r[60;1Heth1.0: port 1(eth1) entered blocking state[1;60r[60;1H
+[1;61r[60;1Heth1.0: port 1(eth1) entered forwarding state[1;60r[60;1H
+[1;61r[60;1HIPv6: ADDRCONF(NETDEV_UP): eth1.0: link is not ready[1;60r[60;1H
+[1;61r[60;1H.IPv6: ADDRCONF(NETDEV_CHANGE): eth1.0: link becomes ready[1;60r[60;1H
+[1;61r[60;1H...................[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1H### End of System initialize ###[1;60r[60;1H
+[1;61r[60;1HStarting tcf-agent: OK[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HAuthorized uses only. All activity may be monitored and reported.[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hrhu-xx login: root[1;60r[60;1H
+[1;61r[60;1HPassword: [1;60r[60;1H
+[1;61r[60;1HLast login: Mon May 11 07:50:21 UTC 2026 from 192.168.20.50 on pts/0[1;60r[60;1H
+[1;61r[60;1HSecurity & OS hardening are being applied.[1;60r[60;1H
+[1;61r[60;1H[1;1H[60;136Hroot@rhu-xx:~# [1;60r[60;1H
+[1;61r[60;1Hroot@rhu-xx:~# vtysh [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HHello, this is ORAN-FW (version 0.0.1-ga3830e3-dirty).[1;60r[60;1H
+[1;61r[60;1HCopyright 2019-2028 SOLiD Inc.[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub p statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 0 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 2000 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 3156 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 822564 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 5167 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub vlansl     slot 0 1000 0s xaefe 1   [1;60r[60;1H
+[1;61r[60;1H  <0-1>  TestMode : <0-1>[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub vlan slot 0 1000 0xaefe 0 1[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub mac[1;60r[60;1H
+[1;61r[60;1Hmac         mac-enable  mac-ru      mac-table   [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub mac  -table apply [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HSync mac-table to mac register [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru0                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru1                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru2                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru3                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru4                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru5                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru6                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hcc                   <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub mac-table apply [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HSync mac-table to mac register [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru0                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru1                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru2                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru3                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru4                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru5                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hru6                  <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hcc                   <= 00:00:00:00:00:00 [1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub mac-table apply rhu-xx# hub vlan slot 0 1000 0xaefe 0 1rhu-xx# hub [P[P[P[P[P[P[P[P[P[P[Pmac-table apply rhu-xx# [K1hub mac-table apply rhu-xx# hub vlan slot 0 1000 0xaefe 0 1rhu-xx# [P[P[P[P[P[P[P[P[Pshow hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 0 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 4600 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 6687 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1838062 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11298 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics durhu-xx# [Kshow hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 28229392 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 1806685888 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 28229485 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 28229452 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 4800 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 6794 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 1900096 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 11605 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub pol rt link en[1;60r[60;1H
+[1;61r[60;1H% Unknown command.[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub pop rt link enable [1;60r[60;1H
+[1;61r[60;1Hsucceed to control link : enable.[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# hub port link enable rhu-xx# show hub port link enstatistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 155190012 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 9932165568 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 155190104 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 155190072 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 5400 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 7689 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 2141752 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 13100 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 215036826 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 13762359680 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 215036878 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 215036870 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 6000 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 8434 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 2370698 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 14445 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 223245728 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 14287726592 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 223245728 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 223245728 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 6000 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 8495 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 2375212 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 14506 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 233388724 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 14936882688 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 233388809 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 233388780 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 6000 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 8499 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 2375508 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 14510 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 313456646 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 20061225984 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 313456656 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 313456656 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 6000 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 8500 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 2375568 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 14511 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 317206736 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 20301235328 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 317206819 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 317206787 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 6000 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 8500 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 2375568 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 14511 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 322954158 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 20669068160 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 322954190 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 322954189 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 6000 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 8521 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 2377534 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 14532 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 335629029 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 21480262656 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 335629121 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 335629089 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 6000 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 8691 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 2393270 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 14702 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# show hub statistics du[1;60r[60;1H
+[1;61r[60;1H------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1HPORT : du[1;60r[60;1H
+[1;61r[60;1Hin-unicast-pkts                : 354091248 [1;60r[60;1H
+[1;61r[60;1Hin-broadcast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-multicast-pkts              : 0 [1;60r[60;1H
+[1;61r[60;1Hin-octets                      : 22661839872 [1;60r[60;1H
+[1;61r[60;1Hin-total-pkts                  : 354091248 [1;60r[60;1H
+[1;61r[60;1Hin-fixed-pkts                  : 354091248 [1;60r[60;1H
+[1;61r[60;1Hin-ucplane-pkts                : 0 [1;60r[60;1H
+[1;61r[60;1Hin-drop-pkts                   : 0 [1;60r[60;1H
+[1;61r[60;1Hout-unicast-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-broadcast-pkts             : 6200 [1;60r[60;1H
+[1;61r[60;1Hout-multicast-pkts             : 9127 [1;60r[60;1H
+[1;61r[60;1Hout-octets                     : 2486626 [1;60r[60;1H
+[1;61r[60;1Hout-total-pkts                 : 15338 [1;60r[60;1H
+[1;61r[60;1Hout-fixed-pkts                 : 0 [1;60r[60;1H
+[1;61r[60;1Hout-ucplane-pkts               : 0 [1;60r[60;1H
+[1;61r[60;1Hout-drop-pkts                  : 0 [1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100  0C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x2cb0cc43[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x2fc88fc6[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x343aae6e[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x34b17a5c[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x35c56c3e[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C 8[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0xbaedd46[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0xc2c6245[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0xca272a4[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0xd2fc97d[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0xd951ce4[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0xdf68023[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0xe46eaf2[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0xe72153a[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0xe9837ad[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0xece7baa[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x2a0aadfc[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x2a98d8d5[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x2ae01d54[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x2b0cc157[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x2b36fe5d[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x2b7bbc09[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C8C8[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x77d115ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x7870defa[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x78a59760[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x78cc634c[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x78fb483c[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x79729e58[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x79cb63f3[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x86f676c0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x86f676c0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x86f676c0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x86f676c0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000108, Data: 0x86f676c0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000108C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x9000010C 0[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# [8;54H[?25l[?1c+-----------------------------+[9;54H|                             |[10;54H|  Cannot open /dev/ttyUSB5!  |[11;54H|                             |[12;54H+-----------------------------+[10;82H[?25l[?1c[?25h[?0c[8;1Hrhu-xx# fpgareg 0x9000010C                                                          [9;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee                                        [10;1Hrhu-xx# fpgareg 0x9000010C                                                          [11;1H[PL Read] addr: 0x9000010c, Data: 0x64a6b5ee                                        [12;1Hrhu-xx# fpgareg 0x90000108                                                          [60;9Hfpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x0[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x1[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x1[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x1[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x2[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x3[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x3[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x3[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x3[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x3[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x3[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x3[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x3[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x3[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x3eb[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# fpgareg 0x90000100[1;60r[60;1H
+[1;61r[60;1H[PL Read] addr: 0x90000100, Data: 0x2afb[1;60r[60;1H
+[1;61r[60;1Hrhu-xx# 

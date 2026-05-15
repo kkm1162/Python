@@ -1,0 +1,126 @@
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.15.0-139-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+Expanded Security Maintenance for Infrastructure is not enabled.
+
+7 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+219 additional security updates can be applied with ESM Infra.
+Learn more about enabling ESM Infra service for Ubuntu 20.04 at
+https://ubuntu.com/20-04
+
+New release '22.04.5 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+Your Hardware Enablement Stack (HWE) is supported until April 2025.
+Last login: Mon May 11 17:27:28 2026 from 192.168.80.58
+]0;slab@slab: ~slab@slab:~$ minicom2
+[m)0[H[J[m[7m[61;1H[K[?25h[?0c[?25l[?1c                                                                                                                                       [?25h[?0c[?25h[?0c[?25l[?1cCTRL-A Z for help | 115200 8N1 | NOR | Minicom 2.7.1 | VT102 | Offline | ttyUSB2                                                       [?25h[?0c[1;1H[61;1H[?25l[?1cCTRL-A Z for help | 115200 8N1 | NOR | Minicom 2.7.1 | VT102 | Offline | ttyUSB2                                                       [?25h[?0c[1;1H
+[mWelcome to minicom 2.7.1
+
+OPTIONS: I18n 
+Compiled on Dec 23 2019, 02:06:26.
+Port /dev/ttyUSB2, 14:56:34
+
+Press CTRL-A Z for help on special keys
+
+solid
+-sh: solid: command not found
+root@nDLPU:~# ngenesisQ!@
+-sh: !@: event not found
+root@nDLPU:~# ifconfig
+dbg: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet6 fe80::8ccd:5bff:fe1b:656  prefixlen 64  scopeid 0x20<link>
+        ether 8e:cd:5b:1b:06:56  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 299  bytes 22550 (22.0 KiB)
+        TX errors 299  dropped 0 overruns 0  carrier 299  collisions 0
+        device interrupt 43  
+
+docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+        ether 02:42:da:0d:46:48  txqueuelen 0  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 298714899  bytes 1897974378866 (1.7 TiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 298714899  bytes 1897974378866 (1.7 TiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+oranbr0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet6 fe80::cc4:45ff:fed0:a81b  prefixlen 64  scopeid 0x20<link>
+        ether 00:0a:35:00:00:02  txqueuelen 1000  (Ethernet)
+        RX packets 40341658  bytes 2137395098 (1.9 GiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 282  bytes 19884 (19.4 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+oru0: flags=67<UP,BROADCAST,RUNNING>  mtu 1500
+        ether 00:0a:35:00:00:02  txqueuelen 1000  (Ethernet)
+        RX packets 42249666  bytes 2844553960 (2.6 GiB)
+        RX errors 0  dropped 477  overruns 0  frame 0
+        TX packets 18173448  bytes 1123059895 (1.0 GiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+sys: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.16.254.19  netmask 255.254.0.0  broadcast 172.17.255.255
+        inet6 fe80::200:19ff:fe00:0  prefixlen 64  scopeid 0x20<link>
+        ether 00:00:19:00:00:00  txqueuelen 1000  (Ethernet)
+        RX packets 5722717  bytes 6398652108 (5.9 GiB)[1;60r[60;1H
+[1;61r[60;1H        RX errors 5  dropped 0  overruns 0  frame 5[1;60r[60;1H
+[1;61r[60;1H        TX packets 702879  bytes 177805826 (169.5 MiB)[1;60r[60;1H
+[1;61r[60;1H        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0[1;60r[60;1H
+[1;61r[60;1H        device interrupt 44  [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hsys:1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500[1;60r[60;1H
+[1;61r[60;1H        inet 192.168.58.11  netmask 255.255.255.0  broadcast 192.168.58.255[1;60r[60;1H
+[1;61r[60;1H        ether 00:00:19:00:00:00  txqueuelen 1000  (Ethernet)[1;60r[60;1H
+[1;61r[60;1H        device interrupt 44  [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hveth-oru1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500[1;60r[60;1H
+[1;61r[60;1H        inet6 fe80::3891:94ff:fe30:3e10  prefixlen 64  scopeid 0x20<link>[1;60r[60;1H
+[1;61r[60;1H        ether 3a:91:94:30:3e:10  txqueuelen 1000  (Ethernet)[1;60r[60;1H
+[1;61r[60;1H        RX packets 1414052  bytes 114570520 (109.2 MiB)[1;60r[60;1H
+[1;61r[60;1H        RX errors 0  dropped 0  overruns 0  frame 0[1;60r[60;1H
+[1;61r[60;1H        TX packets 40028873  bytes 2701652248 (2.5 GiB)[1;60r[60;1H
+[1;61r[60;1H        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Hroot@nDLPU:~# vt  oru-container-shell [1;60r[60;1H
+[1;61r[60;1Hs[1;60r[60;1H
+[1;61r[60;1H========================================================================[1;60r[60;1H
+[1;61r[60;1H Developer mode enabled.[1;60r[60;1H
+[1;61r[60;1H========================================================================[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HHello, this is O-RAN.MP.DAEMON (version 0.20.16 (0.20.16)).[1;60r[60;1H
+[1;61r[60;1HCopyright 2019-2028 SOLiD Inc.[1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Horu1-mplane# show dhcp [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1HDHCP [1;60r[60;1H
+[1;61r[60;1H----------------------------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1H ifname          link   client   discovery  mplane   IP-address                          lease-time [1;60r[60;1H
+[1;61r[60;1H----------------------------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1H sys.1           up     v4/up    *          *        10.0.60.166/255.255.255.0           300        [1;60r[60;1H
+[1;61r[60;1H----------------------------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1H sys.1           up     v6/up    *          *        2001:1200:1100:1000::135/64         240        [1;60r[60;1H
+[1;61r[60;1H----------------------------------------------------------------------------------------------------[1;60r[60;1H
+[1;61r[60;1H VLAN discovery succeeded. [1;60r[60;1H
+[1;61r[60;1H   searchable-mplane-access-vlans-info: [1;60r[60;1H
+[1;61r[60;1H     searchable-access-vlans: 1 (untag) (vlan-discovery) [1;60r[60;1H
+[1;61r[60;1H     vlan-range: [1;60r[60;1H
+[1;61r[60;1H       lowest-vlan-id: 1 [1;60r[60;1H
+[1;61r[60;1H       highest-vlan-id: 4094 [1;60r[60;1H
+[1;61r[60;1H[1;60r[60;1H
+[1;61r[60;1Horu1-mplane# [8;58H[?25l[?1c+----------------------+[9;58H|    Leave Minicom?    |[10;58H|               No     |[11;58H+----------------------+[10;79H[?25l[?1c[10;61H[m[7m   Yes  [?25h[?0c[8;1H[m        TX packets 18173448  bytes 1123059895 (1.0 GiB)                          [9;1H        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0               [10;1H                                                                                 [11;1Hsys: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500                        [60;14H[?25h[?0c[?25h[?0c[H[J[?25h[?0c]0;slab@slab: ~slab@slab:~$ ss -lntp | rg ":4334"

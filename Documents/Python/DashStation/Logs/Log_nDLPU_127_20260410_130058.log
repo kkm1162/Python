@@ -1,0 +1,76 @@
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-37-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+210 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+12 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+Last login: Fri Apr 10 12:59:57 2026 from 192.168.80.171
+solid@OL4-RUC:~$ ssh admin@10.0.20.127
++------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+(admin@10.0.20.127) Password: 
++------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+
+========================================================================
+ Developer mode enabled.
+========================================================================
+
+Hello, this is O-RAN.MP.DAEMON (version 0.20.11 (0.20.11)).
+Copyright 2019-2028 SOLiD Inc.
+
+oru1-mplane# 
+
+CLI connection is closed by idle-timeout (600 seconds).
+
+Connection to 10.0.20.127 closed.
+solid@OL4-RUC:~$ 

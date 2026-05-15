@@ -1,0 +1,1616 @@
+[2026-05-11 14:58:04] Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.15.0-139-generic x86_64)
+
+[2026-05-11 14:58:04]  * Documentation:  https://help.ubuntu.com
+[2026-05-11 14:58:04]  * Management:     https://landscape.canonical.com
+[2026-05-11 14:58:04]  * Support:        https://ubuntu.com/pro
+
+[2026-05-11 14:58:04] Expanded Security Maintenance for Infrastructure is not enabled.
+
+[2026-05-11 14:58:04] 7 updates can be applied immediately.
+[2026-05-11 14:58:04] To see these additional updates run: apt list --upgradable
+
+[2026-05-11 14:58:04] 219 additional security updates can be applied with ESM Infra.
+[2026-05-11 14:58:04] Learn more about enabling ESM Infra service for Ubuntu 20.04 at
+[2026-05-11 14:58:04] https://ubuntu.com/20-04
+
+[2026-05-11 14:58:04] New release '22.04.5 LTS' available.
+[2026-05-11 14:58:04] Run 'do-release-upgrade' to upgrade to it.
+
+[2026-05-11 14:58:04] Your Hardware Enablement Stack (HWE) is supported until April 2025.
+[2026-05-11 14:58:04] Last login: Mon May 11 14:56:24 2026 from 192.168.80.58
+
+[2026-05-11 14:58:04] slab@slab:~$ minicom5 root
+                                                                                                                                       
+[2026-05-11 14:58:06] CTRL-A Z for help | 115200 8N1 | NOR | Minicom 2.7.1 | VT102 | Offline | ttyUSB5                                                       CTRL-A Z for help | 115200 8N1 | NOR | Minicom 2.7.1 | VT102 | Offline | ttyUSB5                                                       
+[2026-05-11 14:58:06] Welcome to minicom 2.7.1
+
+[2026-05-11 14:58:06] OPTIONS: I18n 
+[2026-05-11 14:58:06] Compiled on Dec 23 2019, 02:06:26.
+[2026-05-11 14:58:06] Port /dev/ttyUSB5, 14:57:36
+
+[2026-05-11 14:58:06] Press CTRL-A Z for help on special keys
+
+[2026-05-11 14:58:20] +----------------------+|    Leave Minicom?    ||               No     |+----------------------+   Yes  Press CTRL-A Z for help on special keys                                                                                                                                                                                                                                                                                             slab@slab:~$ 1minicom5 root
+                                                                                                                                       
+[2026-05-11 14:58:22] CTRL-A Z for help | 115200 8N1 | NOR | Minicom 2.7.1 | VT102 | Offline | ttyUSB5                                                       CTRL-A Z for help | 115200 8N1 | NOR | Minicom 2.7.1 | VT102 | Offline | ttyUSB5                                                       
+[2026-05-11 14:58:22] Welcome to minicom 2.7.1
+
+[2026-05-11 14:58:22] OPTIONS: I18n 
+[2026-05-11 14:58:22] Compiled on Dec 23 2019, 02:06:26.
+[2026-05-11 14:58:22] Port /dev/ttyUSB5, 14:58:14
+
+[2026-05-11 14:58:22] Press CTRL-A Z for help on special keys
+
+[2026-05-11 14:58:24] sysrq: SysRq : HELP : loglevel(0-9) reboot(b) crash(c) terminate-all-tasks(e) memory-full-oom-kill(f) kill-all-tasks(i) thaw-filesystems(j) sak(k) show-backtrace-all-active-cpus(l) show-memory-usage(m) nice-all-RT-tasks(n) poweroff(o) show-registers(p) show-all-timers(q) unraw(r) sync(s) show-task-states(t) unmount(u) show-blocked-tasks(w) 
+
+[2026-05-11 14:58:24] Authorized uses only. All activity may be monitored and reported.
+
+[2026-05-11 14:58:24] rhu-xx login: root
+[2026-05-11 14:58:26] Password: 
+[2026-05-11 14:58:30] Last login: Mon May 11 05:56:47 UTC 2026 on ttyPS0
+[2026-05-11 14:58:30] Security & OS hardening are being applied.
+[2026-05-11 14:58:30] root@rhu-xx:~# 
+[2026-05-11 14:58:30] root@rhu-xx:~# 
+[2026-05-11 14:58:30] root@rhu-xx:~# 
+[2026-05-11 14:58:30] root@rhu-xx:~# vtysh 
+
+[2026-05-11 16:07:28] Hello, this is ORAN-FW (version 0.0.1-ga3830e3-dirty).
+[2026-05-11 16:07:28] Copyright 2019-2028 SOLiD Inc.
+
+[2026-05-11 16:07:28] rhu-xx# show pack    
+[2026-05-11 16:07:32] alarm           cpsu            eeprom          interface       net             running-config  sync            user
+[2026-05-11 16:07:32] certificate     ddr             environment     inventory       netconf         startup-config  system          version
+[2026-05-11 16:07:32] cli             debug           eth-forward     logging         pmic            sts             transceiver     watchdog
+[2026-05-11 16:07:32] commandtree     device          hub             ncl             reset           sw              uplane          ymodule
+[2026-05-11 16:07:32] rhu-xx# show hub 
+[2026-05-11 16:07:34] apihub      diag        mac-table   poe         ru-link     rx_enable   statistics  vlan        
+[2026-05-11 16:07:34] combine     mac         phy         port        ru2du       shdcell     ul          vlan_pass   
+[2026-05-11 16:07:34] rhu-xx# show hub 
+[2026-05-11 16:07:34] apihub      diag        mac-table   poe         ru-link     rx_enable   statistics  vlan        
+[2026-05-11 16:07:34] combine     mac         phy         port        ru2du       shdcell     ul          vlan_pass   
+[2026-05-11 16:07:34] rhu-xx# show hub statistics 
+[2026-05-11 16:07:38] cc   du   ps0  ru0  ru1  ru2  ru3  ru4  ru5  ru6  
+[2026-05-11 16:07:38] rhu-xx# show hub statistics 
+[2026-05-11 16:07:38] cc   du   ps0  ru0  ru1  ru2  ru3  ru4  ru5  ru6  
+[2026-05-11 16:07:38] rhu-xx# show hub statistics du  
+[2026-05-11 16:07:40] ------------------------------------------------------------------------------
+[2026-05-11 16:07:40] PORT : du
+[2026-05-11 16:07:40] in-unicast-pkts                : 175 
+[2026-05-11 16:07:40] in-broadcast-pkts              : 1265 
+[2026-05-11 16:07:40] in-multicast-pkts              : 14708 
+[2026-05-11 16:07:40] in-octets                      : 1129281 
+[2026-05-11 16:07:40] in-total-pkts                  : 16148 
+[2026-05-11 16:07:40] in-fixed-pkts                  : 14281 
+[2026-05-11 16:07:40] in-ucplane-pkts                : 0 
+[2026-05-11 16:07:40] in-drop-pkts                   : 0 
+[2026-05-11 16:07:40] out-unicast-pkts               : 156 
+[2026-05-11 16:07:40] out-broadcast-pkts             : 2414 
+[2026-05-11 16:07:40] out-multicast-pkts             : 7627 
+[2026-05-11 16:07:40] out-octets                     : 1134638 
+[2026-05-11 16:07:40] out-total-pkts                 : 10208 
+[2026-05-11 16:07:40] out-fixed-pkts                 : 0 
+[2026-05-11 16:07:40] out-ucplane-pkts               : 0 
+[2026-05-11 16:07:40] out-drop-pkts                  : 0 
+[2026-05-11 16:07:40] rhu-xx#  show hub statistics du
+[2026-05-11 16:07:42] ------------------------------------------------------------------------------
+[2026-05-11 16:07:42] PORT : du
+[2026-05-11 16:07:42] in-unicast-pkts                : 175 
+[2026-05-11 16:07:42] in-broadcast-pkts              : 1265 
+[2026-05-11 16:07:42] in-multicast-pkts              : 14708 
+[2026-05-11 16:07:42] in-octets                      : 1129281 
+[2026-05-11 16:07:42] in-total-pkts                  : 16148 
+[2026-05-11 16:07:42] in-fixed-pkts                  : 14281 
+[2026-05-11 16:07:42] in-ucplane-pkts                : 0 
+[2026-05-11 16:07:42] in-drop-pkts                   : 0 
+[2026-05-11 16:07:42] out-unicast-pkts               : 156 
+[2026-05-11 16:07:42] out-broadcast-pkts             : 2416 
+[2026-05-11 16:07:42] out-multicast-pkts             : 7627 
+[2026-05-11 16:07:42] out-octets                     : 1135170 
+[2026-05-11 16:07:42] out-total-pkts                 : 10210 
+[2026-05-11 16:07:42] out-fixed-pkts                 : 0 
+[2026-05-11 16:07:42] out-ucplane-pkts               : 0 
+[2026-05-11 16:07:42] out-drop-pkts                  : 0 
+[2026-05-11 16:07:42] rhu-xx# hub port link enable 
+[2026-05-11 16:08:04] succeed to control link : enable.
+[2026-05-11 16:08:04] rhu-xx# hub vlan slot 0 1 10      
+[2026-05-11 16:08:10]   <0-4096>  vlan id (if 0,  not used vlan)
+[2026-05-11 16:08:10] rhu-xx# hub vlan slot 0 1000 
+[2026-05-11 16:08:14]   WORD  ether type,  ex) 0xAEFE (if 0,  not used eth-type)
+[2026-05-11 16:08:14] rhu-xx# hub vlan slot 0 1000 ae  0xaefe 
+[2026-05-11 16:08:19]   <0-1>  TestMode : <0-1>
+[2026-05-11 16:08:19] rhu-xx# hub vlan slot 0 1000 0xaefe 0 1 
+[2026-05-11 16:08:21]   <0-1>  DropMode : <0-1>
+[2026-05-11 16:08:21] rhu-xx# hub vlan slot 0 1000 0xaefe 0   1  -    0 1
+[2026-05-11 16:08:27] rhu-xx# start-shell 
+[2026-05-11 16:08:41] root@rhu-xx:~# ifconfig
+[2026-05-11 16:08:41] eth0      Link encap:Ethernet  HWaddr DC:C1:01:00:79:D9  
+[2026-05-11 16:08:41]           inet addr:192.168.20.24  Bcast:192.168.20.255  Mask:255.255.255.0
+[2026-05-11 16:08:41]           UP BROADCAST MULTICAST  MTU:1500  Metric:1
+[2026-05-11 16:08:41]           RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+[2026-05-11 16:08:41]           TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+[2026-05-11 16:08:41]           collisions:0 txqueuelen:1000 
+[2026-05-11 16:08:41]           RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+[2026-05-11 16:08:41]           Interrupt:30 
+
+[2026-05-11 16:08:41] eth1      Link encap:Ethernet  HWaddr DC:C1:01:00:79:DA  
+[2026-05-11 16:08:41]           inet6 addr: fe80::dec1:1ff:fe00:79da/64 Scope:Link
+[2026-05-11 16:08:41]           UP BROADCAST RUNNING PROMISC MULTICAST  MTU:1500  Metric:1
+[2026-05-11 16:08:41]           RX packets:16447 errors:0 dropped:0 overruns:0 frame:0
+[2026-05-11 16:08:41]           TX packets:3590 errors:0 dropped:0 overruns:0 carrier:0
+[2026-05-11 16:08:41]           collisions:0 txqueuelen:1000 
+[2026-05-11 16:08:41]           RX bytes:919932 (898.3 KiB)  TX bytes:757502 (739.7 KiB)
+[2026-05-11 16:08:41]           Interrupt:31 
+
+[2026-05-11 16:08:41] eth1.0    Link encap:Ethernet  HWaddr DC:C1:01:00:79:DA  
+[2026-05-11 16:08:41]           inet6 addr: fe80::dec1:1ff:fe00:79da/64 Scope:Link
+[2026-05-11 16:08:41]           UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+[2026-05-11 16:08:41]           RX packets:16447 errors:0 dropped:14326 overruns:0 frame:0
+[2026-05-11 16:08:41]           TX packets:300 errors:0 dropped:0 overruns:0 carrier:0
+[2026-05-11 16:08:41]           collisions:0 txqueuelen:1000 
+[2026-05-11 16:08:41]           RX bytes:919932 (898.3 KiB)  TX bytes:39890 (38.9 KiB)
+
+[2026-05-11 16:08:41] lo        Link encap:Local Loopback  
+[2026-05-11 16:08:41]           inet addr:127.0.0.1  Mask:255.0.0.0
+[2026-05-11 16:08:41]           inet6 addr: ::1/128 Scope:Host
+[2026-05-11 16:08:41]           UP LOOPBACK RUNNING  MTU:65536  Metric:1
+[2026-05-11 16:08:43]           RX packets:21 errors:0 dropped:0 overruns:0 frame:0
+[2026-05-11 16:08:43]           TX packets:21 errors:0 dropped:0 overruns:0 carrier:0
+[2026-05-11 16:08:43]           collisions:0 txqueuelen:1000 
+[2026-05-11 16:08:43]           RX bytes:3232 (3.1 KiB)  TX bytes:3232 (3.1 KiB)
+
+[2026-05-11 16:08:43] root@rhu-xx:~# vtysh 
+
+[2026-05-11 16:08:57] Hello, this is ORAN-FW (version 0.0.1-ga3830e3-dirty).
+[2026-05-11 16:08:57] Copyright 2019-2028 SOLiD Inc.
+
+[2026-05-11 16:08:57] rhu-xx# show pack    tart-shell 
+[2026-05-11 16:09:01] rhu-xx# hub vlan slot 0 1000 0xaefe 0 1
+[2026-05-11 16:09:01] rhu-xx# hub port link enable 
+[2026-05-11 16:09:03] rhu-xx# show hub statistics du
+[2026-05-11 16:09:03] rhu-xx# show system hub statistics du
+[2026-05-11 16:09:03] ------------------------------------------------------------------------------
+[2026-05-11 16:09:03] PORT : du
+[2026-05-11 16:09:03] in-unicast-pkts                : 175 
+[2026-05-11 16:09:03] in-broadcast-pkts              : 1265 
+[2026-05-11 16:09:03] in-multicast-pkts              : 14708 
+[2026-05-11 16:09:03] in-octets                      : 1129281 
+[2026-05-11 16:09:03] in-total-pkts                  : 16148 
+[2026-05-11 16:09:03] in-fixed-pkts                  : 14281 
+[2026-05-11 16:09:03] in-ucplane-pkts                : 0 
+[2026-05-11 16:09:03] in-drop-pkts                   : 0 
+[2026-05-11 16:09:03] out-unicast-pkts               : 156 
+[2026-05-11 16:09:03] out-broadcast-pkts             : 2454 
+[2026-05-11 16:09:03] out-multicast-pkts             : 7631 
+[2026-05-11 16:09:03] out-octets                     : 1145518 
+[2026-05-11 16:09:03] out-total-pkts                 : 10252 
+[2026-05-11 16:09:03] out-fixed-pkts                 : 0 
+[2026-05-11 16:09:03] out-ucplane-pkts               : 0 
+[2026-05-11 16:09:03] out-drop-pkts                  : 0 
+[2026-05-11 16:09:03] rhu-xx# 1show hub statistics du
+[2026-05-11 16:09:29] ------------------------------------------------------------------------------
+[2026-05-11 16:09:29] PORT : du
+[2026-05-11 16:09:29] in-unicast-pkts                : 175 
+[2026-05-11 16:09:29] in-broadcast-pkts              : 1265 
+[2026-05-11 16:09:29] in-multicast-pkts              : 14708 
+[2026-05-11 16:09:29] in-octets                      : 1129281 
+[2026-05-11 16:09:29] in-total-pkts                  : 16148 
+[2026-05-11 16:09:29] in-fixed-pkts                  : 14281 
+[2026-05-11 16:09:29] in-ucplane-pkts                : 0 
+[2026-05-11 16:09:29] in-drop-pkts                   : 0 
+[2026-05-11 16:09:29] out-unicast-pkts               : 156 
+[2026-05-11 16:09:29] out-broadcast-pkts             : 2468 
+[2026-05-11 16:09:29] out-multicast-pkts             : 7632 
+[2026-05-11 16:09:29] out-octets                     : 1149302 
+[2026-05-11 16:09:29] out-total-pkts                 : 10267 
+[2026-05-11 16:09:29] out-fixed-pkts                 : 0 
+[2026-05-11 16:09:29] out-ucplane-pkts               : 0 
+[2026-05-11 16:09:29] out-drop-pkts                  : 0 
+[2026-05-11 16:09:29] rhu-xx# 
+[2026-05-11 16:09:29] rhu-xx# 
+[2026-05-11 16:09:29] rhu-xx# 
+[2026-05-11 16:09:29] rhu-xx# 
+[2026-05-11 16:09:29] rhu-xx# 
+[2026-05-11 16:09:29] rhu-xx# 
+[2026-05-11 16:10:37] rhu-xx# show hub statistics du
+[2026-05-11 16:10:39] ------------------------------------------------------------------------------
+[2026-05-11 16:10:39] PORT : du
+[2026-05-11 16:10:39] in-unicast-pkts                : 175 
+[2026-05-11 16:10:39] in-broadcast-pkts              : 1265 
+[2026-05-11 16:10:39] in-multicast-pkts              : 14708 
+[2026-05-11 16:10:39] in-octets                      : 1129281 
+[2026-05-11 16:10:39] in-total-pkts                  : 16148 
+[2026-05-11 16:10:39] in-fixed-pkts                  : 14281 
+[2026-05-11 16:10:39] in-ucplane-pkts                : 0 
+[2026-05-11 16:10:39] in-drop-pkts                   : 0 
+[2026-05-11 16:10:39] out-unicast-pkts               : 156 
+[2026-05-11 16:10:39] out-broadcast-pkts             : 2502 
+[2026-05-11 16:10:39] out-multicast-pkts             : 7634 
+[2026-05-11 16:10:39] out-octets                     : 1158466 
+[2026-05-11 16:10:39] out-total-pkts                 : 10303 
+[2026-05-11 16:10:39] out-fixed-pkts                 : 0 
+[2026-05-11 16:10:39] out-ucplane-pkts               : 0 
+[2026-05-11 16:10:39] out-drop-pkts                  : 0 
+[2026-05-11 16:10:39] rhu-xx# show hub statistics du
+[2026-05-11 16:10:39] ------------------------------------------------------------------------------
+[2026-05-11 16:10:39] PORT : du
+[2026-05-11 16:10:39] in-unicast-pkts                : 175 
+[2026-05-11 16:10:39] in-broadcast-pkts              : 1265 
+[2026-05-11 16:10:39] in-multicast-pkts              : 14708 
+[2026-05-11 16:10:39] in-octets                      : 1129281 
+[2026-05-11 16:10:39] in-total-pkts                  : 16148 
+[2026-05-11 16:10:39] in-fixed-pkts                  : 14281 
+[2026-05-11 16:10:39] in-ucplane-pkts                : 0 
+[2026-05-11 16:10:39] in-drop-pkts                   : 0 
+[2026-05-11 16:10:39] out-unicast-pkts               : 156 
+[2026-05-11 16:10:39] out-broadcast-pkts             : 2502 
+[2026-05-11 16:10:39] out-multicast-pkts             : 7635 
+[2026-05-11 16:10:41] out-octets                     : 1158526 
+[2026-05-11 16:10:41] out-total-pkts                 : 10304 
+[2026-05-11 16:10:41] out-fixed-pkts                 : 0 
+[2026-05-11 16:10:41] out-ucplane-pkts               : 0 
+[2026-05-11 16:10:41] out-drop-pkts                  : 0 
+[2026-05-11 16:10:41] rhu-xx# show hub statistics du
+[2026-05-11 16:10:56] ------------------------------------------------------------------------------
+[2026-05-11 16:10:56] PORT : du
+[2026-05-11 16:10:56] in-unicast-pkts                : 175 
+[2026-05-11 16:10:56] in-broadcast-pkts              : 1265 
+[2026-05-11 16:10:56] in-multicast-pkts              : 14708 
+[2026-05-11 16:10:56] in-octets                      : 1129281 
+[2026-05-11 16:10:56] in-total-pkts                  : 16148 
+[2026-05-11 16:10:56] in-fixed-pkts                  : 14281 
+[2026-05-11 16:10:56] in-ucplane-pkts                : 0 
+[2026-05-11 16:10:56] in-drop-pkts                   : 0 
+[2026-05-11 16:10:56] out-unicast-pkts               : 156 
+[2026-05-11 16:10:56] out-broadcast-pkts             : 2510 
+[2026-05-11 16:10:56] out-multicast-pkts             : 7635 
+[2026-05-11 16:10:56] out-octets                     : 1160654 
+[2026-05-11 16:10:56] out-total-pkts                 : 10312 
+[2026-05-11 16:10:56] out-fixed-pkts                 : 0 
+[2026-05-11 16:10:56] out-ucplane-pkts               : 0 
+[2026-05-11 16:10:56] out-drop-pkts                  : 0 
+[2026-05-11 16:10:56] rhu-xx# show hub statistics du
+[2026-05-11 16:10:56] ------------------------------------------------------------------------------
+[2026-05-11 16:10:56] PORT : du
+[2026-05-11 16:10:56] in-unicast-pkts                : 175 
+[2026-05-11 16:10:56] in-broadcast-pkts              : 1265 
+[2026-05-11 16:10:56] in-multicast-pkts              : 14708 
+[2026-05-11 16:10:56] in-octets                      : 1129281 
+[2026-05-11 16:10:56] in-total-pkts                  : 16148 
+[2026-05-11 16:10:56] in-fixed-pkts                  : 14281 
+[2026-05-11 16:10:56] in-ucplane-pkts                : 0 
+[2026-05-11 16:10:56] in-drop-pkts                   : 0 
+[2026-05-11 16:10:56] out-unicast-pkts               : 156 
+[2026-05-11 16:10:56] out-broadcast-pkts             : 2512 
+[2026-05-11 16:10:56] out-multicast-pkts             : 7635 
+[2026-05-11 16:10:56] out-octets                     : 1161186 
+[2026-05-11 16:10:56] out-total-pkts                 : 10314 
+[2026-05-11 16:10:56] out-fixed-pkts                 : 0 
+[2026-05-11 16:10:56] out-ucplane-pkts               : 0 
+[2026-05-11 16:10:56] out-drop-pkts                  : 0 
+[2026-05-11 16:10:56] rhu-xx# 
+[2026-05-11 16:10:58] rhu-xx# show hub statistics du
+[2026-05-11 16:10:58] ------------------------------------------------------------------------------
+[2026-05-11 16:10:58] PORT : du
+[2026-05-11 16:10:58] in-unicast-pkts                : 175 
+[2026-05-11 16:10:58] in-broadcast-pkts              : 1265 
+[2026-05-11 16:10:58] in-multicast-pkts              : 14708 
+[2026-05-11 16:10:58] in-octets                      : 1129281 
+[2026-05-11 16:10:58] in-total-pkts                  : 16148 
+[2026-05-11 16:10:58] in-fixed-pkts                  : 14281 
+[2026-05-11 16:10:58] in-ucplane-pkts                : 0 
+[2026-05-11 16:10:58] in-drop-pkts                   : 0 
+[2026-05-11 16:10:58] out-unicast-pkts               : 156 
+[2026-05-11 16:10:58] out-broadcast-pkts             : 2512 
+[2026-05-11 16:10:58] out-multicast-pkts             : 7635 
+[2026-05-11 16:10:58] out-octets                     : 1161186 
+[2026-05-11 16:10:58] out-total-pkts                 : 10314 
+[2026-05-11 16:10:58] out-fixed-pkts                 : 0 
+[2026-05-11 16:10:58] out-ucplane-pkts               : 0 
+[2026-05-11 16:10:58] out-drop-pkts                  : 0 
+[2026-05-11 16:10:58] rhu-xx# show hub statistics du
+[2026-05-11 16:10:58] ------------------------------------------------------------------------------
+[2026-05-11 16:10:58] PORT : du
+[2026-05-11 16:10:58] in-unicast-pkts                : 175 
+[2026-05-11 16:10:58] in-broadcast-pkts              : 1265 
+[2026-05-11 16:10:58] in-multicast-pkts              : 14708 
+[2026-05-11 16:10:58] in-octets                      : 1129281 
+[2026-05-11 16:10:58] in-total-pkts                  : 16148 
+[2026-05-11 16:10:58] in-fixed-pkts                  : 14281 
+[2026-05-11 16:10:58] in-ucplane-pkts                : 0 
+[2026-05-11 16:10:58] in-drop-pkts                   : 0 
+[2026-05-11 16:10:58] out-unicast-pkts               : 156 
+[2026-05-11 16:10:58] out-broadcast-pkts             : 2514 
+[2026-05-11 16:10:58] out-multicast-pkts             : 7635 
+[2026-05-11 16:10:58] out-octets                     : 1161718 
+[2026-05-11 16:10:58] out-total-pkts                 : 10316 
+[2026-05-11 16:10:58] out-fixed-pkts                 : 0 
+[2026-05-11 16:10:58] out-ucplane-pkts               : 0 
+[2026-05-11 16:10:58] out-drop-pkts                  : 0 
+[2026-05-11 16:10:58] rhu-xx# 
+[2026-05-11 16:11:04] rhu-xx# show hub statistics du
+[2026-05-11 16:46:00] ------------------------------------------------------------------------------
+[2026-05-11 16:46:00] PORT : du
+[2026-05-11 16:46:00] in-unicast-pkts                : 314097121 
+[2026-05-11 16:46:00] in-broadcast-pkts              : 1265 
+[2026-05-11 16:46:00] in-multicast-pkts              : 14723 
+[2026-05-11 16:46:00] in-octets                      : 20103339762 
+[2026-05-11 16:46:00] in-total-pkts                  : 314113199 
+[2026-05-11 16:46:00] in-fixed-pkts                  : 314111285 
+[2026-05-11 16:46:00] in-ucplane-pkts                : 0 
+[2026-05-11 16:46:00] in-drop-pkts                   : 0 
+[2026-05-11 16:46:00] out-unicast-pkts               : 156 
+[2026-05-11 16:46:00] out-broadcast-pkts             : 3558 
+[2026-05-11 16:46:00] out-multicast-pkts             : 7722 
+[2026-05-11 16:46:00] out-octets                     : 1444642 
+[2026-05-11 16:46:00] out-total-pkts                 : 11447 
+[2026-05-11 16:46:00] out-fixed-pkts                 : 0 
+[2026-05-11 16:46:00] out-ucplane-pkts               : 0 
+[2026-05-11 16:46:00] out-drop-pkts                  : 0 
+[2026-05-11 16:46:00] rhu-xx# show hub statistics du
+[2026-05-11 16:46:06] ------------------------------------------------------------------------------
+[2026-05-11 16:46:06] PORT : du
+[2026-05-11 16:46:06] in-unicast-pkts                : 334231144 
+[2026-05-11 16:46:06] in-broadcast-pkts              : 1265 
+[2026-05-11 16:46:06] in-multicast-pkts              : 14723 
+[2026-05-11 16:46:06] in-octets                      : 21391917362 
+[2026-05-11 16:46:06] in-total-pkts                  : 334247225 
+[2026-05-11 16:46:06] in-fixed-pkts                  : 334245310 
+[2026-05-11 16:46:06] in-ucplane-pkts                : 0 
+[2026-05-11 16:46:06] in-drop-pkts                   : 0 
+[2026-05-11 16:46:06] out-unicast-pkts               : 156 
+[2026-05-11 16:46:06] out-broadcast-pkts             : 3558 
+[2026-05-11 16:46:06] out-multicast-pkts             : 7722 
+[2026-05-11 16:46:06] out-octets                     : 1444642 
+[2026-05-11 16:46:06] out-total-pkts                 : 11447 
+[2026-05-11 16:46:06] out-fixed-pkts                 : 0 
+[2026-05-11 16:46:06] out-ucplane-pkts               : 0 
+[2026-05-11 16:46:06] out-drop-pkts                  : 0 
+[2026-05-11 16:46:06] rhu-xx# show hub statistics du
+[2026-05-11 16:46:06] ------------------------------------------------------------------------------
+[2026-05-11 16:46:06] PORT : du
+[2026-05-11 16:46:06] in-unicast-pkts                : 339412317 
+[2026-05-11 16:46:06] in-broadcast-pkts              : 1265 
+[2026-05-11 16:46:06] in-multicast-pkts              : 14723 
+[2026-05-11 16:46:06] in-octets                      : 21723512434 
+[2026-05-11 16:46:06] in-total-pkts                  : 339428398 
+[2026-05-11 16:46:06] in-fixed-pkts                  : 339426483 
+[2026-05-11 16:46:06] in-ucplane-pkts                : 0 
+[2026-05-11 16:46:06] in-drop-pkts                   : 0 
+[2026-05-11 16:46:06] out-unicast-pkts               : 156 
+[2026-05-11 16:46:06] out-broadcast-pkts             : 3558 
+[2026-05-11 16:46:06] out-multicast-pkts             : 7722 
+[2026-05-11 16:46:06] out-octets                     : 1444642 
+[2026-05-11 16:46:06] out-total-pkts                 : 11447 
+[2026-05-11 16:46:06] out-fixed-pkts                 : 0 
+[2026-05-11 16:46:06] out-ucplane-pkts               : 0 
+[2026-05-11 16:46:06] out-drop-pkts                  : 0 
+[2026-05-11 16:46:06] rhu-xx# show hub statistics du
+[2026-05-11 16:46:06] ------------------------------------------------------------------------------
+[2026-05-11 16:46:06] PORT : du
+[2026-05-11 16:46:06] in-unicast-pkts                : 344971253 
+[2026-05-11 16:46:06] in-broadcast-pkts              : 1265 
+[2026-05-11 16:46:06] in-multicast-pkts              : 14723 
+[2026-05-11 16:46:06] in-octets                      : 22079282354 
+[2026-05-11 16:46:06] in-total-pkts                  : 344987302 
+[2026-05-11 16:46:06] in-fixed-pkts                  : 344985388 
+[2026-05-11 16:46:06] in-ucplane-pkts                : 0 
+[2026-05-11 16:46:06] in-drop-pkts                   : 0 
+[2026-05-11 16:46:06] out-unicast-pkts               : 156 
+[2026-05-11 16:46:06] out-broadcast-pkts             : 3558 
+[2026-05-11 16:46:06] out-multicast-pkts             : 7722 
+[2026-05-11 16:46:06] out-octets                     : 1444642 
+[2026-05-11 16:46:06] out-total-pkts                 : 11447 
+[2026-05-11 16:46:06] out-fixed-pkts                 : 0 
+[2026-05-11 16:46:06] out-ucplane-pkts               : 0 
+[2026-05-11 16:46:06] out-drop-pkts                  : 0 
+[2026-05-11 16:46:06] rhu-xx# show hub statistics du
+[2026-05-11 16:46:06] ------------------------------------------------------------------------------
+[2026-05-11 16:46:06] PORT : du
+[2026-05-11 16:46:06] in-unicast-pkts                : 352767491 
+[2026-05-11 16:46:06] in-broadcast-pkts              : 1265 
+[2026-05-11 16:46:06] in-multicast-pkts              : 14723 
+[2026-05-11 16:46:06] in-octets                      : 22578241458 
+[2026-05-11 16:46:06] in-total-pkts                  : 352783539 
+[2026-05-11 16:46:06] in-fixed-pkts                  : 352781631 
+[2026-05-11 16:46:06] in-ucplane-pkts                : 0 
+[2026-05-11 16:46:06] in-drop-pkts                   : 0 
+[2026-05-11 16:46:06] out-unicast-pkts               : 156 
+[2026-05-11 16:46:06] out-broadcast-pkts             : 3558 
+[2026-05-11 16:46:06] out-multicast-pkts             : 7722 
+[2026-05-11 16:46:06] out-octets                     : 1444642 
+[2026-05-11 16:46:06] out-total-pkts                 : 11447 
+[2026-05-11 16:46:06] out-fixed-pkts                 : 0 
+[2026-05-11 16:46:06] out-ucplane-pkts               : 0 
+[2026-05-11 16:46:06] out-drop-pkts                  : 0 
+[2026-05-11 16:46:06] rhu-xx# show hub statistics du
+[2026-05-11 16:48:01] ------------------------------------------------------------------------------
+[2026-05-11 16:48:01] PORT : du
+[2026-05-11 16:48:01] in-unicast-pkts                : 513208986 
+[2026-05-11 16:48:01] in-broadcast-pkts              : 1265 
+[2026-05-11 16:48:01] in-multicast-pkts              : 14723 
+[2026-05-11 16:48:01] in-octets                      : 32846498482 
+[2026-05-11 16:48:01] in-total-pkts                  : 513225055 
+[2026-05-11 16:48:01] in-fixed-pkts                  : 513223152 
+[2026-05-11 16:48:01] in-ucplane-pkts                : 0 
+[2026-05-11 16:48:01] in-drop-pkts                   : 0 
+[2026-05-11 16:48:01] out-unicast-pkts               : 156 
+[2026-05-11 16:48:01] out-broadcast-pkts             : 3614 
+[2026-05-11 16:48:01] out-multicast-pkts             : 7727 
+[2026-05-11 16:48:01] out-octets                     : 1459838 
+[2026-05-11 16:48:01] out-total-pkts                 : 11508 
+[2026-05-11 16:48:01] out-fixed-pkts                 : 0 
+[2026-05-11 16:48:01] out-ucplane-pkts               : 0 
+[2026-05-11 16:48:01] out-drop-pkts                  : 0 
+[2026-05-11 16:48:01] rhu-xx# show hub statistics du
+[2026-05-11 16:48:01] ------------------------------------------------------------------------------
+[2026-05-11 16:48:01] PORT : du
+[2026-05-11 16:48:01] in-unicast-pkts                : 519548249 
+[2026-05-11 16:48:01] in-broadcast-pkts              : 1265 
+[2026-05-11 16:48:01] in-multicast-pkts              : 14723 
+[2026-05-11 16:48:01] in-octets                      : 33252210610 
+[2026-05-11 16:48:01] in-total-pkts                  : 519564306 
+[2026-05-11 16:48:01] in-fixed-pkts                  : 519562392 
+[2026-05-11 16:48:01] in-ucplane-pkts                : 0 
+[2026-05-11 16:48:01] in-drop-pkts                   : 0 
+[2026-05-11 16:48:01] out-unicast-pkts               : 156 
+[2026-05-11 16:48:01] out-broadcast-pkts             : 3614 
+[2026-05-11 16:48:01] out-multicast-pkts             : 7727 
+[2026-05-11 16:48:01] out-octets                     : 1459838 
+[2026-05-11 16:48:01] out-total-pkts                 : 11508 
+[2026-05-11 16:48:01] out-fixed-pkts                 : 0 
+[2026-05-11 16:48:01] out-ucplane-pkts               : 0 
+[2026-05-11 16:48:01] out-drop-pkts                  : 0 
+[2026-05-11 16:48:01] rhu-xx# show hub statistics du
+[2026-05-11 16:48:01] ------------------------------------------------------------------------------
+[2026-05-11 16:48:01] PORT : du
+[2026-05-11 16:48:01] in-unicast-pkts                : 524178858 
+[2026-05-11 16:48:01] in-broadcast-pkts              : 1265 
+[2026-05-11 16:48:01] in-multicast-pkts              : 14723 
+[2026-05-11 16:48:01] in-octets                      : 33548570290 
+[2026-05-11 16:48:01] in-total-pkts                  : 524194909 
+[2026-05-11 16:48:01] in-fixed-pkts                  : 524193024 
+[2026-05-11 16:48:01] in-ucplane-pkts                : 0 
+[2026-05-11 16:48:01] in-drop-pkts                   : 0 
+[2026-05-11 16:48:01] out-unicast-pkts               : 156 
+[2026-05-11 16:48:01] out-broadcast-pkts             : 3616 
+[2026-05-11 16:48:01] out-multicast-pkts             : 7727 
+[2026-05-11 16:48:01] out-octets                     : 1460370 
+[2026-05-11 16:48:01] out-total-pkts                 : 11510 
+[2026-05-11 16:48:01] out-fixed-pkts                 : 0 
+[2026-05-11 16:48:01] out-ucplane-pkts               : 0 
+[2026-05-11 16:48:01] out-drop-pkts                  : 0 
+[2026-05-11 16:48:01] rhu-xx# show hub statistics du
+[2026-05-11 16:48:01] ------------------------------------------------------------------------------
+[2026-05-11 16:48:01] PORT : du
+[2026-05-11 16:48:01] in-unicast-pkts                : 527936659 
+[2026-05-11 16:48:01] in-broadcast-pkts              : 1265 
+[2026-05-11 16:48:01] in-multicast-pkts              : 14723 
+[2026-05-11 16:48:01] in-octets                      : 33789069362 
+[2026-05-11 16:48:01] in-total-pkts                  : 527952724 
+[2026-05-11 16:48:01] in-fixed-pkts                  : 527950825 
+[2026-05-11 16:48:01] in-ucplane-pkts                : 0 
+[2026-05-11 16:48:01] in-drop-pkts                   : 0 
+[2026-05-11 16:48:01] out-unicast-pkts               : 156 
+[2026-05-11 16:48:01] out-broadcast-pkts             : 3616 
+[2026-05-11 16:48:01] out-multicast-pkts             : 7727 
+[2026-05-11 16:48:01] out-octets                     : 1460370 
+[2026-05-11 16:48:01] out-total-pkts                 : 11510 
+[2026-05-11 16:48:01] out-fixed-pkts                 : 0 
+[2026-05-11 16:48:01] out-ucplane-pkts               : 0 
+[2026-05-11 16:48:01] out-drop-pkts                  : 0 
+[2026-05-11 16:48:01] rhu-xx# show hub statistics du
+[2026-05-11 16:48:01] ------------------------------------------------------------------------------
+[2026-05-11 16:48:01] PORT : du
+[2026-05-11 16:48:01] in-unicast-pkts                : 531435767 
+[2026-05-11 16:48:01] in-broadcast-pkts              : 1265 
+[2026-05-11 16:48:01] in-multicast-pkts              : 14723 
+[2026-05-11 16:48:01] in-octets                      : 34013013234 
+[2026-05-11 16:48:01] in-total-pkts                  : 531451848 
+[2026-05-11 16:48:01] in-fixed-pkts                  : 531449933 
+[2026-05-11 16:48:01] in-ucplane-pkts                : 0 
+[2026-05-11 16:48:01] in-drop-pkts                   : 0 
+[2026-05-11 16:48:01] out-unicast-pkts               : 156 
+[2026-05-11 16:48:01] out-broadcast-pkts             : 3616 
+[2026-05-11 16:48:01] out-multicast-pkts             : 7727 
+[2026-05-11 16:48:01] out-octets                     : 1460370 
+[2026-05-11 16:48:01] out-total-pkts                 : 11510 
+[2026-05-11 16:48:01] out-fixed-pkts                 : 0 
+[2026-05-11 16:48:01] out-ucplane-pkts               : 0 
+[2026-05-11 16:48:01] out-drop-pkts                  : 0 
+[2026-05-11 16:48:01] rhu-xx# show hub statistics du
+[2026-05-11 16:48:01] ------------------------------------------------------------------------------
+[2026-05-11 16:48:01] PORT : du
+[2026-05-11 16:48:01] in-unicast-pkts                : 535084851 
+[2026-05-11 16:48:01] in-broadcast-pkts              : 1265 
+[2026-05-11 16:48:01] in-multicast-pkts              : 14723 
+[2026-05-11 16:48:01] in-octets                      : 34246554610 
+[2026-05-11 16:48:01] in-total-pkts                  : 535100932 
+[2026-05-11 16:48:01] in-fixed-pkts                  : 535099017 
+[2026-05-11 16:48:01] in-ucplane-pkts                : 0 
+[2026-05-11 16:48:01] in-drop-pkts                   : 0 
+[2026-05-11 16:48:01] out-unicast-pkts               : 156 
+[2026-05-11 16:48:01] out-broadcast-pkts             : 3616 
+[2026-05-11 16:48:01] out-multicast-pkts             : 7727 
+[2026-05-11 16:48:01] out-octets                     : 1460370 
+[2026-05-11 16:48:01] out-total-pkts                 : 11510 
+[2026-05-11 16:48:01] out-fixed-pkts                 : 0 
+[2026-05-11 16:48:01] out-ucplane-pkts               : 0 
+[2026-05-11 16:48:01] out-drop-pkts                  : 0 
+[2026-05-11 16:48:01] rhu-xx# show      ts  start-shell 
+[2026-05-11 16:48:29] root@rhu-xx:~# ifconfig
+[2026-05-11 16:48:29] eth0      Link encap:Ethernet  HWaddr DC:C1:01:00:79:D9  
+[2026-05-11 16:48:29]           inet addr:192.168.20.24  Bcast:192.168.20.255  Mask:255.255.255.0
+[2026-05-11 16:48:29]           UP BROADCAST MULTICAST  MTU:1500  Metric:1
+[2026-05-11 16:48:29]           RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+[2026-05-11 16:48:29]           TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+[2026-05-11 16:48:29]           collisions:0 txqueuelen:1000 
+[2026-05-11 16:48:29]           RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+[2026-05-11 16:48:29]           Interrupt:30 
+
+[2026-05-11 16:48:29] eth1      Link encap:Ethernet  HWaddr DC:C1:01:00:79:DA  
+[2026-05-11 16:48:29]           inet6 addr: fe80::dec1:1ff:fe00:79da/64 Scope:Link
+[2026-05-11 16:48:29]           UP BROADCAST RUNNING PROMISC MULTICAST  MTU:1500  Metric:1
+[2026-05-11 16:48:29]           RX packets:16462 errors:0 dropped:15 overruns:0 frame:0
+[2026-05-11 16:48:29]           TX packets:4874 errors:0 dropped:0 overruns:0 carrier:0
+[2026-05-11 16:48:29]           collisions:0 txqueuelen:1000 
+[2026-05-11 16:48:29]           RX bytes:920987 (899.4 KiB)  TX bytes:1083994 (1.0 MiB)
+[2026-05-11 16:48:29]           Interrupt:31 
+
+[2026-05-11 16:48:29] eth1.0    Link encap:Ethernet  HWaddr DC:C1:01:00:79:DA  
+[2026-05-11 16:48:29]           inet6 addr: fe80::dec1:1ff:fe00:79da/64 Scope:Link
+[2026-05-11 16:48:29]           UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+[2026-05-11 16:48:29]           RX packets:16447 errors:0 dropped:14326 overruns:0 frame:0
+[2026-05-11 16:48:29]           TX packets:300 errors:0 dropped:0 overruns:0 carrier:0
+[2026-05-11 16:48:29]           collisions:0 txqueuelen:1000 
+[2026-05-11 16:48:29]           RX bytes:919932 (898.3 KiB)  TX bytes:39890 (38.9 KiB)
+
+[2026-05-11 16:48:29] lo        Link encap:Local Loopback  
+[2026-05-11 16:48:29]           inet addr:127.0.0.1  Mask:255.0.0.0
+[2026-05-11 16:48:29]           inet6 addr: ::1/128 Scope:Host
+[2026-05-11 16:48:29]           UP LOOPBACK RUNNING  MTU:65536  Metric:1
+[2026-05-11 16:48:29]           RX packets:21 errors:0 dropped:0 overruns:0 frame:0
+[2026-05-11 16:48:29]           TX packets:21 errors:0 dropped:0 overruns:0 carrier:0
+[2026-05-11 16:48:29]           collisions:0 txqueuelen:1000 
+[2026-05-11 16:48:29]           RX bytes:3232 (3.1 KiB)  TX bytes:3232 (3.1 KiB)
+
+[2026-05-11 16:48:29] root@rhu-xx:~# macb ff0e0000.ethernet eth0: link up (1000/Full)
+[2026-05-11 16:49:33] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+
+[2026-05-11 16:52:18] root@rhu-xx:~# 
+[2026-05-11 16:52:18] root@rhu-xx:~# 
+[2026-05-11 16:52:18] root@rhu-xx:~# scp solid@192.1638  8.20.50:/tmp/ORAN_HUB_DTU_ZUP_TOP.bin /tmp/
+[2026-05-11 16:52:32] The authenticity of host '192.168.20.50 (192.168.20.50)' can't be established.
+[2026-05-11 16:52:32] ED25519 key fingerprint is SHA256:v6N/47gjL5fE6jKT4iBcqvs3WCB1gFMWznoD+lDiupo.
+[2026-05-11 16:52:32] This key is not known by any other names
+[2026-05-11 16:52:32] Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+[2026-05-11 16:52:32] Warning: Permanently added '192.168.20.50' (ED25519) to the list of known hosts.
+[2026-05-11 16:52:32] solid@192.168.20.50's password: 
+[2026-05-11 16:52:36] ORAN_HUB_DTU_ZUP_TOP.bin                                                                                0%    0     0.0KB/s   --:-- ETA
+[2026-05-11 16:52:36] ORAN_HUB_DTU_ZUP_TOP.bin                                                                              100%   28MB  65.8MB/s   00:00    
+[2026-05-11 16:52:36] root@rhu-xx:~# cd /software/
+[2026-05-11 16:54:23] root@rhu-xx:/software# ls -al
+[2026-05-11 16:54:23] total 60
+[2026-05-11 16:54:23] drwxr-xr-x    5 root     root          4096 May 11 05:46 ./
+[2026-05-11 16:54:23] drwxr-xr-x   22 root     root           500 May 11 05:46 ../
+[2026-05-11 16:54:23] -rw-r-----    1 root     root            88 Jan 13 06:59 .BOOT_CS
+[2026-05-11 16:54:23] -rw-r-----    1 root     root            10 Jan 13 06:59 .BOOT_VERSION
+[2026-05-11 16:54:23] -rw-r-----    1 root     admin            9 May 11 05:46 .boot_cause.current
+[2026-05-11 16:54:23] -rw-r--r--    1 root     root             0 Jun 21  2024 .nosecure
+[2026-05-11 16:54:23] -rw-r--r--    1 root     root             0 Nov 22  2024 .skip_netconf_callhome_max_attempts
+[2026-05-11 16:54:23] -rwxr-x---    1 root     root          2021 Jan 13 06:59 activate_slot.sh*
+[2026-05-11 16:54:23] lrwxrwxrwx    1 root     root             5 Jan 13 06:59 activated -> first/
+[2026-05-11 16:54:23] -rw-r-----    1 root     root             0 Jan 13 06:59 activated_first
+[2026-05-11 16:54:23] -rwxr-xr-x    1 root     root             0 Jan  1  1970 boot_first*
+[2026-05-11 16:54:23] -rw-r--r--    1 root     root             0 Mar  8  2021 fac_set
+[2026-05-11 16:54:23] lrwxrwxrwx    1 root     admin            8 Mar  8  2021 factory -> /factory/
+[2026-05-11 16:54:23] drwxr-x---    3 root     admin         4096 Jan 13 06:59 first/
+[2026-05-11 16:54:23] drwx------    2 root     root         16384 Mar  8  2021 lost+found/
+[2026-05-11 16:54:23] lrwxrwxrwx    1 root     root             5 May 11 05:46 now -> first/
+[2026-05-11 16:54:23] lrwxrwxrwx    1 root     root             6 Jan 13 06:59 previous -> second/
+[2026-05-11 16:54:23] -rw-r-----    1 root     root             0 Jan 13 06:59 previous_second
+[2026-05-11 16:54:23] drwxr-x---    3 root     admin         4096 Jan 12 06:34 second/
+[2026-05-11 16:54:23] -rw-r--r--    1 root     root             0 Nov 22  2024 skip_netconf_callhome_max_attempts
+[2026-05-11 16:54:23] -rwxr-xr-x    1 root     root             0 Jan  1  1970 start*
+[2026-05-11 16:54:23] -rw-r-----    1 root     admin            0 May 11 05:46 success
+[2026-05-11 16:54:23] -rwxr-x---    1 root     root         15120 Jan 13 06:59 update_slot.sh*
+[2026-05-11 16:54:23] root@rhu-xx:/software# 
+[2026-05-11 16:54:25] root@rhu-xx:/software# cd ~    cd -
+[2026-05-11 16:54:31] /home/root
+[2026-05-11 16:54:31] root@rhu-xx:~# 
+[2026-05-11 16:54:31] root@rhu-xx:~# 
+[2026-05-11 16:54:31] root@rhu-xx:~# ls -al
+[2026-05-11 16:54:33] total 16
+[2026-05-11 16:54:33] drwx------    3 root     root           140 May 11 07:52 ./
+[2026-05-11 16:54:33] drwxr-xr-x    4 root     root            80 Aug 14  2025 ../
+[2026-05-11 16:54:33] -rw-------    1 root     root            33 May 11 07:51 .bash_history
+[2026-05-11 16:54:33] -rw-r--r--    1 root     root           432 Aug 14  2025 .bashrc
+[2026-05-11 16:54:33] -rw-------    1 root     root           152 May 11 07:48 .history_quagga
+[2026-05-11 16:54:33] -rw-r--r--    1 root     root           241 Aug 14  2025 .profile
+[2026-05-11 16:54:33] drwx------    2 root     root            80 May 11 07:52 .ssh/
+[2026-05-11 16:54:33] root@rhu-xx:~# cp /tmp/
+[2026-05-11 16:54:39] .appd_start_count         .pmic_boot_cause          .temp_gen_dir/            bootmode.txt              ru_software/
+[2026-05-11 16:54:39] .hw_id                    .pse_ver                  .temp_vendor_cert/        ru_faillog/               ru_timezone
+[2026-05-11 16:54:39] .hw_version               .storage_code             ORAN_HUB_DTU_ZUP_TOP.bin  ru_log/                   ru_trace_log/
+[2026-05-11 16:54:39] .netopeer_run             .storage_sts              beamforming/              ru_pm/                    transceiver/
+[2026-05-11 16:54:39] root@rhu-xx:~# cp /tmp/ORAN_HUB_DTU_ZUP_TOP.bin /ETC/    usr/local/etc/    fpga/
+[2026-05-11 16:55:06] VERSION         bitstream.bin   update_fpga.sh  
+[2026-05-11 16:55:06] root@rhu-xx:~# cp /tmp/ORAN_HUB_DTU_ZUP_TOP.bin /usr/local/fpga/
+[2026-05-11 16:55:06] VERSION         bitstream.bin   update_fpga.sh  
+[2026-05-11 16:55:06] root@rhu-xx:~# cp /tmp/ORAN_HUB_DTU_ZUP_TOP.bin /usr/local/fpga/
+[2026-05-11 16:55:08] root@rhu-xx:~# cd /usr/local/fpga/
+[2026-05-11 16:55:14] root@rhu-xx:/usr/local/fpga# ll
+[2026-05-11 16:55:14] total 57348
+[2026-05-11 16:55:14] -rw-r--r--    1 root     root      29353104 May 11 07:55 ORAN_HUB_DTU_ZUP_TOP.bin
+[2026-05-11 16:55:14] -rwxr-x---    1 root     admin           20 Jan 13 06:59 VERSION*
+[2026-05-11 16:55:14] -rwxr-x---    1 root     admin     29354688 Jan 13 06:59 bitstream.bin*
+[2026-05-11 16:55:14] -rwxr-x---    1 root     admin         4072 Jan 13 06:59 update_fpga.sh*
+[2026-05-11 16:55:14] root@rhu-xx:/usr/local/fpga# cp bitstream.bin bitstream.bin  _backup
+[2026-05-11 16:55:24] root@rhu-xx:/usr/local/fpga# cp ORAN_HUB_DTU_ZUP_TOP.bin bitstream.bin
+[2026-05-11 16:55:34] cp: overwrite 'bitstream.bin'? wy^H^H^H        y
+[2026-05-11 16:55:42] root@rhu-xx:/usr/local/fpga# ls -al
+[2026-05-11 16:55:44] total 86024
+[2026-05-11 16:55:44] drwxr-xr-x    2 root     admin         4096 May 11 07:55 ./
+[2026-05-11 16:55:44] drwxr-x---    7 root     admin         4096 Jan 13 06:59 ../
+[2026-05-11 16:55:44] -rw-r--r--    1 root     root      29353104 May 11 07:55 ORAN_HUB_DTU_ZUP_TOP.bin
+[2026-05-11 16:55:44] -rwxr-x---    1 root     admin           20 Jan 13 06:59 VERSION*
+[2026-05-11 16:55:44] -rw-r--r--    1 root     root      29353104 May 11 07:55 bitstream.bin
+[2026-05-11 16:55:44] -rwxr-x---    1 root     root      29354688 May 11 07:55 bitstream.bin_backup*
+[2026-05-11 16:55:44] -rwxr-x---    1 root     admin         4072 Jan 13 06:59 update_fpga.sh*
+[2026-05-11 16:55:44] root@rhu-xx:/usr/local/fpga# sync
+[2026-05-11 16:55:54] syroot@rhu-xx:/usr/local/fpga# sync
+[2026-05-11 16:55:56] root@rhu-xx:/usr/local/fpga# reboot
+
+[2026-05-11 16:55:56] Broadcast message from root@rhu-xx (ttyPS0) (Mon May 11 07:55:55 2026):
+
+[2026-05-11 16:55:56] The system is going down for reboot NOW!
+[2026-05-11 16:55:56] INIT: SwitchingÑÑ½runlevel: 6
+[2026-05-11 16:55:56] INIT: Sending processes the TERM signal
+[2026-05-11 16:55:56] root@rhu-xx:/usr/local/fpga#  * Stopping O-RAN RHU watchdog daemon watchdogd
+[2026-05-11 16:55:58] stopped process in pidfile '/var/run/watchdogd.pid' (pid 2502)
+[2026-05-11 16:55:58]  * Stopping O-RAN RHU daemon appd
+[2026-05-11 16:55:58] stopped process in pidfile '/var/run/appd.pid' (pid 2498)
+[2026-05-11 16:56:00] Stopping haveged: 
+
+[2026-05-11 16:56:00] Stopping OpenBSD Secure Shell server: sshdstopped /usr/sbin/sshd (pid 2467)
+[2026-05-11 16:56:00] .
+[2026-05-11 16:56:00] audit: type=1305 audit(1778486160.059:715): audit_pid=0 old=2472 auid=4294967295 ses=4294967295 res=1
+[2026-05-11 16:56:00] Stopping system message bus: dbus.
+[2026-05-11 16:56:00] Stopping syslogd/klogd: stopped syslogd (pid 2483)
+[2026-05-11 16:56:00] stopped klogd (pid 2486)
+[2026-05-11 16:56:00] done
+[2026-05-11 16:56:00] Stopping tcf-agent: OK
+[2026-05-11 16:56:02] Stopping random number generator daemon.
+[2026-05-11 16:56:02] Deconfiguring network interfaces... done.
+[2026-05-11 16:56:02]  * Stopping YANG-based data store sysrepod
+[2026-05-11 16:56:02] stopped process in pidfile '/var/run/sysrepod.pid' (pid 2490)
+[2026-05-11 16:56:02]  ! Writing boot cause: USER-TRIGGERED-RESTART
+[2026-05-11 16:56:02] Sending all processes the TERM signal...
+[2026-05-11 16:56:02] Terminated
+[2026-05-11 16:56:06] Sending all processes the KILL signal...
+[2026-05-11 16:56:06] Unmounting remote filesystems...
+[2026-05-11 16:56:06] Deactivating swap...
+[2026-05-11 16:56:06] Unmounting local filesystems...
+[2026-05-11 16:56:08] Rebooting... reboot: Restarting system
+[2026-05-11 16:56:32] Booting Linux on physical CPU 0x0000000000 [0x410fd034]
+[2026-05-11 16:56:32] Linux version 4.19.0 (oe-user@oe-host) (gcc version 8.2.0 (GCC)) #1 SMP Thu Aug 14 03:06:44 UTC 2025
+[2026-05-11 16:56:32] Machine model: ZynqMP ORAN_HUB_DTU_ZUP
+[2026-05-11 16:56:32] efi: Getting EFI parameters from FDT:
+[2026-05-11 16:56:32] efi: UEFI not found.
+[2026-05-11 16:56:32] cma: Reserved 256 MiB at 0x000000006bc00000
+[2026-05-11 16:56:32] psci: probing for conduit method from DT.
+[2026-05-11 16:56:32] psci: PSCIv1.1 detected in firmware.
+[2026-05-11 16:56:32] psci: Using standard PSCI v0.2 function IDs
+[2026-05-11 16:56:32] psci: MIGRATE_INFO_TYPE not supported.
+[2026-05-11 16:56:32] psci: SMC Calling Convention v1.1
+[2026-05-11 16:56:32] random: get_random_bytes called from start_kernel+0x94/0x3f8 with crng_init=0
+[2026-05-11 16:56:32] percpu: Embedded 22 pages/cpu @(____ptrval____) s51416 r8192 d30504 u90112
+[2026-05-11 16:56:32] Detected VIPT I-cache on CPU0
+[2026-05-11 16:56:32] CPU features: enabling workaround for ARM erratum 845719
+[2026-05-11 16:56:32] Speculative Store Bypass Disable mitigation not required
+[2026-05-11 16:56:32] CPU features: detected: Kernel page table isolation (KPTI)
+[2026-05-11 16:56:32] Built 1 zonelists, mobility grouping on.  Total pages: 1033987
+[2026-05-11 16:56:32] Kernel command line: uio_pdrv_genirq.of_id=generic-uio console=ttyPS0,115200 ubootver=0.2.05
+[2026-05-11 16:56:32] Dentry cache hash table entries: 524288 (order: 10, 4194304 bytes)
+[2026-05-11 16:56:32] Inode-cache hash table entries: 262144 (order: 9, 2097152 bytes)
+[2026-05-11 16:56:32] software IO TLB: mapped [mem 0x67c00000-0x6bc00000] (64MB)
+[2026-05-11 16:56:32] Memory: 3489312K/4193280K available (9724K kernel code, 590K rwdata, 4740K rodata, 512K init, 301K bss, 441824K reserved, 262144K cma-reserved)
+[2026-05-11 16:56:32] rcu: Hierarchical RCU implementation.
+[2026-05-11 16:56:32] rcu: RCU restricting CPUs from NR_CPUS=8 to nr_cpu_ids=4.
+[2026-05-11 16:56:32] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=4
+[2026-05-11 16:56:32] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[2026-05-11 16:56:32] GIC: Adjusting CPU interface base to 0x00000000f902f000
+[2026-05-11 16:56:32] GIC: Using split EOI/Deactivate mode
+[2026-05-11 16:56:32] arch_timer: cp15 timer(s) running at 33.33MHz (phys).
+[2026-05-11 16:56:32] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x7b00c47c0, max_idle_ns: 440795202120 ns
+[2026-05-11 16:56:32] sched_clock: 56 bits at 33MHz, resolution 30ns, wraps every 2199023255541ns
+[2026-05-11 16:56:32] Console: colour dummy device 80x25
+[2026-05-11 16:56:32] Calibrating delay loop (skipped), value calculated using timer frequency.. 66.66 BogoMIPS (lpj=133333)
+[2026-05-11 16:56:32] pid_max: default: 32768 minimum: 301
+[2026-05-11 16:56:32] Mount-cache hash table entries: 8192 (order: 4, 65536 bytes)
+[2026-05-11 16:56:32] Mountpoint-cache hash table entries: 8192 (order: 4, 65536 bytes)
+[2026-05-11 16:56:32] ASID allocator initialised with 32768 entries
+[2026-05-11 16:56:32] rcu: Hierarchical SRCU implementation.
+[2026-05-11 16:56:32] EFI services will not be available.
+[2026-05-11 16:56:32] smp: Bringing up secondary CPUs ...
+[2026-05-11 16:56:32] Detected VIPT I-cache on CPU1
+[2026-05-11 16:56:32] CPU1: Booted secondary processor 0x0000000001 [0x410fd034]
+[2026-05-11 16:56:32] Detected VIPT I-cache on CPU2
+[2026-05-11 16:56:32] CPU2: Booted secondary processor 0x0000000002 [0x410fd034]
+[2026-05-11 16:56:32] Detected VIPT I-cache on CPU3
+[2026-05-11 16:56:32] CPU3: Booted secondary processor 0x0000000003 [0x410fd034]
+[2026-05-11 16:56:32] smp: Brought up 1 node, 4 CPUs
+[2026-05-11 16:56:32] SMP: Total of 4 processors activated.
+[2026-05-11 16:56:32] CPU features: detected: 32-bit EL0 Support
+[2026-05-11 16:56:32] CPU: All CPU(s) started at EL2
+[2026-05-11 16:56:32] alternatives: patching kernel code
+[2026-05-11 16:56:32] devtmpfs: initialized
+[2026-05-11 16:56:32] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[2026-05-11 16:56:32] futex hash table entries: 1024 (order: 4, 65536 bytes)
+[2026-05-11 16:56:32] xor: measuring software checksum speed
+[2026-05-11 16:56:32]    8regs     :  2606.000 MB/sec
+[2026-05-11 16:56:32]    8regs_prefetch:  2251.000 MB/sec
+[2026-05-11 16:56:32]    32regs    :  2989.000 MB/sec
+[2026-05-11 16:56:32]    32regs_prefetch:  2533.000 MB/sec
+[2026-05-11 16:56:32] xor: using function: 32regs (2989.000 MB/sec)
+[2026-05-11 16:56:32] pinctrl core: initialized pinctrl subsystem
+[2026-05-11 16:56:32] NET: Registered protocol family 16
+[2026-05-11 16:56:32] audit: initializing netlink subsys (disabled)
+[2026-05-11 16:56:32] audit: type=2000 audit(0.172:1): state=initialized audit_enabled=0 res=1
+[2026-05-11 16:56:32] vdso: 2 pages (1 code @ (____ptrval____), 1 data @ (____ptrval____))
+[2026-05-11 16:56:32] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+[2026-05-11 16:56:32] DMA: preallocated 256 KiB pool for atomic allocations
+[2026-05-11 16:56:32] HugeTLB registered 2.00 MiB page size, pre-allocated 0 pages
+[2026-05-11 16:56:32] raid6: int64x1  gen()   485 MB/s
+[2026-05-11 16:56:32] raid6: int64x1  xor()   486 MB/s
+[2026-05-11 16:56:32] raid6: int64x2  gen()   737 MB/s
+[2026-05-11 16:56:32] raid6: int64x2  xor()   649 MB/s
+[2026-05-11 16:56:32] raid6: int64x4  gen()  1067 MB/s
+[2026-05-11 16:56:32] raid6: int64x4  xor()   801 MB/s
+[2026-05-11 16:56:32] raid6: int64x8  gen()  1268 MB/s
+[2026-05-11 16:56:32] raid6: int64x8  xor()   829 MB/s
+[2026-05-11 16:56:32] raid6: neonx1   gen()   795 MB/s
+[2026-05-11 16:56:32] raid6: neonx1   xor()   944 MB/s
+[2026-05-11 16:56:32] raid6: neonx2   gen()  1227 MB/s
+[2026-05-11 16:56:32] raid6: neonx2   xor()  1268 MB/s
+[2026-05-11 16:56:32] raid6: neonx4   gen()  1613 MB/s
+[2026-05-11 16:56:32] raid6: neonx4   xor()  1541 MB/s
+[2026-05-11 16:56:32] raid6: neonx8   gen()  1697 MB/s
+[2026-05-11 16:56:32] raid6: neonx8   xor()  1594 MB/s
+[2026-05-11 16:56:32] raid6: using algorithm neonx8 gen() 1697 MB/s
+[2026-05-11 16:56:32] raid6: .... xor() 1594 MB/s, rmw enabled
+[2026-05-11 16:56:32] raid6: using neon recovery algorithm
+[2026-05-11 16:56:32] SCSI subsystem initialized
+[2026-05-11 16:56:32] usbcore: registered new interface driver usbfs
+[2026-05-11 16:56:32] usbcore: registered new interface driver hub
+[2026-05-11 16:56:32] usbcore: registered new device driver usb
+[2026-05-11 16:56:32] media: Linux media interface: v0.10
+[2026-05-11 16:56:32] videodev: Linux video capture interface: v2.00
+[2026-05-11 16:56:32] pps_core: LinuxPPS API ver. 1 registered
+[2026-05-11 16:56:32] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[2026-05-11 16:56:32] PTP clock support registered
+[2026-05-11 16:56:32] EDAC MC: Ver: 3.0.0
+[2026-05-11 16:56:32] zynqmp-ipi-mbox mailbox@ff990400: Probed ZynqMP IPI Mailbox driver.
+[2026-05-11 16:56:32] FPGA manager framework
+[2026-05-11 16:56:32] Bluetooth: Core ver 2.22
+[2026-05-11 16:56:32] NET: Registered protocol family 31
+[2026-05-11 16:56:32] Bluetooth: HCI device and connection manager initialized
+[2026-05-11 16:56:32] Bluetooth: HCI socket layer initialized
+[2026-05-11 16:56:32] Bluetooth: L2CAP socket layer initialized
+[2026-05-11 16:56:32] Bluetooth: SCO socket layer initialized
+[2026-05-11 16:56:32] clocksource: Switched to clocksource arch_sys_counter
+[2026-05-11 16:56:32] VFS: Disk quotas dquot_6.6.0
+[2026-05-11 16:56:32] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[2026-05-11 16:56:32] NET: Registered protocol family 2
+[2026-05-11 16:56:32] tcp_listen_portaddr_hash hash table entries: 2048 (order: 3, 32768 bytes)
+[2026-05-11 16:56:32] TCP established hash table entries: 32768 (order: 6, 262144 bytes)
+[2026-05-11 16:56:32] TCP bind hash table entries: 32768 (order: 7, 524288 bytes)
+[2026-05-11 16:56:32] TCP: Hash tables configured (established 32768 bind 32768)
+[2026-05-11 16:56:32] UDP hash table entries: 2048 (order: 4, 65536 bytes)
+[2026-05-11 16:56:32] UDP-Lite hash table entries: 2048 (order: 4, 65536 bytes)
+[2026-05-11 16:56:32] NET: Registered protocol family 1
+[2026-05-11 16:56:32] RPC: Registered named UNIX socket transport module.
+[2026-05-11 16:56:32] RPC: Registered udp transport module.
+[2026-05-11 16:56:32] RPC: Registered tcp transport module.
+[2026-05-11 16:56:32] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[2026-05-11 16:56:32] Trying to unpack rootfs image as initramfs...
+[2026-05-11 16:56:32] Freeing initrd memory: 33396K
+[2026-05-11 16:56:32] hw perfevents: no interrupt-affinity property for /pmu, guessing.
+[2026-05-11 16:56:32] hw perfevents: enabled with armv8_pmuv3 PMU driver, 7 counters available
+[2026-05-11 16:56:32] workingset: timestamp_bits=62 max_order=20 bucket_order=0
+[2026-05-11 16:56:32] NFS: Registering the id_resolver key type
+[2026-05-11 16:56:32] Key type id_resolver registered
+[2026-05-11 16:56:32] Key type id_legacy registered
+[2026-05-11 16:56:32] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[2026-05-11 16:56:32] jffs2: version 2.2. (NAND) (SUMMARY)  ÂÂ© 2001-2006 Red Hat, Inc.
+[2026-05-11 16:56:32] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 247)
+[2026-05-11 16:56:32] io scheduler noop registered
+[2026-05-11 16:56:32] io scheduler deadline registered
+[2026-05-11 16:56:32] io scheduler cfq registered (default)
+[2026-05-11 16:56:32] io scheduler mq-deadline registered
+[2026-05-11 16:56:32] io scheduler kyber registered
+[2026-05-11 16:56:32] cacheinfo: Unable to detect cache hierarchy for CPU 0
+[2026-05-11 16:56:32] brd: module loaded
+[2026-05-11 16:56:32] loop: module loaded
+[2026-05-11 16:56:32] libphy: Fixed MDIO Bus: probed
+[2026-05-11 16:56:32] tun: Universal TUN/TAP device driver, 1.6
+[2026-05-11 16:56:32] CAN device driver interface
+[2026-05-11 16:56:32] usbcore: registered new interface driver asix
+[2026-05-11 16:56:32] usbcore: registered new interface driver ax88179_178a
+[2026-05-11 16:56:32] usbcore: registered new interface driver cdc_ether
+[2026-05-11 16:56:32] usbcore: registered new interface driver net1080
+[2026-05-11 16:56:32] usbcore: registered new interface driver cdc_subset
+[2026-05-11 16:56:32] usbcore: registered new interface driver zaurus
+[2026-05-11 16:56:32] usbcore: registered new interface driver cdc_ncm
+[2026-05-11 16:56:32] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+[2026-05-11 16:56:32] ehci-pci: EHCI PCI platform driver
+[2026-05-11 16:56:32] ehci-platform: EHCI generic platform driver
+[2026-05-11 16:56:32] usbcore: registered new interface driver cdc_wdm
+[2026-05-11 16:56:32] usbcore: registered new interface driver uas
+[2026-05-11 16:56:32] usbcore: registered new interface driver usb-storage
+[2026-05-11 16:56:32] usbcore: registered new interface driver sisusb
+[2026-05-11 16:56:32] usbcore: registered new interface driver lvs
+[2026-05-11 16:56:32] mousedev: PS/2 mouse device common for all mice
+[2026-05-11 16:56:32] rtc_zynqmp ffa60000.rtc: rtc core: registered ffa60000.rtc as rtc0
+[2026-05-11 16:56:32] i2c /dev entries driver
+[2026-05-11 16:56:32] usbcore: registered new interface driver uvcvideo
+[2026-05-11 16:56:32] USB Video Class driver (1.1.1)
+[2026-05-11 16:56:32] EDAC MC: ECC not enabled
+[2026-05-11 16:56:32] EDAC DEVICE0: Giving out device to module edac controller cache_err: DEV edac (POLLED)
+[2026-05-11 16:56:32] EDAC DEVICE1: Giving out device to module zynqmp-ocm-edac controller zynqmp_ocm: DEV ff960000.memory-controller (INTERRUPT)
+[2026-05-11 16:56:32] sdhci: Secure Digital Host Controller Interface driver
+[2026-05-11 16:56:32] sdhci: Copyright(c) Pierre Ossman
+[2026-05-11 16:56:32] sdhci-pltfm: SDHCI platform and OF driver helper
+[2026-05-11 16:56:32] ledtrig-cpu: registered to indicate activity on CPUs
+[2026-05-11 16:56:32] zynqmp_firmware_probe Platform Management API v1.1
+[2026-05-11 16:56:32] zynqmp_firmware_probe Trustzone version v1.0
+[2026-05-11 16:56:32] zynqmp-pinctrl firmware:zynqmp-firmware:pinctrl: zynqmp pinctrl initialized
+[2026-05-11 16:56:32] zynqmp_clk_mux_get_parent() getparent failed for clock: lpd_wdt, ret = -22
+[2026-05-11 16:56:32] securefw securefw: DMA mask not set
+[2026-05-11 16:56:32] securefw securefw: securefw probed
+[2026-05-11 16:56:32] usbcore: registered new interface driver usbhid
+[2026-05-11 16:56:32] usbhid: USB HID core driver
+[2026-05-11 16:56:32] ARM CCI_400_r1 PMU driver probed
+[2026-05-11 16:56:32] fpga_manager fpga0: Xilinx ZynqMP FPGA Manager registered
+[2026-05-11 16:56:32] pktgen: Packet Generator for packet performance testing. Version: 2.75
+[2026-05-11 16:56:32] Initializing XFRM netlink socket
+[2026-05-11 16:56:32] NET: Registered protocol family 10
+[2026-05-11 16:56:32] Segment Routing with IPv6
+[2026-05-11 16:56:32] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[2026-05-11 16:56:32] NET: Registered protocol family 17
+[2026-05-11 16:56:32] NET: Registered protocol family 15
+[2026-05-11 16:56:32] bridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.
+[2026-05-11 16:56:32] can: controller area network core (rev 20170425 abi 9)
+[2026-05-11 16:56:32] NET: Registered protocol family 29
+[2026-05-11 16:56:32] can: raw protocol (rev 20170425)
+[2026-05-11 16:56:32] can: broadcast manager protocol (rev 20170425 t)
+[2026-05-11 16:56:32] can: netlink gateway (rev 20170425) max_hops=1
+[2026-05-11 16:56:32] Bluetooth: RFCOMM TTY layer initialized
+[2026-05-11 16:56:32] Bluetooth: RFCOMM socket layer initialized
+[2026-05-11 16:56:32] Bluetooth: RFCOMM ver 1.11
+[2026-05-11 16:56:32] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[2026-05-11 16:56:32] Bluetooth: BNEP filters: protocol multicast
+[2026-05-11 16:56:32] Bluetooth: BNEP socket layer initialized
+[2026-05-11 16:56:32] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+[2026-05-11 16:56:32] Bluetooth: HIDP socket layer initialized
+[2026-05-11 16:56:32] 8021q: 802.1Q VLAN Support v1.8
+[2026-05-11 16:56:32] Key type dns_resolver registered
+[2026-05-11 16:56:32] registered taskstats version 1
+[2026-05-11 16:56:32] Btrfs loaded, crc32c=crc32c-generic
+[2026-05-11 16:56:32] ff000000.serial: ttyPS0 at MMIO 0xff000000 (irq = 42, base_baud = 6249999) is a xuartps
+[2026-05-11 16:56:32] console [ttyPS0] enabled
+[2026-05-11 16:56:32] xilinx-zynqmp-dma fd500000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma fd510000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma fd520000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma fd530000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma fd540000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma fd550000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma fd560000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma fd570000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma ffa80000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma ffa90000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma ffaa0000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma ffab0000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma ffac0000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma ffad0000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma ffae0000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] xilinx-zynqmp-dma ffaf0000.dma: ZynqMP DMA driver Probe success
+[2026-05-11 16:56:32] macb ff0e0000.ethernet: Not enabling partial store and forward
+[2026-05-11 16:56:32] libphy: MACB_mii_bus: probed
+[2026-05-11 16:56:32] f22:: phy_device_create 
+[2026-05-11 16:56:32] f22:: phy_probe 2
+[2026-05-11 16:56:32] TI DP83867 ff0e0000.ethernet-ffffffff:05: attached PHY driver [TI DP83867] (mii_bus:phy_addr=ff0e0000.ethernet-ffffffff:05, irq=POLL)
+[2026-05-11 16:56:32] macb ff0e0000.ethernet eth0: Cadence GEM rev 0x50070106 at 0xff0e0000 irq 30 (00:0a:35:00:22:01)
+[2026-05-11 16:56:32] macb ff0b0000.ethernet: Not enabling partial store and forward
+[2026-05-11 16:56:32] macb ff0b0000.ethernet: invalid hw address, using random
+[2026-05-11 16:56:32] f22:: phy_device_create 
+[2026-05-11 16:56:32] libphy: MACB_mii_bus: probed
+[2026-05-11 16:56:32] f22:: phy_device_create 
+[2026-05-11 16:56:32] f22:: phy_probe 2
+[2026-05-11 16:56:32] f22:: genphy_config_init 
+[2026-05-11 16:56:32] Generic PHY fixed-0:00: attached PHY driver [Generic PHY] (mii_bus:phy_addr=fixed-0:00, irq=POLL)
+[2026-05-11 16:56:32] macb ff0b0000.ethernet eth1: Cadence GEM rev 0x50070106 at 0xff0b0000 irq 31 (ba:d9:99:2c:1b:82)
+[2026-05-11 16:56:32] xilinx-axipmon ffa00000.perf-monitor: Probed Xilinx APM
+[2026-05-11 16:56:32] xilinx-axipmon fd0b0000.perf-monitor: Probed Xilinx APM
+[2026-05-11 16:56:32] xilinx-axipmon fd490000.perf-monitor: Probed Xilinx APM
+[2026-05-11 16:56:32] xilinx-axipmon ffa10000.perf-monitor: Probed Xilinx APM
+[2026-05-11 16:56:32] i2c i2c-0: Added multiplexed i2c bus 2
+[2026-05-11 16:56:32] i2c i2c-0: Added multiplexed i2c bus 3
+[2026-05-11 16:56:32] at24 4-0050: 8192 byte 24c64 EEPROM, writable, 1 bytes/write
+[2026-05-11 16:56:32] i2c i2c-0: Added multiplexed i2c bus 4
+[2026-05-11 16:56:32] lm75 5-0048: hwmon0: sensor 'tmp112'
+[2026-05-11 16:56:32] i2c i2c-0: Added multiplexed i2c bus 5
+[2026-05-11 16:56:32] i2c i2c-0: Added multiplexed i2c bus 6
+[2026-05-11 16:56:32] tps65086 7-005e: Device: TPS650864, OTP: B, Rev: 0
+[2026-05-11 16:56:32] i2c i2c-0: Added multiplexed i2c bus 7
+[2026-05-11 16:56:32] i2c i2c-8: Added multiplexed i2c bus 9
+[2026-05-11 16:56:32] i2c i2c-8: Added multiplexed i2c bus 10
+[2026-05-11 16:56:32] i2c i2c-8: Added multiplexed i2c bus 11
+[2026-05-11 16:56:32] adt7470 12-002e: adt7470 chip found
+[2026-05-11 16:56:32] i2c i2c-8: Added multiplexed i2c bus 12
+[2026-05-11 16:56:32] lm75 13-0048: hwmon3: sensor 'tmp112'
+[2026-05-11 16:56:32] i2c i2c-8: Added multiplexed i2c bus 13
+[2026-05-11 16:56:32] pca953x 14-0020: 14-0020 supply vcc not found, using dummy regulator
+[2026-05-11 16:56:32] pca953x 14-0020: Linked as a consumer to regulator.0
+[2026-05-11 16:56:32] i2c i2c-8: Added multiplexed i2c bus 14
+[2026-05-11 16:56:32] i2c i2c-8: Added multiplexed i2c bus 15
+[2026-05-11 16:56:32] i2c i2c-8: Added multiplexed i2c bus 16
+[2026-05-11 16:56:32] pca954x 8-0070: registered 8 multiplexed busses for I2C switch pca9548
+[2026-05-11 16:56:32] i2c i2c-0: Added multiplexed i2c bus 8
+[2026-05-11 16:56:32] i2c i2c-0: Added multiplexed i2c bus 17
+[2026-05-11 16:56:32] pca954x 0-0074: registered 8 multiplexed busses for I2C switch pca9548
+[2026-05-11 16:56:32] cdns-i2c ff020000.i2c: 400 kHz mmio ff020000 irq 33
+[2026-05-11 16:56:32] cdns-i2c ff030000.i2c: 400 kHz mmio ff030000 irq 34
+[2026-05-11 16:56:32] mmc0: SDHCI controller on ff160000.mmc [ff160000.mmc] using ADMA 64-bit
+[2026-05-11 16:56:34] mmc1: SDHCI controller on ff170000.mmc [ff170000.mmc] using ADMA 64-bit
+[2026-05-11 16:56:34] rtc_zynqmp ffa60000.rtc: setting system clock to 2026-05-11 07:56:32 UTC (1778486192)
+[2026-05-11 16:56:34] Freeing unused kernel memory: 512K
+[2026-05-11 16:56:34] mmc0: new HS200 MMC card at address 0001
+[2026-05-11 16:56:34] mmcblk0: mmc0:0001 DG4008 7.28 GiB 
+[2026-05-11 16:56:34] mmcblk0boot0: mmc0:0001 DG4008 partition 1 4.00 MiB
+[2026-05-11 16:56:34] mmcblk0boot1: mmc0:0001 DG4008 partition 2 4.00 MiB
+[2026-05-11 16:56:34] mmcblk0rpmb: mmc0:0001 DG4008 partition 3 4.00 MiB, chardev (245:0)
+[2026-05-11 16:56:34]  mmcblk0: p1 p2 p3 p4 < p5 p6 >
+[2026-05-11 16:56:34] Run /init as init process
+[2026-05-11 16:56:34] INIT: version 2.88 booting
+[2026-05-11 16:56:34] FAT-fs (mmcblk0p1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.
+[2026-05-11 16:56:34] EXT4-fs: Warning: mounting with data=journal disables delayed allocation and O_DIRECT support!
+[2026-05-11 16:56:34] EXT4-fs (mmcblk0p2): mounted filesystem with journalled data mode. Opts: data=journal
+[2026-05-11 16:56:34] random: fast init done
+[2026-05-11 16:56:34] EXT4-fs (mmcblk0p3): mounted filesystem with journalled data mode. Opts: data=journal
+[2026-05-11 16:56:34] EXT4-fs (mmcblk0p5): mounted filesystem with journalled data mode. Opts: data=journal
+[2026-05-11 16:56:34] EXT4-fs (mmcblk0p6): mounted filesystem with ordered data mode. Opts: data=ordered
+[2026-05-11 16:56:34] Starting udev
+[2026-05-11 16:56:34] udevd[1693]: starting version 3.2.5
+[2026-05-11 16:56:34] random: udevd: uninitialized urandom read (16 bytes read)
+[2026-05-11 16:56:34] random: udevd: uninitialized urandom read (16 bytes read)
+[2026-05-11 16:56:34] random: udevd: uninitialized urandom read (16 bytes read)
+[2026-05-11 16:56:34] udevd[1694]: starting eudev-3.2.5
+[2026-05-11 16:56:34] Checking ext4 file system... (/dev/mmcblk0p4)
+[2026-05-11 16:56:34] e2fsck 1.44.3 (10-July-2018)
+[2026-05-11 16:56:34] e2fsck: Attempt to read block from filesystem resulted in short read while trying to open /dev/mmcblk0p4
+[2026-05-11 16:56:34] Could this be a zero-length partition?
+[2026-05-11 16:56:34] Remounting eMMC partitions...
+[2026-05-11 16:56:34] mount: mounting /dev/mmcblk0p7 on /storage failed: No such file or directory
+[2026-05-11 16:56:34] ### Starting normal boot procedure ...
+[2026-05-11 16:56:34] ! Applying security & OS hardening configurations...
+[2026-05-11 16:56:34]  ! (1/4)...
+[2026-05-11 16:56:34] kernel.randomize_va_space = 2
+[2026-05-11 16:56:34] net.ipv4.conf.all.send_redirects = 0
+[2026-05-11 16:56:34] net.ipv4.conf.default.send_redirects = 0
+[2026-05-11 16:56:34] net.ipv4.conf.all.accept_redirects = 0
+[2026-05-11 16:56:34] net.ipv4.conf.default.accept_redirects = 0
+[2026-05-11 16:56:34] net.ipv6.conf.all.accept_redirects = 0
+[2026-05-11 16:56:34] net.ipv6.conf.default.accept_redirects = 0
+[2026-05-11 16:56:34] net.ipv4.icmp_ignore_bogus_error_responses = 1
+[2026-05-11 16:56:34] net.ipv4.conf.all.forwarding = 0
+[2026-05-11 16:56:34] net.ipv4.conf.default.forwarding = 0
+[2026-05-11 16:56:34] net.ipv6.conf.all.forwarding = 0
+[2026-05-11 16:56:34] net.ipv6.conf.default.forwarding = 0
+[2026-05-11 16:56:34] net.ipv4.conf.all.rp_filter = 1
+[2026-05-11 16:56:34] net.ipv4.conf.default.rp_filter = 1
+[2026-05-11 16:56:34] net.ipv4.conf.all.proxy_arp = 0
+[2026-05-11 16:56:34] net.ipv4.conf.default.proxy_arp = 0
+[2026-05-11 16:56:34] net.ipv4.conf.all.arp_accept = 0
+[2026-05-11 16:56:34] net.ipv4.conf.default.arp_accept = 0
+[2026-05-11 16:56:34] net.ipv4.icmp_echo_ignore_broadcasts = 1
+[2026-05-11 16:56:34] net.ipv4.conf.all.accept_source_route = 0
+[2026-05-11 16:56:34] net.ipv4.conf.default.accept_source_route = 0
+[2026-05-11 16:56:34] net.ipv4.conf.all.log_martians = 1
+[2026-05-11 16:56:34] net.ipv4.conf.default.log_martians = 1
+[2026-05-11 16:56:34]  ! (2/4)...
+[2026-05-11 16:56:34]  ! (3/4)...
+[2026-05-11 16:56:34] No rules
+[2026-05-11 16:56:34] enabled 0
+[2026-05-11 16:56:34] failure 1
+[2026-05-11 16:56:34] pid 0
+[2026-05-11 16:56:34] rate_limit 0
+[2026-05-11 16:56:34] backlog_limit 8192
+[2026-05-11 16:56:34] lost 0
+[2026-05-11 16:56:34] backlog 0
+[2026-05-11 16:56:34] backlog_wait_time 15000
+[2026-05-11 16:56:34] enabled 0
+[2026-05-11 16:56:34] failure 1
+[2026-05-11 16:56:34] pid 0
+[2026-05-11 16:56:34] rate_limit 0
+[2026-05-11 16:56:34] backlog_limit 8192
+[2026-05-11 16:56:34] lost 0
+[2026-05-11 16:56:34] backlog 0
+[2026-05-11 16:56:34] backlog_wait_time 0
+[2026-05-11 16:56:34] enabled 0
+[2026-05-11 16:56:34] failure 1
+[2026-05-11 16:56:34] pid 0
+[2026-05-11 16:56:34] rate_limit 0
+[2026-05-11 16:56:34] backlog_limit 8192
+[2026-05-11 16:56:34] lost 0
+[2026-05-11 16:56:34] backlog 0
+[2026-05-11 16:56:34] backlog_wait_time 0
+[2026-05-11 16:56:34]  ! (4/4)... completed
+[2026-05-11 16:56:34]  ! OLD_NOW_SLOT_NAME=first
+[2026-05-11 16:56:34]  ! ACTIVATED_SLOT_NAME=first
+[2026-05-11 16:56:34]  ! PREVIOUS_SLOT_NAME=second
+[2026-05-11 16:56:34]  ! FACTORY_SLOT_NAME=factory
+[2026-05-11 16:56:34]  ! BOOT_SLOT_NAME=first
+[2026-05-11 16:56:34]  ! NEW_NOW_SLOT_NAME=first
+[2026-05-11 16:56:34] Secure Boot Flash File Check
+[2026-05-11 16:56:34] /var/ru_software/now
+[2026-05-11 16:56:34] lrwxrwxrwx    1 root     root             5 May 11 07:56 /var/ru_software/now -> first
+[2026-05-11 16:56:34] md5sum /var/ru_software/now/file_list | grep "218ec953bfc6248916a86121516b949d"
+[2026-05-11 16:56:34] 218ec953bfc6248916a86121516b949d  /var/ru_software/now/file_list
+[2026-05-11 16:56:34] Software Secure Boot Verification Check OK
+[2026-05-11 16:56:36] md5sum: WARNING: 1 of 449 computed checksums did NOT match
+[2026-05-11 16:56:36] ./local/fpga/bitstream.bin: FAILED
+[2026-05-11 16:56:36] Secure Boot Software file Verification Check Error
+[2026-05-11 16:56:36] nosecure reboot
+[2026-05-11 16:56:36] ### First time watchdog trigger ###
+[2026-05-11 16:56:36] Default disable ETH port...
+[2026-05-11 16:56:36] HW ID(3) = [1 : 1]
+[2026-05-11 16:56:36]  ! Reading boot cause: USER-TRIGGERED-RESTART
+[2026-05-11 16:56:36]  ! RHU clock chip initialize (HWv3)..
+[2026-05-11 16:56:36] =================================================
+[2026-05-11 16:56:36] =========== IDT Clock Set (V1.001)   ============
+[2026-05-11 16:56:36] =================================================
+[2026-05-11 16:56:36] line count : 183
+[2026-05-11 16:56:36] Import Set file IDT 8A34001 : /usr/local/etc/vtysh.default/HWv3_rhu_clock.conf
+[2026-05-11 16:56:36]  ! Updating fpga image...
+[2026-05-11 16:56:36] the format of this bitstream.bin is "data"
+[2026-05-11 16:56:36]  ! Updating fpga-manager flags
+[2026-05-11 16:56:36] /usr/local/fpga/bitstream.bin :
+[2026-05-11 16:56:36]    key_source         = 0xFFFFFFFF
+[2026-05-11 16:56:36]    fpga_manager_flags = 0
+[2026-05-11 16:56:36]  ! Copying FPGA image to firmware library
+[2026-05-11 16:56:36]  ! Writing FPGA image
+[2026-05-11 16:56:36] fpga_manager fpga0: writing bitstream.bin to Xilinx ZynqMP FPGA Manager
+[2026-05-11 16:56:36]  ! Writing completed.
+[2026-05-11 16:56:36]  ! FPGA writing success!
+[2026-05-11 16:56:36] ### Get PL image version
+[2026-05-11 16:56:36] ************************
+[2026-05-11 16:56:36]     PL ver.:93032018
+[2026-05-11 16:56:36] ************************
+[2026-05-11 16:56:36]  Reinitializing SYSREPO persist & running data...
+[2026-05-11 16:56:36]  initializing SYSREPO persist data...
+[2026-05-11 16:56:36]  initializing SYSREPO running data...
+[2026-05-11 16:56:36]  ! L2 address config...
+[2026-05-11 16:56:38] L2 address 'dc:c1:01:00:79:da' is going to be set to eth1
+[2026-05-11 16:56:38] IPv6: ADDRCONF(NETDEV_UP): eth1: link is not ready
+[2026-05-11 16:56:38] L2 address 'dc:c1:01:00:79:d9' is going to be set to eth0
+[2026-05-11 16:56:38] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[2026-05-11 16:56:38] succeed to change timezone : UTC:0
+[2026-05-11 16:56:38] macb ff0b0000.ethernet eth1: unable to generate target frequency: 125000000 Hz
+[2026-05-11 16:56:38] macb ff0b0000.ethernet eth1: link up (1000/Full)
+[2026-05-11 16:56:38] IPv6: ADDRCONF(NETDEV_CHANGE): eth1: link becomes ready
+[2026-05-11 16:56:38] macb ff0e0000.ethernet eth0: link up (1000/Full)
+[2026-05-11 16:56:38] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[2026-05-11 16:56:40] ### PSE SW verion check & Patch ###
+[2026-05-11 16:56:40] ATTiny WDT Disable
+[2026-05-11 16:56:42] curr ver : 3.5.4
+[2026-05-11 16:56:42] ATTiny WDT Enable
+[2026-05-11 16:56:42] Default network config eth0,eth1...
+[2026-05-11 16:56:42]  ! enabled ETH port...
+[2026-05-11 16:56:42] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[2026-05-11 16:56:42] macb ff0e0000.ethernet eth0: link up (1000/Full)
+[2026-05-11 16:56:42] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[2026-05-11 16:56:42] axis-fifo driver loaded with parameters read_timeout = 1000, write_timeout = 1000
+[2026-05-11 16:56:42] axis_fifo 80500000.AXIS_FIFO: axis-fifo created at 0x0000000080500000 mapped to 0x0xffffff80100c0000, irq=44, major=243, minor=0
+[2026-05-11 16:56:42] uartlite 80b00000.serial: Checking id 0
+[2026-05-11 16:56:42] 80b00000.serial: ttyUL0 at MMIO 0x80b00000 (irq = 46, base_baud = 0) is a uartlite
+[2026-05-11 16:56:42] uartlite 80b10000.serial: Checking id 0
+[2026-05-11 16:56:42] 80b10000.serial: ttyUL1 at MMIO 0x80b10000 (irq = 47, base_baud = 0) is a uartlite
+[2026-05-11 16:56:42]  ! Symbolic link /etc/udhcpc.d/50default...
+[2026-05-11 16:56:42] *********************************************
+[2026-05-11 16:56:42] **PTP4L version : V03.13.04
+[2026-05-11 16:56:42] *********************************************
+
+[2026-05-11 16:56:42] Run PTP4L Daemon!
+[2026-05-11 16:56:42] #############################################################################
+[2026-05-11 16:56:42] ApiHub version : V10.55, Poe SW version : V01.02, Poe Config version : V01.00
+[2026-05-11 16:56:42] #############################################################################
+[2026-05-11 16:56:42] Configuring packages on first boot....
+[2026-05-11 16:56:42]  (This may take several minutes. Please do not power off the machine.)
+[2026-05-11 16:56:42] Running postinst /etc/rpm-postinsts/100-sysvinit-inittab...
+[2026-05-11 16:56:42] update-rc.d: /etc/init.d/run-postinsts exists during rc.d purge (continuing)
+[2026-05-11 16:56:42]  Removing an
+[2026-05-11 16:56:42] INIT: Entering runlevel: 5
+[2026-05-11 16:56:42] Configuring network interfaces... done.
+[2026-05-11 16:56:42] Starting system message bus: dbus.
+[2026-05-11 16:56:42] Starting random number generator daemonUnable to open file: /dev/tpm0
+[2026-05-11 16:56:42] can't open any entropy source
+[2026-05-11 16:56:42] Maybe RNG device modules are not loaded
+
+[2026-05-11 16:56:42] .
+[2026-05-11 16:56:42] Starting haveged: haveged: listening socket at 3
+[2026-05-11 16:56:42] haveged: haveged starting up
+
+
+[2026-05-11 16:56:42] haveged: haveged: ver: 1.9.4; arch: generic; vend: ; build: (gcc 8.2.0 CTV); collect: 128K
+
+[2026-05-11 16:56:42] haveged: haveged: cpu: (VC); data: 16K (D); inst: 16K (D); idx: 11/40; sz: 15528/64688
+
+[2026-05-11 16:56:42] haveged: haveged: tot tests(BA8): A:1/1 B:1/1 continuous tests(B):  last entropy estimate 7.9981
+
+[2026-05-11 16:56:42] haveged: haveged: fills: 0, generated: 0 
+
+[2026-05-11 16:56:42] random: crng init done
+[2026-05-11 16:56:42] random: 7 urandom warning(s) missed due to ratelimiting
+[2026-05-11 16:56:42] Starting OpenBSD Secure Shell server: sshd
+[2026-05-11 16:56:42] HOST_KEYS: /data/etc/ssh/ssh_host_ecdsa_key
+[2026-05-11 16:56:42] KEY_SIZE=384
+[2026-05-11 16:56:42] done.
+[2026-05-11 16:56:42] Starting syslogd/klogd: done
+[2026-05-11 16:56:42]  * Starting YANG-based data store sysrepod
+[2026-05-11 16:56:44]  * Starting O-RAN RHU daemon appd
+[2026-05-11 16:56:44]  * Starting O-RAN RHU watchdog daemon watchdogd
+[2026-05-11 16:56:44] Function Initializing..eth1.0: port 1(eth1) entered blocking state
+[2026-05-11 16:56:44] eth1.0: port 1(eth1) entered disabled state
+[2026-05-11 16:56:44] device eth1 entered promiscuous mode
+[2026-05-11 16:56:44] eth1.0: port 1(eth1) entered blocking state
+[2026-05-11 16:56:44] eth1.0: port 1(eth1) entered forwarding state
+[2026-05-11 16:56:44] IPv6: ADDRCONF(NETDEV_UP): eth1.0: link is not ready
+[2026-05-11 16:56:46] .IPv6: ADDRCONF(NETDEV_CHANGE): eth1.0: link becomes ready
+[2026-05-11 16:56:46] ...................
+
+[2026-05-11 16:57:05] ### End of System initialize ###
+[2026-05-11 16:57:05] Starting tcf-agent: OK
+
+[2026-05-11 16:57:05] Authorized uses only. All activity may be monitored and reported.
+
+[2026-05-11 16:57:05] rhu-xx login: root
+[2026-05-11 16:57:29] Password: 
+[2026-05-11 16:57:35] Last login: Mon May 11 07:50:21 UTC 2026 from 192.168.20.50 on pts/0
+[2026-05-11 16:57:35] Security & OS hardening are being applied.
+
+[2026-05-11 16:57:35] root@rhu-xx:~# 
+[2026-05-11 16:57:35] root@rhu-xx:~# vtysh 
+
+[2026-05-11 16:57:37] Hello, this is ORAN-FW (version 0.0.1-ga3830e3-dirty).
+[2026-05-11 16:57:37] Copyright 2019-2028 SOLiD Inc.
+
+[2026-05-11 16:57:37] rhu-xx# show hub p statistics du
+[2026-05-11 16:57:41] ------------------------------------------------------------------------------
+[2026-05-11 16:57:41] PORT : du
+[2026-05-11 16:57:41] in-unicast-pkts                : 0 
+[2026-05-11 16:57:41] in-broadcast-pkts              : 0 
+[2026-05-11 16:57:41] in-multicast-pkts              : 0 
+[2026-05-11 16:57:41] in-octets                      : 0 
+[2026-05-11 16:57:41] in-total-pkts                  : 0 
+[2026-05-11 16:57:41] in-fixed-pkts                  : 0 
+[2026-05-11 16:57:41] in-ucplane-pkts                : 0 
+[2026-05-11 16:57:41] in-drop-pkts                   : 0 
+[2026-05-11 16:57:41] out-unicast-pkts               : 0 
+[2026-05-11 16:57:41] out-broadcast-pkts             : 2000 
+[2026-05-11 16:57:41] out-multicast-pkts             : 3156 
+[2026-05-11 16:57:41] out-octets                     : 822564 
+[2026-05-11 16:57:41] out-total-pkts                 : 5167 
+[2026-05-11 16:57:41] out-fixed-pkts                 : 0 
+[2026-05-11 16:57:41] out-ucplane-pkts               : 0 
+[2026-05-11 16:57:41] out-drop-pkts                  : 0 
+[2026-05-11 16:57:41] rhu-xx# hub vlansl     slot 0 1000 0s xaefe 1   
+[2026-05-11 16:57:59]   <0-1>  TestMode : <0-1>
+[2026-05-11 16:57:59] rhu-xx# hub vlan slot 0 1000 0xaefe 0 1
+[2026-05-11 16:58:01] rhu-xx# hub mac
+[2026-05-11 16:58:19] mac         mac-enable  mac-ru      mac-table   
+[2026-05-11 16:58:19] rhu-xx# hub mac  -table apply 
+
+[2026-05-11 16:58:25] Sync mac-table to mac register 
+[2026-05-11 16:58:25] ------------------------------------------------------------------------------
+[2026-05-11 16:58:25] ru0                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:25] ------------------------------------------------------------------------------
+[2026-05-11 16:58:25] ru1                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:25] ------------------------------------------------------------------------------
+[2026-05-11 16:58:25] ru2                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:25] ------------------------------------------------------------------------------
+[2026-05-11 16:58:25] ru3                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:25] ------------------------------------------------------------------------------
+[2026-05-11 16:58:25] ru4                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:25] ------------------------------------------------------------------------------
+[2026-05-11 16:58:25] ru5                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:25] ------------------------------------------------------------------------------
+[2026-05-11 16:58:25] ru6                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:25] ------------------------------------------------------------------------------
+[2026-05-11 16:58:25] ------------------------------------------------------------------------------
+[2026-05-11 16:58:25] cc                   <= 00:00:00:00:00:00 
+[2026-05-11 16:58:25] ------------------------------------------------------------------------------
+[2026-05-11 16:58:25] rhu-xx# hub mac-table apply 
+
+[2026-05-11 16:58:27] Sync mac-table to mac register 
+[2026-05-11 16:58:27] ------------------------------------------------------------------------------
+[2026-05-11 16:58:27] ru0                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:27] ------------------------------------------------------------------------------
+[2026-05-11 16:58:27] ru1                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:27] ------------------------------------------------------------------------------
+[2026-05-11 16:58:27] ru2                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:27] ------------------------------------------------------------------------------
+[2026-05-11 16:58:27] ru3                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:27] ------------------------------------------------------------------------------
+[2026-05-11 16:58:27] ru4                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:27] ------------------------------------------------------------------------------
+[2026-05-11 16:58:27] ru5                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:27] ------------------------------------------------------------------------------
+[2026-05-11 16:58:27] ru6                  <= 00:00:00:00:00:00 
+[2026-05-11 16:58:27] ------------------------------------------------------------------------------
+[2026-05-11 16:58:27] ------------------------------------------------------------------------------
+[2026-05-11 16:58:27] cc                   <= 00:00:00:00:00:00 
+[2026-05-11 16:58:27] ------------------------------------------------------------------------------
+[2026-05-11 16:58:27] rhu-xx# hub mac-table apply 
+[2026-05-11 16:58:27] rhu-xx# hub vlan slot 0 1000 0xaefe 0 1
+[2026-05-11 16:58:29] rhu-xx# hub mac-table apply 
+[2026-05-11 16:58:29] rhu-xx# 1hub mac-table apply 
+[2026-05-11 16:58:31] rhu-xx# hub vlan slot 0 1000 0xaefe 0 1
+[2026-05-11 16:58:31] rhu-xx# show hub statistics du
+[2026-05-11 16:58:33] ------------------------------------------------------------------------------
+[2026-05-11 16:58:33] PORT : du
+[2026-05-11 16:58:33] in-unicast-pkts                : 0 
+[2026-05-11 16:58:33] in-broadcast-pkts              : 0 
+[2026-05-11 16:58:33] in-multicast-pkts              : 0 
+[2026-05-11 16:58:33] in-octets                      : 0 
+[2026-05-11 16:58:33] in-total-pkts                  : 0 
+[2026-05-11 16:58:33] in-fixed-pkts                  : 0 
+[2026-05-11 16:58:33] in-ucplane-pkts                : 0 
+[2026-05-11 16:58:33] in-drop-pkts                   : 0 
+[2026-05-11 16:58:33] out-unicast-pkts               : 0 
+[2026-05-11 16:58:33] out-broadcast-pkts             : 4600 
+[2026-05-11 16:58:33] out-multicast-pkts             : 6687 
+[2026-05-11 16:58:33] out-octets                     : 1838062 
+[2026-05-11 16:58:33] out-total-pkts                 : 11298 
+[2026-05-11 16:58:33] out-fixed-pkts                 : 0 
+[2026-05-11 16:58:33] out-ucplane-pkts               : 0 
+[2026-05-11 16:58:33] out-drop-pkts                  : 0 
+[2026-05-11 16:58:33] rhu-xx# 
+[2026-05-11 16:58:38] rhu-xx# show hub statistics du
+[2026-05-11 16:58:40] rhu-xx# show hub statistics du
+[2026-05-11 16:58:42] ------------------------------------------------------------------------------
+[2026-05-11 16:58:42] PORT : du
+[2026-05-11 16:58:42] in-unicast-pkts                : 28229392 
+[2026-05-11 16:58:42] in-broadcast-pkts              : 0 
+[2026-05-11 16:58:42] in-multicast-pkts              : 0 
+[2026-05-11 16:58:42] in-octets                      : 1806685888 
+[2026-05-11 16:58:42] in-total-pkts                  : 28229485 
+[2026-05-11 16:58:42] in-fixed-pkts                  : 28229452 
+[2026-05-11 16:58:42] in-ucplane-pkts                : 0 
+[2026-05-11 16:58:42] in-drop-pkts                   : 0 
+[2026-05-11 16:58:42] out-unicast-pkts               : 0 
+[2026-05-11 16:58:42] out-broadcast-pkts             : 4800 
+[2026-05-11 16:58:42] out-multicast-pkts             : 6794 
+[2026-05-11 16:58:42] out-octets                     : 1900096 
+[2026-05-11 16:58:42] out-total-pkts                 : 11605 
+[2026-05-11 16:58:42] out-fixed-pkts                 : 0 
+[2026-05-11 16:58:42] out-ucplane-pkts               : 0 
+[2026-05-11 16:58:42] out-drop-pkts                  : 0 
+[2026-05-11 16:58:42] rhu-xx# show hub pol rt link en
+[2026-05-11 16:58:46] % Unknown command.
+[2026-05-11 16:58:46] rhu-xx# hub pop rt link enable 
+[2026-05-11 16:58:50] succeed to control link : enable.
+[2026-05-11 16:58:50] rhu-xx# hub port link enable 
+[2026-05-11 16:58:52] rhu-xx# show hub port link enstatistics du
+[2026-05-11 16:58:54] ------------------------------------------------------------------------------
+[2026-05-11 16:58:54] PORT : du
+[2026-05-11 16:58:54] in-unicast-pkts                : 155190012 
+[2026-05-11 16:58:54] in-broadcast-pkts              : 0 
+[2026-05-11 16:58:54] in-multicast-pkts              : 0 
+[2026-05-11 16:58:54] in-octets                      : 9932165568 
+[2026-05-11 16:58:54] in-total-pkts                  : 155190104 
+[2026-05-11 16:58:54] in-fixed-pkts                  : 155190072 
+[2026-05-11 16:58:54] in-ucplane-pkts                : 0 
+[2026-05-11 16:58:54] in-drop-pkts                   : 0 
+[2026-05-11 16:58:54] out-unicast-pkts               : 0 
+[2026-05-11 16:58:54] out-broadcast-pkts             : 5400 
+[2026-05-11 16:58:54] out-multicast-pkts             : 7689 
+[2026-05-11 16:58:54] out-octets                     : 2141752 
+[2026-05-11 16:58:54] out-total-pkts                 : 13100 
+[2026-05-11 16:58:54] out-fixed-pkts                 : 0 
+[2026-05-11 16:58:54] out-ucplane-pkts               : 0 
+[2026-05-11 16:58:54] out-drop-pkts                  : 0 
+[2026-05-11 16:58:54] rhu-xx# show hub statistics du
+[2026-05-11 16:59:00] ------------------------------------------------------------------------------
+[2026-05-11 16:59:00] PORT : du
+[2026-05-11 16:59:00] in-unicast-pkts                : 215036826 
+[2026-05-11 16:59:00] in-broadcast-pkts              : 0 
+[2026-05-11 16:59:00] in-multicast-pkts              : 0 
+[2026-05-11 16:59:00] in-octets                      : 13762359680 
+[2026-05-11 16:59:00] in-total-pkts                  : 215036878 
+[2026-05-11 16:59:00] in-fixed-pkts                  : 215036870 
+[2026-05-11 16:59:00] in-ucplane-pkts                : 0 
+[2026-05-11 16:59:00] in-drop-pkts                   : 0 
+[2026-05-11 16:59:00] out-unicast-pkts               : 0 
+[2026-05-11 16:59:00] out-broadcast-pkts             : 6000 
+[2026-05-11 16:59:00] out-multicast-pkts             : 8434 
+[2026-05-11 16:59:00] out-octets                     : 2370698 
+[2026-05-11 16:59:00] out-total-pkts                 : 14445 
+[2026-05-11 16:59:00] out-fixed-pkts                 : 0 
+[2026-05-11 16:59:00] out-ucplane-pkts               : 0 
+[2026-05-11 16:59:00] out-drop-pkts                  : 0 
+[2026-05-11 16:59:00] rhu-xx# show hub statistics du
+[2026-05-11 16:59:02] ------------------------------------------------------------------------------
+[2026-05-11 16:59:02] PORT : du
+[2026-05-11 16:59:02] in-unicast-pkts                : 223245728 
+[2026-05-11 16:59:02] in-broadcast-pkts              : 0 
+[2026-05-11 16:59:02] in-multicast-pkts              : 0 
+[2026-05-11 16:59:02] in-octets                      : 14287726592 
+[2026-05-11 16:59:02] in-total-pkts                  : 223245728 
+[2026-05-11 16:59:02] in-fixed-pkts                  : 223245728 
+[2026-05-11 16:59:02] in-ucplane-pkts                : 0 
+[2026-05-11 16:59:02] in-drop-pkts                   : 0 
+[2026-05-11 16:59:02] out-unicast-pkts               : 0 
+[2026-05-11 16:59:02] out-broadcast-pkts             : 6000 
+[2026-05-11 16:59:02] out-multicast-pkts             : 8495 
+[2026-05-11 16:59:02] out-octets                     : 2375212 
+[2026-05-11 16:59:02] out-total-pkts                 : 14506 
+[2026-05-11 16:59:02] out-fixed-pkts                 : 0 
+[2026-05-11 16:59:02] out-ucplane-pkts               : 0 
+[2026-05-11 16:59:02] out-drop-pkts                  : 0 
+[2026-05-11 16:59:02] rhu-xx# show hub statistics du
+[2026-05-11 16:59:02] ------------------------------------------------------------------------------
+[2026-05-11 16:59:02] PORT : du
+[2026-05-11 16:59:02] in-unicast-pkts                : 233388724 
+[2026-05-11 16:59:02] in-broadcast-pkts              : 0 
+[2026-05-11 16:59:02] in-multicast-pkts              : 0 
+[2026-05-11 16:59:02] in-octets                      : 14936882688 
+[2026-05-11 16:59:02] in-total-pkts                  : 233388809 
+[2026-05-11 16:59:02] in-fixed-pkts                  : 233388780 
+[2026-05-11 16:59:02] in-ucplane-pkts                : 0 
+[2026-05-11 16:59:02] in-drop-pkts                   : 0 
+[2026-05-11 16:59:02] out-unicast-pkts               : 0 
+[2026-05-11 16:59:02] out-broadcast-pkts             : 6000 
+[2026-05-11 16:59:02] out-multicast-pkts             : 8499 
+[2026-05-11 16:59:02] out-octets                     : 2375508 
+[2026-05-11 16:59:02] out-total-pkts                 : 14510 
+[2026-05-11 16:59:02] out-fixed-pkts                 : 0 
+[2026-05-11 16:59:02] out-ucplane-pkts               : 0 
+[2026-05-11 16:59:02] out-drop-pkts                  : 0 
+[2026-05-11 16:59:02] rhu-xx# show hub statistics du
+[2026-05-11 16:59:10] ------------------------------------------------------------------------------
+[2026-05-11 16:59:10] PORT : du
+[2026-05-11 16:59:10] in-unicast-pkts                : 313456646 
+[2026-05-11 16:59:10] in-broadcast-pkts              : 0 
+[2026-05-11 16:59:10] in-multicast-pkts              : 0 
+[2026-05-11 16:59:10] in-octets                      : 20061225984 
+[2026-05-11 16:59:10] in-total-pkts                  : 313456656 
+[2026-05-11 16:59:10] in-fixed-pkts                  : 313456656 
+[2026-05-11 16:59:10] in-ucplane-pkts                : 0 
+[2026-05-11 16:59:10] in-drop-pkts                   : 0 
+[2026-05-11 16:59:10] out-unicast-pkts               : 0 
+[2026-05-11 16:59:10] out-broadcast-pkts             : 6000 
+[2026-05-11 16:59:10] out-multicast-pkts             : 8500 
+[2026-05-11 16:59:10] out-octets                     : 2375568 
+[2026-05-11 16:59:10] out-total-pkts                 : 14511 
+[2026-05-11 16:59:10] out-fixed-pkts                 : 0 
+[2026-05-11 16:59:10] out-ucplane-pkts               : 0 
+[2026-05-11 16:59:10] out-drop-pkts                  : 0 
+[2026-05-11 16:59:10] rhu-xx# show hub statistics du
+[2026-05-11 16:59:12] ------------------------------------------------------------------------------
+[2026-05-11 16:59:12] PORT : du
+[2026-05-11 16:59:12] in-unicast-pkts                : 317206736 
+[2026-05-11 16:59:12] in-broadcast-pkts              : 0 
+[2026-05-11 16:59:12] in-multicast-pkts              : 0 
+[2026-05-11 16:59:12] in-octets                      : 20301235328 
+[2026-05-11 16:59:12] in-total-pkts                  : 317206819 
+[2026-05-11 16:59:12] in-fixed-pkts                  : 317206787 
+[2026-05-11 16:59:12] in-ucplane-pkts                : 0 
+[2026-05-11 16:59:12] in-drop-pkts                   : 0 
+[2026-05-11 16:59:12] out-unicast-pkts               : 0 
+[2026-05-11 16:59:12] out-broadcast-pkts             : 6000 
+[2026-05-11 16:59:12] out-multicast-pkts             : 8500 
+[2026-05-11 16:59:12] out-octets                     : 2375568 
+[2026-05-11 16:59:12] out-total-pkts                 : 14511 
+[2026-05-11 16:59:12] out-fixed-pkts                 : 0 
+[2026-05-11 16:59:12] out-ucplane-pkts               : 0 
+[2026-05-11 16:59:12] out-drop-pkts                  : 0 
+[2026-05-11 16:59:12] rhu-xx# show hub statistics du
+[2026-05-11 16:59:12] ------------------------------------------------------------------------------
+[2026-05-11 16:59:12] PORT : du
+[2026-05-11 16:59:12] in-unicast-pkts                : 322954158 
+[2026-05-11 16:59:12] in-broadcast-pkts              : 0 
+[2026-05-11 16:59:12] in-multicast-pkts              : 0 
+[2026-05-11 16:59:12] in-octets                      : 20669068160 
+[2026-05-11 16:59:12] in-total-pkts                  : 322954190 
+[2026-05-11 16:59:12] in-fixed-pkts                  : 322954189 
+[2026-05-11 16:59:12] in-ucplane-pkts                : 0 
+[2026-05-11 16:59:12] in-drop-pkts                   : 0 
+[2026-05-11 16:59:12] out-unicast-pkts               : 0 
+[2026-05-11 16:59:12] out-broadcast-pkts             : 6000 
+[2026-05-11 16:59:12] out-multicast-pkts             : 8521 
+[2026-05-11 16:59:12] out-octets                     : 2377534 
+[2026-05-11 16:59:12] out-total-pkts                 : 14532 
+[2026-05-11 16:59:12] out-fixed-pkts                 : 0 
+[2026-05-11 16:59:12] out-ucplane-pkts               : 0 
+[2026-05-11 16:59:12] out-drop-pkts                  : 0 
+[2026-05-11 16:59:12] rhu-xx# show hub statistics du
+[2026-05-11 16:59:12] ------------------------------------------------------------------------------
+[2026-05-11 16:59:12] PORT : du
+[2026-05-11 16:59:12] in-unicast-pkts                : 335629029 
+[2026-05-11 16:59:12] in-broadcast-pkts              : 0 
+[2026-05-11 16:59:12] in-multicast-pkts              : 0 
+[2026-05-11 16:59:12] in-octets                      : 21480262656 
+[2026-05-11 16:59:12] in-total-pkts                  : 335629121 
+[2026-05-11 16:59:12] in-fixed-pkts                  : 335629089 
+[2026-05-11 16:59:12] in-ucplane-pkts                : 0 
+[2026-05-11 16:59:12] in-drop-pkts                   : 0 
+[2026-05-11 16:59:12] out-unicast-pkts               : 0 
+[2026-05-11 16:59:12] out-broadcast-pkts             : 6000 
+[2026-05-11 16:59:12] out-multicast-pkts             : 8691 
+[2026-05-11 16:59:12] out-octets                     : 2393270 
+[2026-05-11 16:59:12] out-total-pkts                 : 14702 
+[2026-05-11 16:59:12] out-fixed-pkts                 : 0 
+[2026-05-11 16:59:12] out-ucplane-pkts               : 0 
+[2026-05-11 16:59:12] out-drop-pkts                  : 0 
+[2026-05-11 16:59:12] rhu-xx# show hub statistics du
+[2026-05-11 16:59:14] ------------------------------------------------------------------------------
+[2026-05-11 16:59:14] PORT : du
+[2026-05-11 16:59:14] in-unicast-pkts                : 354091248 
+[2026-05-11 16:59:14] in-broadcast-pkts              : 0 
+[2026-05-11 16:59:14] in-multicast-pkts              : 0 
+[2026-05-11 16:59:14] in-octets                      : 22661839872 
+[2026-05-11 16:59:14] in-total-pkts                  : 354091248 
+[2026-05-11 16:59:14] in-fixed-pkts                  : 354091248 
+[2026-05-11 16:59:14] in-ucplane-pkts                : 0 
+[2026-05-11 16:59:14] in-drop-pkts                   : 0 
+[2026-05-11 16:59:14] out-unicast-pkts               : 0 
+[2026-05-11 16:59:14] out-broadcast-pkts             : 6200 
+[2026-05-11 16:59:14] out-multicast-pkts             : 9127 
+[2026-05-11 16:59:14] out-octets                     : 2486626 
+[2026-05-11 16:59:14] out-total-pkts                 : 15338 
+[2026-05-11 16:59:14] out-fixed-pkts                 : 0 
+[2026-05-11 16:59:14] out-ucplane-pkts               : 0 
+[2026-05-11 16:59:14] out-drop-pkts                  : 0 
+[2026-05-11 16:59:14] rhu-xx# fpgareg 0x90000100  0C
+[2026-05-11 16:59:54] [PL Read] addr: 0x9000010c, Data: 0x2cb0cc43
+[2026-05-11 16:59:54] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:00:00] [PL Read] addr: 0x9000010c, Data: 0x2fc88fc6
+[2026-05-11 17:00:00] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:00:06] [PL Read] addr: 0x9000010c, Data: 0x343aae6e
+[2026-05-11 17:00:06] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:00:08] [PL Read] addr: 0x9000010c, Data: 0x34b17a5c
+[2026-05-11 17:00:08] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:00:10] [PL Read] addr: 0x9000010c, Data: 0x35c56c3e
+[2026-05-11 17:00:10] rhu-xx# fpgareg 0x9000010C 8
+[2026-05-11 17:01:55] [PL Read] addr: 0x90000108, Data: 0xbaedd46
+[2026-05-11 17:01:55] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:01:57] [PL Read] addr: 0x90000108, Data: 0xc2c6245
+[2026-05-11 17:01:57] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:01:57] [PL Read] addr: 0x90000108, Data: 0xca272a4
+[2026-05-11 17:01:57] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:01:59] [PL Read] addr: 0x90000108, Data: 0xd2fc97d
+[2026-05-11 17:01:59] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:01:59] [PL Read] addr: 0x90000108, Data: 0xd951ce4
+[2026-05-11 17:01:59] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:01:59] [PL Read] addr: 0x90000108, Data: 0xdf68023
+[2026-05-11 17:01:59] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:01:59] [PL Read] addr: 0x90000108, Data: 0xe46eaf2
+[2026-05-11 17:01:59] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:02:01] [PL Read] addr: 0x90000108, Data: 0xe72153a
+[2026-05-11 17:02:01] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:02:01] [PL Read] addr: 0x90000108, Data: 0xe9837ad
+[2026-05-11 17:02:01] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:02:01] [PL Read] addr: 0x90000108, Data: 0xece7baa
+[2026-05-11 17:02:01] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:03:00] [PL Read] addr: 0x90000108, Data: 0x2a0aadfc
+[2026-05-11 17:03:00] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:03:00] [PL Read] addr: 0x90000108, Data: 0x2a98d8d5
+[2026-05-11 17:03:00] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:03:00] [PL Read] addr: 0x90000108, Data: 0x2ae01d54
+[2026-05-11 17:03:00] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:03:00] [PL Read] addr: 0x90000108, Data: 0x2b0cc157
+[2026-05-11 17:03:00] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:03:00] [PL Read] addr: 0x90000108, Data: 0x2b36fe5d
+[2026-05-11 17:03:00] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:03:00] [PL Read] addr: 0x90000108, Data: 0x2b7bbc09
+[2026-05-11 17:03:00] rhu-xx# fpgareg 0x90000108C
+[2026-05-11 17:03:02] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:03:02] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:03:04] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:03:04] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:03:04] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:03:04] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:03:04] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:03:04] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:03:04] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:03:04] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:03:06] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:03:06] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:05:45] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:05:45] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:05:45] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:05:45] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:05:45] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:05:45] rhu-xx# fpgareg 0x9000010C8C8
+[2026-05-11 17:05:47] [PL Read] addr: 0x90000108, Data: 0x77d115ee
+[2026-05-11 17:05:47] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:05:49] [PL Read] addr: 0x90000108, Data: 0x7870defa
+[2026-05-11 17:05:49] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:05:49] [PL Read] addr: 0x90000108, Data: 0x78a59760
+[2026-05-11 17:05:49] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:05:49] [PL Read] addr: 0x90000108, Data: 0x78cc634c
+[2026-05-11 17:05:49] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:05:49] [PL Read] addr: 0x90000108, Data: 0x78fb483c
+[2026-05-11 17:05:49] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:05:51] [PL Read] addr: 0x90000108, Data: 0x79729e58
+[2026-05-11 17:05:51] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:05:51] [PL Read] addr: 0x90000108, Data: 0x79cb63f3
+[2026-05-11 17:05:51] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:06:20] [PL Read] addr: 0x90000108, Data: 0x86f676c0
+[2026-05-11 17:06:20] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:06:22] [PL Read] addr: 0x90000108, Data: 0x86f676c0
+[2026-05-11 17:06:22] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:06:22] [PL Read] addr: 0x90000108, Data: 0x86f676c0
+[2026-05-11 17:06:22] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:06:22] [PL Read] addr: 0x90000108, Data: 0x86f676c0
+[2026-05-11 17:06:22] rhu-xx# fpgareg 0x90000108
+[2026-05-11 17:06:22] [PL Read] addr: 0x90000108, Data: 0x86f676c0
+[2026-05-11 17:06:22] rhu-xx# fpgareg 0x90000108C
+[2026-05-11 17:06:24] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:06:24] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:06:24] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:06:24] rhu-xx# fpgareg 0x9000010C
+[2026-05-11 17:06:24] [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee
+[2026-05-11 17:06:24] rhu-xx# fpgareg 0x9000010C 0
+[2026-05-11 17:06:30] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:06:30] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:06:32] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:06:32] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:06:32] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:06:32] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:06:32] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:06:32] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:06:34] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:06:34] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:06:34] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:06:34] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:06:34] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:06:34] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:06:34] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:06:34] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:06:34] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:06:34] rhu-xx# +-----------------------------+|                             ||  Cannot open /dev/ttyUSB5!  ||                             |+-----------------------------+rhu-xx# fpgareg 0x9000010C                                                          [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee                                        rhu-xx# fpgareg 0x9000010C                                                          [PL Read] addr: 0x9000010c, Data: 0x64a6b5ee                                        rhu-xx# fpgareg 0x90000108                                                          fpgareg 0x90000100
+[2026-05-11 17:31:10] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:31:10] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:31:10] [PL Read] addr: 0x90000100, Data: 0x0
+[2026-05-11 17:31:10] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:31:22] [PL Read] addr: 0x90000100, Data: 0x1
+[2026-05-11 17:31:22] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:31:22] [PL Read] addr: 0x90000100, Data: 0x1
+[2026-05-11 17:31:22] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:31:25] [PL Read] addr: 0x90000100, Data: 0x1
+[2026-05-11 17:31:25] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:13] [PL Read] addr: 0x90000100, Data: 0x2
+[2026-05-11 17:32:13] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:19] [PL Read] addr: 0x90000100, Data: 0x3
+[2026-05-11 17:32:19] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:19] [PL Read] addr: 0x90000100, Data: 0x3
+[2026-05-11 17:32:19] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:19] [PL Read] addr: 0x90000100, Data: 0x3
+[2026-05-11 17:32:19] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:21] [PL Read] addr: 0x90000100, Data: 0x3
+[2026-05-11 17:32:21] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:21] [PL Read] addr: 0x90000100, Data: 0x3
+[2026-05-11 17:32:21] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:21] [PL Read] addr: 0x90000100, Data: 0x3
+[2026-05-11 17:32:21] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:23] [PL Read] addr: 0x90000100, Data: 0x3
+[2026-05-11 17:32:23] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:23] [PL Read] addr: 0x90000100, Data: 0x3
+[2026-05-11 17:32:23] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:27] [PL Read] addr: 0x90000100, Data: 0x3
+[2026-05-11 17:32:27] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:32:37] [PL Read] addr: 0x90000100, Data: 0x3eb
+[2026-05-11 17:32:37] rhu-xx# fpgareg 0x90000100
+[2026-05-11 17:34:32] [PL Read] addr: 0x90000100, Data: 0x2afb
+[2026-05-11 17:34:32] rhu-xx# 

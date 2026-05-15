@@ -1,0 +1,847 @@
+{
+    "settings": {
+        "teraterm_path": "C:\\Program Files (x86)\\teraterm\\ttermpro.exe",
+        "moba_path": "C:\\Program Files (x86)\\Mobatek\\MobaXterm\\MobaXterm.exe",
+        "log_path": "C:\\Users\\thelastsun\\Documents\\Python\\DashStation\\dist\\Logs",
+        "startup_folder": "0. 시험망",
+        "window_width": "1080",
+        "window_height": "1100"
+    },
+    "zones": {
+        "2": "ORU",
+        "3": "ORU",
+        "1": "Server",
+        "0": "RDP"
+    },
+    "folders": {
+        "0. 시험망": {
+            "name": "0. 시험망",
+            "color": "#1976d2"
+        },
+        "1. Util": {
+            "name": "1. Util",
+            "color": "#1976d2"
+        }
+    },
+    "folder_order": [
+        "0. 시험망",
+        "1. Util"
+    ],
+    "sessions": [
+        {
+            "name": "RF_Switch",
+            "type": "P",
+            "ip": "C:/Users/thelastsun/Documents/Python/RF Switch/dist/RF_Switch.exe",
+            "user": "",
+            "pw": "",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "1. Util",
+            "id": "434444929",
+            "col_positions": {
+                "null": 0
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "10.0.10.125(SA), 10.0.10.71 (Administrator)",
+            "type": "M",
+            "ip": "",
+            "user": "",
+            "pw": "",
+            "ru_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ru_pw": "",
+            "final_cmd": "",
+            "ssh_interval": "1.0",
+            "moba_interval": "4.5",
+            "macro_steps": [
+                {
+                    "action": "대기 (pause)",
+                    "value": "170.0"
+                },
+                {
+                    "action": "문구 대기 (wait)",
+                    "value": "nDLPU login::10"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3.0"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "solid"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3.0"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "ngenesisQ!@"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3.0"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "sudo su -"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3.0"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "ngenesisQ!@"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "10.0"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "oru-container-shell"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2.0"
+                },
+                {
+                    "action": "문구 대기 (wait)",
+                    "value": "Error response from daemon: No such container: oru1:10"
+                },
+                {
+                    "action": "문구 확인 후 종료",
+                    "value": "Error response from daemon: No such container: oru1:10:에러발생"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2.0"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "show system detail"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2.0"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "reset system user-config"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2.0"
+                },
+                {
+                    "action": "처음으로 (goto loop)",
+                    "value": ""
+                }
+            ],
+            "folder": "0. 시험망",
+            "id": "434444922",
+            "col_positions": {
+                "null": 0
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "192.168.9.123",
+            "type": "S",
+            "ip": "192.168.9.123",
+            "user": "solid",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA54FIFg0EyEupiAEjfeEm6QAAAAACAAAAAAAQZgAAAAEAACAAAABo9rhwKNajlfu2gngVw6KFoC1uP5O9xuIsPZTAayLctwAAAAAOgAAAAAIAACAAAAB2PQcDbtFRRAawpdt8a2qkvOxkqkRBGTZ0eoNe8O0pVBAAAABpj5UMo8oQrI1500FjeXVMQAAAADK0UXHtS6EndjSE1QzfDz3Fq6mIQaOkQGyEwiQUfLwochlE/FKsd1Y58U96TpUuG0f7ivB4ZKyL08f74NC3f+4=",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "ip neighbo | grep 10.0.20",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.5",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444903",
+            "col_positions": {
+                "null": 1,
+                "__ROOT__": 1,
+                "0. 시험망": 1
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "192.168.9.249",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAkH/85SA2gE68hismRxW9ogAAAAACAAAAAAAQZgAAAAEAACAAAAA56Uwr3aapuFS6xCyCvFN0feFFRJ6NVBbCg6s1Hu+3ngAAAAAOgAAAAAIAACAAAACigUNek1lytBgYb9s70uWBLsUnn3VZmyqQTKycSGtzwBAAAABGQGuBsRjOdTGrYcxyDZ+9QAAAAGUnhalisK4lYA2jyk1XTpwKg2IVueZjl5JueZL4qaX8foooPH6lT2urp9ZbS8gF47SRf8ivMIyXTG2CiQNZrfE=",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "2",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444915",
+            "col_positions": {
+                "null": 1,
+                "__ROOT__": 1,
+                "0. 시험망": 1
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "RU_Controller_60",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAz3mQ2UWexEehC9To7Huw3QAAAAACAAAAAAAQZgAAAAEAACAAAAAirHxAGqi6ubLHaAPfCifuSgWRKaGwcHv17oCUZQQvrAAAAAAOgAAAAAIAACAAAAARdeIQdslyh3Wmix3EdfyOuOFXzZK9KJwQVGLxB87d4RAAAAC+tcHwX0GRMU0CYjGmDmeLQAAAAJlkxxvRFK+OGjGw0vm0UFv7mepAa2BHgDUGyJU2ItVlD5Q7uA6B4aGkHeHt7Ph3tXtorzKBiLsb1eANPbJCojE=",
+            "ru_cmd": "ssh solid@10.0.60.254",
+            "ru_pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAwraarZaCnUqXHEXvezwt/QAAAAACAAAAAAAQZgAAAAEAACAAAADJSQSge3Sln6qXNqaNM/khYLA8Fl+dPptbJUfWjkMN5wAAAAAOgAAAAAIAACAAAABZMY78+IMbWlyb4cxia0cKyz2+hpT/A7kYu6m5hG86fhAAAADe8P/Xvfii2I9iGehLFpOXQAAAAGr7N7Rt85Jv+Dcdlne52eBznCK30m9hLZ1CYSPveNmUS8j7ppMHgqCqM6NOSTsTfarhMAQrTi0krq5iIG7jC6c=",
+            "final_cmd": "ip neigh | grep 10.0.60",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.5",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444920",
+            "col_positions": {
+                "null": 1,
+                "__ROOT__": 1,
+                "0. 시험망": 1
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "ATOM",
+            "type": "P",
+            "ip": "C:\\Users\\thelastsun\\AppData\\Local\\atom\\atom.exe",
+            "port": "22",
+            "baud_rate": "115200",
+            "user": "",
+            "pw": "",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "",
+            "ssh_interval": "2.0",
+            "moba_interval": "3.0",
+            "col_positions": {},
+            "macro_steps": [],
+            "folder": "1. Util",
+            "timestamp_enabled": false
+        },
+        {
+            "name": "WINSCP",
+            "type": "P",
+            "ip": "C:\\Program Files (x86)\\WinSCP\\WinSCP.exe",
+            "port": "22",
+            "baud_rate": "115200",
+            "user": "",
+            "pw": "",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "",
+            "ssh_interval": "2.0",
+            "moba_interval": "3.0",
+            "col_positions": {},
+            "macro_steps": [],
+            "folder": "1. Util",
+            "timestamp_enabled": false
+        },
+        {
+            "name": "10.0.60.166",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAi+B5uO/tOUGI7R2twGMXhQAAAAACAAAAAAAQZgAAAAEAACAAAADiYS7lIAlMLvm2GVT3YXuKeQp7TlGb15CB6DYb7zLzWwAAAAAOgAAAAAIAACAAAADdBWttq+wlII3CF00PZfmYWBamEaPzZXIyVpeMrq+JAhAAAADlXxAWsHKyQhOwdyPsfzIFQAAAAJ0fXwzfJTJEYtcDx8+CGw21SUiJ+XJXdqqy4O1+Bk2kHlx63YpeX0M/j52Kw4I5Jzv01xgdPNoyANecG7PoqNo=",
+            "ru_cmd": "ssh admin@10.0.60.166",
+            "ru_pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAnsHfERcbO0SaD8vE114GhQAAAAACAAAAAAAQZgAAAAEAACAAAAAaJr30OYyeF3ubeJEKfG8DJUmvGv0xir97qWggej+cgwAAAAAOgAAAAAIAACAAAADWMo1PRnhrhZeoR8R32iQ6AtuH/HvWv7NltC1Rf9chTxAAAACqJ6OQNEWrwtmh7+LVK/MrQAAAAMmZuP75PkYUsnGJv8GVPcvDGjNxpBcEm/vWlpwI1HrvRAFWBXJn9oFwPadvxCRM/ddmaDlLSGUx+BQ0Lm3WkyM=",
+            "final_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "2",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444915",
+            "col_positions": {
+                "null": 1,
+                "__ROOT__": 1,
+                "0. 시험망": 3
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "RHU20",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA0XoNLdzciUWtmVhDG7dpNQAAAAACAAAAAAAQZgAAAAEAACAAAAACVxJpfkYY9ro+TLvfAhscsLFM8OzufEH3owtVeDvLHAAAAAAOgAAAAAIAACAAAACxQN1WRBq9Md+Dyr5NFc3RttXSck7SteOB8RCtXFjsjhAAAAC9GhGd59zsa5ewnzB+rUIZQAAAAApw9skgdQI5giIhp7b9J+MRM14yQ1KbTVqe4Ho6m0M4iqX8FAGG3eQg1T6NZNrurZifThvJYgTPKmWs7FvWYH4=",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "minicom5 root, Thfflemfoqtm123!",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "2",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444915",
+            "col_positions": {
+                "null": 1,
+                "__ROOT__": 1,
+                "0. 시험망": 3
+            },
+            "timestamp_enabled": true
+        },
+        {
+            "name": "SmartAccessAnyWhere",
+            "type": "P",
+            "ip": "C:/Program Files/Viavi/SmartAccessAnywhere/SmartAccessAnywhere.exe",
+            "port": "22",
+            "baud_rate": "115200",
+            "user": "",
+            "pw": "",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "",
+            "ssh_interval": "2.0",
+            "moba_interval": "3.0",
+            "col_positions": {
+                "__ROOT__": 0
+            },
+            "macro_steps": [],
+            "folder": "1. Util",
+            "timestamp_enabled": false
+        },
+        {
+            "name": "192.168.80.44(TEST_PC)",
+            "type": "R",
+            "ip": "192.168.80.44",
+            "user": "solid",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAZ238FnAHbECN06ZmHny2jQAAAAACAAAAAAAQZgAAAAEAACAAAACROj4RRFiukkB1BnMjd6sVYtuHg8q4xk+AgT8/hECSewAAAAAOgAAAAAIAACAAAAC59IlumTCdrJzZIaeMAVdAeAN4woYqzlG/V4eJ09vuABAAAADBpqX4htGROx9QWKCDjaOTQAAAAKBf2smAE5x733PpX2EbFyPaQ+8NR73FhaQrXEwNgBios/RTEhegrhSNAqR77zsDeyVsx6p/o8k3wK7PDHJC47A=",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444927",
+            "col_positions": {
+                "null": 2
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "192.168.9.249",
+            "type": "R",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAFyC9S5ZT4UywtaKNKiQBYQAAAAACAAAAAAAQZgAAAAEAACAAAABJbifmMfRm1fVgm1NJWCGEyKsBuXGdnbgAAPOifVHeiQAAAAAOgAAAAAIAACAAAADNmxIQBqaQyuIH2juZ6dZbjAHAYvTEX10K19Q5YTUvJxAAAADdcdVCcYl/z7u8KsStDppZQAAAAA1ZyFoVZDNIkLxtTWeCt2uAwPHoSkIe/HQzOsvW3gP4mCkW7XlfQMLf7zNQNq7VRVfJO5pRPZWAFl0d+AxqN+A=",
+            "ru_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ru_pw": "",
+            "final_cmd": "",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444924",
+            "col_positions": {
+                "null": 2
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "192.168.80.132_LG",
+            "type": "R",
+            "ip": "192.168.9.132",
+            "user": "solid",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAOvLiVisckUG0i4T8HGWgxwAAAAACAAAAAAAQZgAAAAEAACAAAABF+5U9UlFDVopI+Z19m9nRRi4rkwC0RiaKSSlsofnoWAAAAAAOgAAAAAIAACAAAAAxp+H57vQk1YX7TOV9cCz8/M22nUPrPjV0uhA/cQCIkRAAAABzzZwooY58dYgNgQ7DeXCjQAAAALIHvfDEQh86DKgODPpvQvrG0cfRLCaeV+FSCF76GGGBexh0J+lrVp1IL2AqB5+vCUFLkMZdyYszq1WThtQGaoY=",
+            "ru_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ru_pw": "",
+            "final_cmd": "",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444924",
+            "col_positions": {
+                "null": 2,
+                "__ROOT__": 0
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "192.168.80.243_Lenovo",
+            "type": "R",
+            "ip": "192.168.80.243",
+            "user": "solid",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAtD/FiI/uLU64bhrKhktAMwAAAAACAAAAAAAQZgAAAAEAACAAAACv00G0v1rso7SCeK7LoxVAl0ZMAMkwySV514ewcfiKvAAAAAAOgAAAAAIAACAAAACXX2iFVjSDD4pEK9IkqB4lHVPqHP4S6j3y02Mf/73DNRAAAABgGE+nMYF7eyxGn5Qm0JflQAAAANtccHD5IWaxK88WYtFAtjI/vj8HKts85u5ocY4k8IjRL7zpFX19Rg5slzfEWio297Cl0KqgQk1R8NDIKbZPd4E=",
+            "ru_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ru_pw": "",
+            "final_cmd": "",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444924",
+            "col_positions": {
+                "null": 2
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "10.0.60.128",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAeIODyCghL0yML7047+uDxwAAAAACAAAAAAAQZgAAAAEAACAAAACwFBZnBwBkIoh/fhMZvnALBf4ZSNGxtV/VwR261L5GRwAAAAAOgAAAAAIAACAAAACxCXpZlKe6fZbb7w8CLTBK5I0HZNnVrUUqlFawX9tsjhAAAADRrIBK8Me2+9Cew7xkDQ+HQAAAANPHZTkeiA+k7I0GmX4H7lRWgRbF9tWyQE+fgw+Tyo4m94FzLZyUdv2bIPgtVTkiZcSuqgIRf6H1z1su8s7nh0c=",
+            "ru_cmd": "ssh root@10.0.60.128",
+            "ru_pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAALa/1ojtM9EuaJH6TnjhocAAAAAACAAAAAAAQZgAAAAEAACAAAAA6nQeOeaTVRTxwF4a+PUnl+uFuCuQNJBXGv4wFCiK+YQAAAAAOgAAAAAIAACAAAAAhKtygDqcFlY3WyUEJ9BAyZkqyPYZmga89698ZyjCkpCAAAADtNTss6a5pXFBTrvZmegkWZs/o6J0VgCs7g7q6T59WmUAAAAAiTdWfgai4yJCNJVPS+aKv7Xc+jvzNZGNB76Lk00F2kU14yv7hI1Bp4PMkWfZFpSQSWKs4hXB4tWJ5pKKUf2dd",
+            "final_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "2",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444915",
+            "col_positions": {
+                "null": 1,
+                "__ROOT__": 1,
+                "0. 시험망": 3
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "10.0.20.106",
+            "type": "S",
+            "ip": "10.0.20.106",
+            "user": "admin",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAQ56gHK6OakePzzRaAZzSKQAAAAACAAAAAAAQZgAAAAEAACAAAABaJ4JyF9lex/ZPrhEJ+vebrAnSyI+YF+4jf6vsCHi8iAAAAAAOgAAAAAIAACAAAABwc8jn0ockLSHSL213rh6kn63gCVFg2IfcqYXYpaewHhAAAABoyyO6sLOdB9oUwOLPwPErQAAAAJIuGjrgBGM/2em2zwUhHAma5hENMpXbTYud4DPmNrsD41qspL7igH1i/5BT2LB8wPvd5BJaG1GB87dsx1UgqIo=",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.5",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444903",
+            "col_positions": {
+                "null": 1,
+                "__ROOT__": 1,
+                "0. 시험망": 3
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "L2SW_20",
+            "type": "S",
+            "ip": "192.168.9.123",
+            "user": "solid",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAQMxwbtFTpUazjzjvKkipNQAAAAACAAAAAAAQZgAAAAEAACAAAADVszLfs9QP4p7naKB2NdwDes0YXAoWq8sJmT0qRFAQeAAAAAAOgAAAAAIAACAAAAD7e2yOsIfYH5lqVFGpZq320SucjqIO/ruMXYH/mGUD4hAAAAAUXf0nsgTKu+WRaQ8ua8mFQAAAALQUqZPE/0y8Su1OXfk61xcH+S3U++Q7ZSYZrMjS/VzY+257APJUPmoOkkxm7lq1jGcKmufvx2GYxiCtAw6fZU8=",
+            "ru_cmd": "ssh admin@10.0.20.50",
+            "ru_pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAChM9yFBG7024okbI73BSaAAAAAACAAAAAAAQZgAAAAEAACAAAAC58Al8VkS4XGr4LrNpIkBHn2OVdcSWf8MAGvsTAiRjVAAAAAAOgAAAAAIAACAAAACGkxoWC2VFl2noVi0tOkpBxYvwP4gGKMq6knOnYuCuxSAAAAATiH6s+hYBHUMqJPdYTvEFsczOJ7NTwwFp1w2HSdyp6kAAAACXM3JiGPqka1X4BcKHxNXprtrDMDv8gWR/T61Eb2BSb2veu+KpsbbmvdFKx7l/4o89GTDMe0SJEauasT82lfd7",
+            "final_cmd": "en, show mac",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.5",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444932",
+            "col_positions": {
+                "null": 0,
+                "__ROOT__": 2,
+                "0. 시험망": 1
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "L2SW_30",
+            "type": "S",
+            "ip": "192.168.9.123",
+            "user": "solid",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAm7iFXSs4TkiZrAqJRyPZxQAAAAACAAAAAAAQZgAAAAEAACAAAAAoh1VPkz3TXRcwZob1nZImn8zjDaSs0wj8gr6dJtHugQAAAAAOgAAAAAIAACAAAAAxSY1GrZH9d36Ff3WJ2YNvTwsjj++Z3L/nuUx1UrpRNBAAAACEqP+IRcolBjPGXkpydXXuQAAAAHBp+ut7ymko+mS7HNyHBM9lbQEbHymJ9WYyIHkQoImmX6R74Lj2lhtGFWl/1EHpclJN2tX0MSfMO8FTC2lBWQ0=",
+            "ru_cmd": "ssh admin@10.0.30.50",
+            "ru_pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAogJfzePhME2HlaG/z6TdKgAAAAACAAAAAAAQZgAAAAEAACAAAACGBgyFAhJlxjO0Z5TjijCtWPL7oywWXXOEG7BHA0G8cQAAAAAOgAAAAAIAACAAAABXvvOBx4gNjw5R25Gh++BJC8WMjTutr5zrvgPuqda0nCAAAAC1PJts3N1KbQCXi/4uFMthLZzaC1+NmBaPA0ltc5oqBkAAAACsZDm4qvZUk4IyP+6hcQb3IpjFBRrH2LLsHOnGzK69AFDKJ4MlhoycsNZGNLWsG9XV70OXvnEKmqp7bkA3cbUO",
+            "final_cmd": "en, show mac",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.5",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444932",
+            "col_positions": {
+                "null": 0,
+                "__ROOT__": 2,
+                "0. 시험망": 1
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "L2SW_60",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAokthBStMy0qCNrdMim27QQAAAAACAAAAAAAQZgAAAAEAACAAAADmmgVc5ZxDoF8CNogWL8CFzU9E9oFr0OZZ0Efn61770AAAAAAOgAAAAAIAACAAAAD/bKR557IdPMk1B3/YDVQBKzYpINt09icSgoDo/2H4zBAAAABZW3ufBVrJWKsifTFkDeACQAAAAOwTpaWAmuwnEkF6+j+u/py4S6XyPbRDY0p0aIoDyBHhuDOuJu+3blAGr6svtXRLzhx7rGpDBOudrfRqismd+oc=",
+            "ru_cmd": "ssh admin@10.0.60.50",
+            "ru_pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAlYvSv0kEr0yNFUK3K0lmhAAAAAACAAAAAAAQZgAAAAEAACAAAABXgAAyTvcregDuB663kzUmiU7bDMcC+63NWL+vI3oLvAAAAAAOgAAAAAIAACAAAAAh4Zobms07N0m2XOGTqBcNFaYcL/goGKgZyWRLh9MwmyAAAAD7t6g2kpCs97mbk930/BUW2esCAv3Ic/fA2R9UBbfNLkAAAAC8ZrP6byd3URwud9IcJ8sjROy/8nhWQDvvK/ZWAeoF9oEhW5/GywRDnMp7w/rF0QuwUczqxSZKlKRdqKYOWQFp",
+            "final_cmd": "en, show mac",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.5",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444936",
+            "col_positions": {
+                "null": 0,
+                "__ROOT__": 2,
+                "0. 시험망": 1
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "nDLPU(S1)",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA3S5/PT6fmUSLRdhPSdJ4hgAAAAACAAAAAAAQZgAAAAEAACAAAACgt+7/MNFtp6MBVUUBVNXS4YvWzMHoPT4UGeOq4EcK6gAAAAAOgAAAAAIAACAAAACN6sljDHwP6k0K44fNqN4j5tlUCGJS7RGEaaZ+mVipohAAAABMRnCuAhZ4UNaDYmuB2KOqQAAAAFEkdA0JbQOsAZn+Lg9reNV//hYhwtNrDndrnxfaRdVJ0kg8M7H3+OJ66Ye+nZfREfDec3j+7R8u51Ha2WyR91Y=",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "minicom2, solid, ngenesisQ!@",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.5",
+            "moba_interval": "2.0",
+            "macro_steps": [
+                {
+                    "action": "원문 TTL 1줄",
+                    "value": ":loop_start"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "170"
+                },
+                {
+                    "action": "문구 대기 (wait)",
+                    "value": "nDLPU login::10"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "solid"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "ngenesisQ!@"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "sudo su -"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "ngenesisQ!@"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "10"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "oru-container-shell"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2"
+                },
+                {
+                    "action": "문구 대기 (wait)",
+                    "value": "Error response from daemon: No such container: oru1:10"
+                },
+                {
+                    "action": "문구 확인 후 종료",
+                    "value": "Error response from daemon: No such container: oru1:10:에러가 발생하여 매크로를 중단합니다: oru1 컨테이너를 찾을 수 없습니다."
+                },
+                {
+                    "action": "원문 TTL 1줄",
+                    "value": "messagebox \"에러가 발생하여 매크로를 중단합니다: oru1 컨테이너를 찾을 수 없습니다.\" \"매크로 중단\""
+                },
+                {
+                    "action": "원문 TTL 1줄",
+                    "value": "end"
+                },
+                {
+                    "action": "원문 TTL 1줄",
+                    "value": "else"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "show system detail"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "reset system user-config"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2"
+                },
+                {
+                    "action": "처음으로 (goto loop)",
+                    "value": ""
+                }
+            ],
+            "folder": "0. 시험망",
+            "id": "434444934",
+            "col_positions": {
+                "null": 3,
+                "0. 시험망": 2,
+                "__ROOT__": 3
+            },
+            "timestamp_enabled": true
+        },
+        {
+            "name": "nDLPU(S2)",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAjbROXaILSUWxlKHXDLWmrwAAAAACAAAAAAAQZgAAAAEAACAAAACkBoyo+jXK0u/mNMs+QQVY3uDmrlxghOs9MniRKZQ6VAAAAAAOgAAAAAIAACAAAABNJrPklROMZmPBAHNDQlRPFb2vnOisN1Z8669eq5UXVhAAAAAPJYYGa3lEK15qvvleo3rUQAAAAM7fQ8xCjA8nCNLGUZNUdd+3T4rHsevYcFtF9diu67XpXuCKeKlgvtqKaMQf9mFf4AcnB91Q+QqmFSCWz36vNDQ=",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "minicom2, solid, ngenesisQ!@",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.5",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444934",
+            "col_positions": {
+                "null": 3,
+                "0. 시험망": 2,
+                "__ROOT__": 3
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "nDLPU_128",
+            "type": "S",
+            "ip": "192.168.9.123",
+            "user": "solid",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAUiifRA3kT0+CxDiOLm1DmAAAAAACAAAAAAAQZgAAAAEAACAAAAD5Y95nV1fWmMUGm8ahvTAWuvP2uFkTKVeu61xCk36ztQAAAAAOgAAAAAIAACAAAACMiYXzFI12CqAG1QdcnyXDwtqYlQdXg6kcSQC64WXoFRAAAAAQBwrINiOnukYf9fHJK1COQAAAAIDtL/E9/J3G3p/NMXFFItCqHtHVQOdPjnRP4wSOzCGL6Aux5JNLWe7NPgq5va5esghFaiyfT9WhN+AivJm977w=",
+            "ru_cmd": "ssh admin@10.0.20.128",
+            "ru_pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAATLrJShHt2UuNfDtFZR8yoQAAAAACAAAAAAAQZgAAAAEAACAAAABnEKE+uJu/4n3GR5h8WIfvV5CXyzYULNQX01BuLG1aigAAAAAOgAAAAAIAACAAAAAV7X8/UTahGLxR4OfXF+1fR2yp8zH+ZbC+WNgwuFoEAxAAAAAYaf1vEjh6fBr2X9Z5T1JNQAAAAJzYaQphuDQ3pYTGCcmShrwYCpuKzoboNRIU0bflCK/qS654rNKh0ojNeGE6Su7aAD4LHTktqKBSMdC0RNKOPkA=",
+            "final_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "2",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444932",
+            "col_positions": {
+                "null": 0,
+                "__ROOT__": 2,
+                "0. 시험망": 2
+            },
+            "timestamp_enabled": false
+        },
+        {
+            "name": "nRU_n78",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAU1dX5nWh2EioMoNXnRHQuQAAAAACAAAAAAAQZgAAAAEAACAAAACBdtQB19aIYJtN4BI50w01mLb4y4LWS8wxe3dUvVV5FwAAAAAOgAAAAAIAACAAAAAVonpSHzCk7txv6I5MeXknrizCq1rB3L26wMQUUFIKHhAAAAAQlk6FaNxtHvvui/9pSS5BQAAAAPmDDZ2mluuR7RJqsFAg6/3LooqNadyDImn4JLvbBYjy2HwzTyZSt2MZfInwlgBtRnb5Kuv4Y0oV7ci5DxapdNM=",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "minicom1, admin, solid123!",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.5",
+            "moba_interval": "2.0",
+            "macro_steps": [
+                {
+                    "action": "원문 TTL 1줄",
+                    "value": ":loop_start"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "170"
+                },
+                {
+                    "action": "문구 대기 (wait)",
+                    "value": "nDLPU login::10"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "solid"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "ngenesisQ!@"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "sudo su -"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "3"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "ngenesisQ!@"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "10"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "oru-container-shell"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2"
+                },
+                {
+                    "action": "문구 대기 (wait)",
+                    "value": "Error response from daemon: No such container: oru1:10"
+                },
+                {
+                    "action": "문구 확인 후 종료",
+                    "value": "Error response from daemon: No such container: oru1:10:에러가 발생하여 매크로를 중단합니다: oru1 컨테이너를 찾을 수 없습니다."
+                },
+                {
+                    "action": "원문 TTL 1줄",
+                    "value": "messagebox \"에러가 발생하여 매크로를 중단합니다: oru1 컨테이너를 찾을 수 없습니다.\" \"매크로 중단\""
+                },
+                {
+                    "action": "원문 TTL 1줄",
+                    "value": "end"
+                },
+                {
+                    "action": "원문 TTL 1줄",
+                    "value": "else"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "show system detail"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2"
+                },
+                {
+                    "action": "입력 (sendln)",
+                    "value": "reset system user-config"
+                },
+                {
+                    "action": "대기 (pause)",
+                    "value": "2"
+                },
+                {
+                    "action": "처음으로 (goto loop)",
+                    "value": ""
+                }
+            ],
+            "folder": "0. 시험망",
+            "id": "434444934",
+            "col_positions": {
+                "null": 3,
+                "0. 시험망": 2,
+                "__ROOT__": 3
+            },
+            "timestamp_enabled": true
+        },
+        {
+            "name": "DU_emulator",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAATNsEdqZfe0SBF1k3GAA0iAAAAAACAAAAAAAQZgAAAAEAACAAAAAMa3SkfGiLNMR8xwllIpQc/eYHvUeTPBU3e+3Cbn/9pAAAAAAOgAAAAAIAACAAAADEguCiqPqESpmyaStSWstT0qeyMfcuzU6pb4Be1VjIARAAAABLc48QFv1j0D+u4YxTy9vHQAAAALBOggWzN+tTgzS/MHCSQthgShIo/h0DP9byNadNNq8Qd8P2+AhvkiHH9XgMVZQ5AB61FHk72gFp6oj4qFwVq3s=",
+            "ru_cmd": "ssh root@10.0.60.102",
+            "ru_pw": "dpapi:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAJSZ1scI+7UWdGhI04ocCTAAAAAACAAAAAAAQZgAAAAEAACAAAAA+DhimjpjxnNPiqm+IL5qhJa1a3XvZNNjwDNH/sFa9RAAAAAAOgAAAAAIAACAAAACegd78e2Up5fyRzBFgdhmcyz0zRJIh8k758Rdpwf5k3BAAAAC2Yj04My8uY2dw/Faoroz8QAAAANc/hqNAn8XJ4p7TJ3Wvi5zVKDsc4xHcXSYPXu0brt2MjXtH9nVACClHUZldVfxeuHOX4uSh6Gu+Pweodzlt+L0=",
+            "final_cmd": "cd /emulator/",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.3",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": "0. 시험망",
+            "id": "434444915",
+            "col_positions": {
+                "null": 1,
+                "__ROOT__": 1,
+                "0. 시험망": 0
+            },
+            "timestamp_enabled": false
+        }
+    ]
+}

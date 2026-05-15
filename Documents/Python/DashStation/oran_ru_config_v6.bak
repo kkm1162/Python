@@ -1,0 +1,22 @@
+{
+    "server_ip": "192.168.9.249",
+    "ssh_user": "slab",
+    "ssh_pw": "c2xhYlhUNzhOdFNxN3JyWUxNWXVFVjVMLVM5X0d3UUZmQ1pGM0hNYW1CUUVLUHM=",
+    "trex_path": "/home/slab/trex/v3.08",
+    "src_mac": "00:11:22:33:44:55",
+    "dst_mac": "AA:BB:CC:DD:EE:FF",
+    "src_ip": "192.168.11.100",
+    "dst_ip": "192.168.11.2",
+    "dst_port": "830",
+    "vlan_id": "",
+    "pcap_path": "/tmp/pcap_output",
+    "pcap_name": "eCPRI_U_Plane_RRC.pcap",
+    "pkt_size": "64",
+    "rate": "10.0",
+    "pcap_ms": "1.0",
+    "duration_min": "0",
+    "attack_type": "eCPRI U-Plane (대역폭/RRC 과부하)",
+    "trex_port": "1",
+    "trex_cores": "6",
+    "spoofing": false
+}

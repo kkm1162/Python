@@ -1,0 +1,68 @@
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-37-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+250 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+16 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+*** System restart required ***
+Last login: Wed May 13 11:08:58 2026 from 10.0.20.254
+solid@OL4-RUC:~$ ssh admin@10.0.20.50
+admin@10.0.20.50's password: 
+Login Time: May 13, 2026 06:19:57 (Wed) GMT 
+L2SW_20> en
+L2SW_20# show mac
+ VLAN     MAC Address     Type      Ports 
+  -----+----------------+---------+-----------------------+
+  1000   000a.3500.0102   static    eth0/47 
+  1      000a.3500.0002   dynamic   eth0/42    
+  1      000a.3500.000a   dynamic   eth0/41    
+  1      000a.3500.000e   dynamic   eth0/31    
+  1      00b0.ae09.03ee   dynamic   eth0/18    
+  1      00b0.ae09.37d9   dynamic   eth0/18    
+  1      00e0.4c68.0af0   dynamic   eth0/1     
+  1      dcc1.0100.0009   dynamic   eth0/29    
+  1      dcc1.0100.0505   dynamic   eth0/47    
+  1      dcc1.0100.922d   dynamic   eth0/45    
+  1      dcc1.0100.a624   dynamic   eth0/16    
+  1      dcc1.0102.0304   dynamic   eth0/40    
+L2SW_20# conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+L2SW_20(config)# interface ethernet 0/47
+L2SW_20(config-if[ETH0/47])# no synce-port 
+L2SW_20(config-if[ETH0/47])# no ptp port 
+2SW_20(config-if[ETH0/47])# no ptp port L2SW_20(config-if[ETH0/47])# no ptp port 
+2SW_20(config-if[ETH0/47])# no ptp port L2SW_20(config-if[ETH0/47])# no ptp port 
+2SW_20(config-if[ETH0/47])# no ptp port L2SW_20(config-if[ETH0/47])# no ptp port 
+2SW_20(config-if[ETH0/47])# no ptp port L2SW_20(config-if[ETH0/47])# no ptp port 
+L2SW_20(config-if[ETH0/47])# exit
+L2SW_20(config)# exit
+L2SW_20# exit
+Connection to 10.0.20.50 closed.
+solid@OL4-RUC:~$ ssh admin@10.0.20.50
+admin@10.0.20.50's password: 
+Login Time: May 13, 2026 06:30:38 (Wed) GMT 
+L2SW_20> enable 
+L2SW_20# conf tterminal igure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+L2SW_20(config)# interface ethernet 0/467
+L2SW_20(config-if[ETH0/47])# synce-port 
+L2SW_20(config-if-synce)# exit
+L2SW_20(config-if[ETH0/47])# ptp-port transport 
+ethernet  udp       
+2SW_20(config-if[ETH0/47])# ptp-port transport L2SW_20(config-if[ETH0/47])# ptp-port transport 
+ethernet  udp       
+2SW_20(config-if[ETH0/47])# ptp-port transport L2SW_20(config-if[ETH0/47])# ptp-port transport ethernet 
+L2SW_20(config-clk-port)# 
+Vty connection is timed out.
+Connection to 10.0.20.50 closed.
+solid@OL4-RUC:~$ 

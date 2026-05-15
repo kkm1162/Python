@@ -1,0 +1,19 @@
+{
+  "server_ip": "192.168.9.249",
+  "ssh_user": "slab",
+  "ssh_password": "slab",
+  "trex_path": "/home/slab/trex/v3.08",
+  "trex_port": "0",
+  "attacker_mac": "00:11:22:33:44:55",
+  "oru_mac": "AA:BB:CC:DD:EE:FF",
+  "attacker_ip": "192.168.11.100",
+  "oru_ip": "192.168.11.2",
+  "dest_port": "830",
+  "duration": "60",
+  "line_rate": "10.0",
+  "pcap_dir": "/home/slab/pcap_output",
+  "vlan_mode": "Untagged",
+  "vlan_id": "100",
+  "packet_size_mode": "Standard (64 Bytes)",
+  "user_packet_size": "64"
+}

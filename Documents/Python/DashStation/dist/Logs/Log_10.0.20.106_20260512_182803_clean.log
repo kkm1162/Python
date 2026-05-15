@@ -1,0 +1,1435 @@
++------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+Last login: Tue May 12 09:27:58 2026 from 192.168.80.58
+Security & OS hardening are being applied.
+
+========================================================================
+ Developer mode enabled.
+========================================================================
+
+Hello, this is O-RAN.MP.DAEMON (version 0.17.1 (0.17.1-15-g844a6efc9)).
+Copyright 2019-2028 SOLiD Inc.
+
+nRU# start-shell 
+admin@nRU:~$ tail -F /var/log/netconf-rpc.log
+May 12 09:27:12 local4.info netopeer2-server[6517]: Session 25: message (len=4) flushed successfully.
+May 12 09:27:45 local4.info netopeer2-server[6517]: Session 25: received message (len=138):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
+  <close-session xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"/>
+</rpc>
+May 12 09:27:45 local4.info netopeer2-server[6517]: Session 25: sending message (len=91):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
+  <ok/>
+</rpc-reply>
+May 12 09:27:45 local4.info netopeer2-server[6517]: Session 25: message (len=4) flushed successfully.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: sending message (len=2896):
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <capabilities>
+    <capability>urn:ietf:params:netconf:base:1.0</capability>
+    <capability>urn:ietf:params:netconf:base:1.1</capability>
+    <capability>urn:ietf:params:netconf:capability:writable-running:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:rollback-on-error:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:startup:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:url:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:xpath:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:with-defaults:1.0?basic-mode=explicit&amp;also-supported=report-all,report-all-tagged,trim,explicit</capability>
+    <capability>urn:ietf:params:netconf:capability:notification:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:interleave:1.0</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-yang-metadata?module=ietf-yang-metadata&amp;revision=2016-08-05</capability>
+    <capability>urn:ietf:params:xml:ns:yang:1?module=yang&amp;revision=2017-02-20</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2013-07-15</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-yang-types?module=ietf-yang-types&amp;revision=2013-07-15</capability>
+    <capability>urn:ietf:params:netconf:capability:yang-library:1.0?revision=2019-01-04&amp;module-set-id=55</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-acm?module=ietf-netconf-acm&amp;revision=2018-02-14</capability>
+    <capability>urn:ietf:params:xml:ns:netconf:base:1.0?module=ietf-netconf&amp;revision=2011-06-01&amp;features=writable-running,rollback-on-error,startup,url,xpath</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-notifications?module=ietf-netconf-notifications&amp;revision=2012-02-06</capability>
+    <capability>urn:ietf:params:xml:ns:netconf:notification:1.0?module=notifications&amp;revision=2008-07-14</capability>
+    <capability>urn:ietf:params:xml:ns:netmod:notification?module=nc-notifications&amp;revision=2008-07-14</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-x509-cert-to-name?module=ietf-x509-cert-to-name&amp;revision=2014-12-10</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-with-defaults?module=ietf-netconf-with-defaults&amp;revision=2011-06-01</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04</capability>
+    <capability>urn:ietf:params:xml:ns:yang:iana-crypt-hash?module=iana-crypt-hash&amp;revision=2014-08-06</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-system?module=ietf-system&amp;revision=2014-08-06&amp;features=authentication,local-users</capability>
+    <capability>urn:ietf:params:xml:ns:yang:iana-if-type?module=iana-if-type&amp;revision=2017-01-19</capability>
+  </capabilities>
+  <session-id>26</session-id>
+</hello>
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: message (len=6) flushed successfully.
+
+
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: received message (len=206):
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <capabilities>
+    <capability>urn:ietf:params:netconf:base:1.0</capability>
+    <capability>urn:ietf:params:netconf:base:1.1</capability>
+  </capabilities>
+</hello>
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: received message (len=220):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1">
+  <get-schema xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+    <identifier>ietf-datastores</identifier>
+    <format>yang</format>
+  </get-schema>
+</rpc>
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: sending message (len=2816):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1"/>
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: message (len=4) flushed successfully.
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: received message (len=237):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2">
+  <get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <filter type="xpath" xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library" select="/yanglib:*"/>
+  </get>
+</rpc>
+
+
+
+
+
+
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: sending message (len=10903):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2">
+  <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <yang-library xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+      <content-id>55</content-id>
+      <schema>
+        <name>complete</name>
+        <module-set>complete</module-set>
+      </schema>
+    </yang-library>
+    <modules-state xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+      <module-set-id>55</module-set-id>
+      <module>
+        <name>ietf-yang-metadata</name>
+        <revision>2016-08-05</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-metadata</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>yang</name>
+        <revision>2017-02-20</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:1</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-inet-types</name>
+        <revision>2013-07-15</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-inet-types</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-yang-types</name>
+        <revision>2013-07-15</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-types</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-datastores</name>
+        <revision>2018-02-14</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-datastores</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-yang-library</name>
+        <revision>2019-01-04</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-library</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-acm</name>
+        <revision>2018-02-14</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-acm</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf</name>
+        <revision>2011-06-01</revision>
+        <namespace>urn:ietf:params:xml:ns:netconf:base:1.0</namespace>
+        <feature>writable-running</feature>
+        <feature>rollback-on-error</feature>
+        <feature>startup</feature>
+        <feature>url</feature>
+        <feature>xpath</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-notifications</name>
+        <revision>2012-02-06</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-notifications</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>notifications</name>
+        <revision>2008-07-14</revision>
+        <namespace>urn:ietf:params:xml:ns:netconf:notification:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>nc-notifications</name>
+        <revision>2008-07-14</revision>
+        <namespace>urn:ietf:params:xml:ns:netmod:notification</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-x509-cert-to-name</name>
+        <revision>2014-12-10</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-x509-cert-to-name</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-keystore</name>
+        <revision>2016-10-31</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-keystore</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-with-defaults</name>
+        <revision>2011-06-01</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-with-defaults</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-monitoring</name>
+        <revision>2010-10-04</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-datastores</name>
+        <revision>2017-08-17</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-datastores</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-ssh-server</name>
+        <revision>2016-11-02</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-ssh-server</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-tls-server</name>
+        <revision>2016-11-02</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-tls-server</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-server</name>
+        <revision>2016-11-02</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-server</namespace>
+        <feature>listen</feature>
+        <feature>ssh-listen</feature>
+        <feature>tls-listen</feature>
+        <feature>call-home</feature>
+        <feature>ssh-call-home</feature>
+        <feature>tls-call-home</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>iana-crypt-hash</name>
+        <revision>2014-08-06</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:iana-crypt-hash</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-system</name>
+        <revision>2014-08-06</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-system</namespace>
+        <feature>authentication</feature>
+        <feature>local-users</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-crypto-types</name>
+        <revision>2019-04-29</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-crypto-types</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-interfaces</name>
+        <revision>2018-02-20</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-interfaces</namespace>
+        <feature>if-mib</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-ip</name>
+        <revision>2018-02-22</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-ip</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>iana-hardware</name>
+        <revision>2018-03-13</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:iana-hardware</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-hardware</name>
+        <revision>2018-03-13</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-hardware</namespace>
+        <feature>hardware-state</feature>
+        <feature>hardware-sensor</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-dhcpv6-types</name>
+        <revision>2018-09-04</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-dhcpv6-types</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>iana-if-type</name>
+        <revision>2017-01-19</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:iana-if-type</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-wg4-features</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:wg4feat:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-supervision</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:supervision:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-fm</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:fm:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-fan</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:fan:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-hardware</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:hardware:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-interfaces</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:interfaces:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-mplane-int</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:mplane-interfaces:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-dhcp</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:dhcp:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-transceiver</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:transceiver:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-trace</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:trace:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-operations</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:operations:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-troubleshooting</name>
+        <revision>2019-02-04</revision>
+        <namespace>urn:o-ran:troubleshooting:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-file-management</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:file-management:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-software-management</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:software-management:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-sync</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:sync:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-compression-factors</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:compression-factors:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-module-cap</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:module-cap:1.0</namespace>
+        <feature>EAXC-ID-GROUP-SUPPORTED</feature>
+        <feature>CONFIGURABLE-TDD-PATTERN-SUPPORTED</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-delay-management</name>
+        <revision>2020-08-10</revision>
+        <namespace>urn:o-ran:delay:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-processing-element</name>
+        <revision>2020-04-17</revision>
+        <namespace>urn:o-ran:processing-element:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-lbm</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:lbm:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-performance-management</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:performance-management:1.0</namespace>
+        <feature>GRANULARITY-TRANSPORT-MEASUREMENT</feature>
+        <feature>GRANULARITY-EAXC-ID-MEASUREMENT</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-uplane-conf</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:uplane-conf:1.0</namespace>
+        <feature>EAXC-GAIN-CORRECTION</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-usermgmt</name>
+        <revision>2020-12-10</revision>
+        <namespace>urn:o-ran:user-mgmt:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-ethernet-forwarding</name>
+        <revision>2020-04-17</revision>
+        <namespace>urn:o-ran:ethernet-fwd:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-shared-cell</name>
+        <revision>2020-12-10</revision>
+        <namespace>urn:o-ran:shared-cell:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>solid-o-ran-operations</name>
+        <revision>2024-10-23</revision>
+        <namespace>urn:solid.co.kr:o-ran:operations:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+    </modules-state>
+  </data>
+</rpc-reply>
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: message (len=4) flushed successfully.
+
+
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: received message (len=256):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="3">
+  <get-schema xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+    <identifier>solid-o-ran-operations</identifier>
+    <version>2024-10-23</version>
+    <format>yang</format>
+  </get-schema>
+</rpc>
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: sending message (len=980):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="3"/>
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: message (len=4) flushed successfully.
+
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: received message (len=317):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="4">
+  <get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <filter type="xpath" xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library" xmlns:yangmnt="urn:ietf:params:xml:ns:yang:ietf-yang-schema-mount" select="/yanglib:* | /yangmnt:*"/>
+  </get>
+</rpc>
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: sending message (len=365):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="4">
+  <rpc-error>
+    <error-type>application</error-type>
+    <error-tag>operation-failed</error-tag>
+    <error-severity>error</error-severity>
+    <error-message xml:lang="en">Module with the namespace "urn:ietf:params:xml:ns:yang:ietf-yang-schema-mount" could not be found.</error-message>
+  </rpc-error>
+</rpc-reply>
+May 12 09:28:53 local4.info netopeer2-server[6517]: Session 26: message (len=4) flushed successfully.
+
+May 12 09:29:29 local4.info netopeer2-server[6517]: Session 26: received message (len=138):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
+  <close-session xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"/>
+</rpc>
+May 12 09:29:29 local4.info netopeer2-server[6517]: Session 26: sending message (len=91):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
+  <ok/>
+</rpc-reply>
+May 12 09:29:29 local4.info netopeer2-server[6517]: Session 26: message (len=4) flushed successfully.
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: sending message (len=2896):
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <capabilities>
+    <capability>urn:ietf:params:netconf:base:1.0</capability>
+    <capability>urn:ietf:params:netconf:base:1.1</capability>
+    <capability>urn:ietf:params:netconf:capability:writable-running:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:rollback-on-error:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:startup:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:url:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:xpath:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:with-defaults:1.0?basic-mode=explicit&amp;also-supported=report-all,report-all-tagged,trim,explicit</capability>
+    <capability>urn:ietf:params:netconf:capability:notification:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:interleave:1.0</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-yang-metadata?module=ietf-yang-metadata&amp;revision=2016-08-05</capability>
+    <capability>urn:ietf:params:xml:ns:yang:1?module=yang&amp;revision=2017-02-20</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2013-07-15</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-yang-types?module=ietf-yang-types&amp;revision=2013-07-15</capability>
+    <capability>urn:ietf:params:netconf:capability:yang-library:1.0?revision=2019-01-04&amp;module-set-id=55</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-acm?module=ietf-netconf-acm&amp;revision=2018-02-14</capability>
+    <capability>urn:ietf:params:xml:ns:netconf:base:1.0?module=ietf-netconf&amp;revision=2011-06-01&amp;features=writable-running,rollback-on-error,startup,url,xpath</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-notifications?module=ietf-netconf-notifications&amp;revision=2012-02-06</capability>
+    <capability>urn:ietf:params:xml:ns:netconf:notification:1.0?module=notifications&amp;revision=2008-07-14</capability>
+    <capability>urn:ietf:params:xml:ns:netmod:notification?module=nc-notifications&amp;revision=2008-07-14</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-x509-cert-to-name?module=ietf-x509-cert-to-name&amp;revision=2014-12-10</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-with-defaults?module=ietf-netconf-with-defaults&amp;revision=2011-06-01</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04</capability>
+    <capability>urn:ietf:params:xml:ns:yang:iana-crypt-hash?module=iana-crypt-hash&amp;revision=2014-08-06</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-system?module=ietf-system&amp;revision=2014-08-06&amp;features=authentication,local-users</capability>
+    <capability>urn:ietf:params:xml:ns:yang:iana-if-type?module=iana-if-type&amp;revision=2017-01-19</capability>
+  </capabilities>
+  <session-id>27</session-id>
+</hello>
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: message (len=6) flushed successfully.
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: received message (len=206):
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <capabilities>
+    <capability>urn:ietf:params:netconf:base:1.0</capability>
+    <capability>urn:ietf:params:netconf:base:1.1</capability>
+  </capabilities>
+</hello>
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: received message (len=220):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1">
+  <get-schema xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+    <identifier>ietf-datastores</identifier>
+    <format>yang</format>
+  </get-schema>
+</rpc>
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: sending message (len=2816):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1"/>
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: message (len=4) flushed successfully.
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: received message (len=237):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2">
+  <get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <filter type="xpath" xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library" select="/yanglib:*"/>
+  </get>
+</rpc>
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: sending message (len=10903):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2">
+  <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <yang-library xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+      <content-id>55</content-id>
+      <schema>
+        <name>complete</name>
+        <module-set>complete</module-set>
+      </schema>
+    </yang-library>
+    <modules-state xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+      <module-set-id>55</module-set-id>
+      <module>
+        <name>ietf-yang-metadata</name>
+        <revision>2016-08-05</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-metadata</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>yang</name>
+        <revision>2017-02-20</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:1</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-inet-types</name>
+        <revision>2013-07-15</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-inet-types</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-yang-types</name>
+        <revision>2013-07-15</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-types</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-datastores</name>
+        <revision>2018-02-14</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-datastores</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-yang-library</name>
+        <revision>2019-01-04</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-library</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-acm</name>
+        <revision>2018-02-14</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-acm</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf</name>
+        <revision>2011-06-01</revision>
+        <namespace>urn:ietf:params:xml:ns:netconf:base:1.0</namespace>
+        <feature>writable-running</feature>
+        <feature>rollback-on-error</feature>
+        <feature>startup</feature>
+        <feature>url</feature>
+        <feature>xpath</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-notifications</name>
+        <revision>2012-02-06</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-notifications</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>notifications</name>
+        <revision>2008-07-14</revision>
+        <namespace>urn:ietf:params:xml:ns:netconf:notification:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>nc-notifications</name>
+        <revision>2008-07-14</revision>
+        <namespace>urn:ietf:params:xml:ns:netmod:notification</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-x509-cert-to-name</name>
+        <revision>2014-12-10</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-x509-cert-to-name</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-keystore</name>
+        <revision>2016-10-31</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-keystore</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-with-defaults</name>
+        <revision>2011-06-01</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-with-defaults</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-monitoring</name>
+        <revision>2010-10-04</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-datastores</name>
+        <revision>2017-08-17</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-datastores</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-ssh-server</name>
+        <revision>2016-11-02</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-ssh-server</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-tls-server</name>
+        <revision>2016-11-02</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-tls-server</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-server</name>
+        <revision>2016-11-02</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-server</namespace>
+        <feature>listen</feature>
+        <feature>ssh-listen</feature>
+        <feature>tls-listen</feature>
+        <feature>call-home</feature>
+        <feature>ssh-call-home</feature>
+        <feature>tls-call-home</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>iana-crypt-hash</name>
+        <revision>2014-08-06</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:iana-crypt-hash</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-system</name>
+        <revision>2014-08-06</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-system</namespace>
+        <feature>authentication</feature>
+        <feature>local-users</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-crypto-types</name>
+        <revision>2019-04-29</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-crypto-types</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-interfaces</name>
+        <revision>2018-02-20</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-interfaces</namespace>
+        <feature>if-mib</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-ip</name>
+        <revision>2018-02-22</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-ip</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>iana-hardware</name>
+        <revision>2018-03-13</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:iana-hardware</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-hardware</name>
+        <revision>2018-03-13</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-hardware</namespace>
+        <feature>hardware-state</feature>
+        <feature>hardware-sensor</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-dhcpv6-types</name>
+        <revision>2018-09-04</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-dhcpv6-types</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>iana-if-type</name>
+        <revision>2017-01-19</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:iana-if-type</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-wg4-features</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:wg4feat:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-supervision</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:supervision:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-fm</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:fm:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-fan</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:fan:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-hardware</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:hardware:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-interfaces</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:interfaces:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-mplane-int</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:mplane-interfaces:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-dhcp</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:dhcp:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-transceiver</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:transceiver:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-trace</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:trace:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-operations</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:operations:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-troubleshooting</name>
+        <revision>2019-02-04</revision>
+        <namespace>urn:o-ran:troubleshooting:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-file-management</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:file-management:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-software-management</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:software-management:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-sync</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:sync:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-compression-factors</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:compression-factors:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-module-cap</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:module-cap:1.0</namespace>
+        <feature>EAXC-ID-GROUP-SUPPORTED</feature>
+        <feature>CONFIGURABLE-TDD-PATTERN-SUPPORTED</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-delay-management</name>
+        <revision>2020-08-10</revision>
+        <namespace>urn:o-ran:delay:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-processing-element</name>
+        <revision>2020-04-17</revision>
+        <namespace>urn:o-ran:processing-element:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-lbm</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:lbm:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-performance-management</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:performance-management:1.0</namespace>
+        <feature>GRANULARITY-TRANSPORT-MEASUREMENT</feature>
+        <feature>GRANULARITY-EAXC-ID-MEASUREMENT</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-uplane-conf</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:uplane-conf:1.0</namespace>
+        <feature>EAXC-GAIN-CORRECTION</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-usermgmt</name>
+        <revision>2020-12-10</revision>
+        <namespace>urn:o-ran:user-mgmt:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-ethernet-forwarding</name>
+        <revision>2020-04-17</revision>
+        <namespace>urn:o-ran:ethernet-fwd:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-shared-cell</name>
+        <revision>2020-12-10</revision>
+        <namespace>urn:o-ran:shared-cell:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>solid-o-ran-operations</name>
+        <revision>2024-10-23</revision>
+        <namespace>urn:solid.co.kr:o-ran:operations:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+    </modules-state>
+  </data>
+</rpc-reply>
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: message (len=4) flushed successfully.
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: received message (len=256):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="3">
+  <get-schema xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+    <identifier>solid-o-ran-operations</identifier>
+    <version>2024-10-23</version>
+    <format>yang</format>
+  </get-schema>
+</rpc>
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: sending message (len=980):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="3"/>
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: message (len=4) flushed successfully.
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: received message (len=317):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="4">
+  <get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <filter type="xpath" xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library" xmlns:yangmnt="urn:ietf:params:xml:ns:yang:ietf-yang-schema-mount" select="/yanglib:* | /yangmnt:*"/>
+  </get>
+</rpc>
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: sending message (len=365):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="4">
+  <rpc-error>
+    <error-type>application</error-type>
+    <error-tag>operation-failed</error-tag>
+    <error-severity>error</error-severity>
+    <error-message xml:lang="en">Module with the namespace "urn:ietf:params:xml:ns:yang:ietf-yang-schema-mount" could not be found.</error-message>
+  </rpc-error>
+</rpc-reply>
+May 12 09:34:00 local4.info netopeer2-server[6517]: Session 27: message (len=4) flushed successfully.
+May 12 09:34:38 local4.info netopeer2-server[6517]: Session 27: received message (len=138):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
+  <close-session xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"/>
+</rpc>
+May 12 09:34:38 local4.info netopeer2-server[6517]: Session 27: sending message (len=91):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
+  <ok/>
+</rpc-reply>
+May 12 09:34:38 local4.info netopeer2-server[6517]: Session 27: message (len=4) flushed successfully.
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: sending message (len=2896):
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <capabilities>
+    <capability>urn:ietf:params:netconf:base:1.0</capability>
+    <capability>urn:ietf:params:netconf:base:1.1</capability>
+    <capability>urn:ietf:params:netconf:capability:writable-running:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:rollback-on-error:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:startup:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:url:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:xpath:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:with-defaults:1.0?basic-mode=explicit&amp;also-supported=report-all,report-all-tagged,trim,explicit</capability>
+    <capability>urn:ietf:params:netconf:capability:notification:1.0</capability>
+    <capability>urn:ietf:params:netconf:capability:interleave:1.0</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-yang-metadata?module=ietf-yang-metadata&amp;revision=2016-08-05</capability>
+    <capability>urn:ietf:params:xml:ns:yang:1?module=yang&amp;revision=2017-02-20</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2013-07-15</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-yang-types?module=ietf-yang-types&amp;revision=2013-07-15</capability>
+    <capability>urn:ietf:params:netconf:capability:yang-library:1.0?revision=2019-01-04&amp;module-set-id=55</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-acm?module=ietf-netconf-acm&amp;revision=2018-02-14</capability>
+    <capability>urn:ietf:params:xml:ns:netconf:base:1.0?module=ietf-netconf&amp;revision=2011-06-01&amp;features=writable-running,rollback-on-error,startup,url,xpath</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-notifications?module=ietf-netconf-notifications&amp;revision=2012-02-06</capability>
+    <capability>urn:ietf:params:xml:ns:netconf:notification:1.0?module=notifications&amp;revision=2008-07-14</capability>
+    <capability>urn:ietf:params:xml:ns:netmod:notification?module=nc-notifications&amp;revision=2008-07-14</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-x509-cert-to-name?module=ietf-x509-cert-to-name&amp;revision=2014-12-10</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-with-defaults?module=ietf-netconf-with-defaults&amp;revision=2011-06-01</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04</capability>
+    <capability>urn:ietf:params:xml:ns:yang:iana-crypt-hash?module=iana-crypt-hash&amp;revision=2014-08-06</capability>
+    <capability>urn:ietf:params:xml:ns:yang:ietf-system?module=ietf-system&amp;revision=2014-08-06&amp;features=authentication,local-users</capability>
+    <capability>urn:ietf:params:xml:ns:yang:iana-if-type?module=iana-if-type&amp;revision=2017-01-19</capability>
+  </capabilities>
+  <session-id>28</session-id>
+</hello>
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: message (len=6) flushed successfully.
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: received message (len=206):
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <capabilities>
+    <capability>urn:ietf:params:netconf:base:1.0</capability>
+    <capability>urn:ietf:params:netconf:base:1.1</capability>
+  </capabilities>
+</hello>
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: received message (len=220):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1">
+  <get-schema xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+    <identifier>ietf-datastores</identifier>
+    <format>yang</format>
+  </get-schema>
+</rpc>
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: sending message (len=2816):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1"/>
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: message (len=4) flushed successfully.
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: received message (len=237):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2">
+  <get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <filter type="xpath" xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library" select="/yanglib:*"/>
+  </get>
+</rpc>
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: sending message (len=10903):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2">
+  <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <yang-library xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+      <content-id>55</content-id>
+      <schema>
+        <name>complete</name>
+        <module-set>complete</module-set>
+      </schema>
+    </yang-library>
+    <modules-state xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+      <module-set-id>55</module-set-id>
+      <module>
+        <name>ietf-yang-metadata</name>
+        <revision>2016-08-05</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-metadata</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>yang</name>
+        <revision>2017-02-20</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:1</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-inet-types</name>
+        <revision>2013-07-15</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-inet-types</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-yang-types</name>
+        <revision>2013-07-15</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-types</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-datastores</name>
+        <revision>2018-02-14</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-datastores</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-yang-library</name>
+        <revision>2019-01-04</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-library</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-acm</name>
+        <revision>2018-02-14</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-acm</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf</name>
+        <revision>2011-06-01</revision>
+        <namespace>urn:ietf:params:xml:ns:netconf:base:1.0</namespace>
+        <feature>writable-running</feature>
+        <feature>rollback-on-error</feature>
+        <feature>startup</feature>
+        <feature>url</feature>
+        <feature>xpath</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-notifications</name>
+        <revision>2012-02-06</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-notifications</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>notifications</name>
+        <revision>2008-07-14</revision>
+        <namespace>urn:ietf:params:xml:ns:netconf:notification:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>nc-notifications</name>
+        <revision>2008-07-14</revision>
+        <namespace>urn:ietf:params:xml:ns:netmod:notification</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-x509-cert-to-name</name>
+        <revision>2014-12-10</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-x509-cert-to-name</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-keystore</name>
+        <revision>2016-10-31</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-keystore</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-with-defaults</name>
+        <revision>2011-06-01</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-with-defaults</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-monitoring</name>
+        <revision>2010-10-04</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-datastores</name>
+        <revision>2017-08-17</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-datastores</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-ssh-server</name>
+        <revision>2016-11-02</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-ssh-server</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-tls-server</name>
+        <revision>2016-11-02</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-tls-server</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-netconf-server</name>
+        <revision>2016-11-02</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-server</namespace>
+        <feature>listen</feature>
+        <feature>ssh-listen</feature>
+        <feature>tls-listen</feature>
+        <feature>call-home</feature>
+        <feature>ssh-call-home</feature>
+        <feature>tls-call-home</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>iana-crypt-hash</name>
+        <revision>2014-08-06</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:iana-crypt-hash</namespace>
+        <conformance-type>import</conformance-type>
+      </module>
+      <module>
+        <name>ietf-system</name>
+        <revision>2014-08-06</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-system</namespace>
+        <feature>authentication</feature>
+        <feature>local-users</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-crypto-types</name>
+        <revision>2019-04-29</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-crypto-types</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-interfaces</name>
+        <revision>2018-02-20</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-interfaces</namespace>
+        <feature>if-mib</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-ip</name>
+        <revision>2018-02-22</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-ip</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>iana-hardware</name>
+        <revision>2018-03-13</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:iana-hardware</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-hardware</name>
+        <revision>2018-03-13</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-hardware</namespace>
+        <feature>hardware-state</feature>
+        <feature>hardware-sensor</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>ietf-dhcpv6-types</name>
+        <revision>2018-09-04</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-dhcpv6-types</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>iana-if-type</name>
+        <revision>2017-01-19</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:iana-if-type</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-wg4-features</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:wg4feat:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-supervision</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:supervision:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-fm</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:fm:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-fan</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:fan:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-hardware</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:hardware:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-interfaces</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:interfaces:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-mplane-int</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:mplane-interfaces:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-dhcp</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:dhcp:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-transceiver</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:transceiver:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-trace</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:trace:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-operations</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:operations:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-troubleshooting</name>
+        <revision>2019-02-04</revision>
+        <namespace>urn:o-ran:troubleshooting:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-file-management</name>
+        <revision>2019-07-03</revision>
+        <namespace>urn:o-ran:file-management:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-software-management</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:software-management:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-sync</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:sync:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-compression-factors</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:compression-factors:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-module-cap</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:module-cap:1.0</namespace>
+        <feature>EAXC-ID-GROUP-SUPPORTED</feature>
+        <feature>CONFIGURABLE-TDD-PATTERN-SUPPORTED</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-delay-management</name>
+        <revision>2020-08-10</revision>
+        <namespace>urn:o-ran:delay:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-processing-element</name>
+        <revision>2020-04-17</revision>
+        <namespace>urn:o-ran:processing-element:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-lbm</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:lbm:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-performance-management</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:performance-management:1.0</namespace>
+        <feature>GRANULARITY-TRANSPORT-MEASUREMENT</feature>
+        <feature>GRANULARITY-EAXC-ID-MEASUREMENT</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-uplane-conf</name>
+        <revision>2021-03-22</revision>
+        <namespace>urn:o-ran:uplane-conf:1.0</namespace>
+        <feature>EAXC-GAIN-CORRECTION</feature>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-usermgmt</name>
+        <revision>2020-12-10</revision>
+        <namespace>urn:o-ran:user-mgmt:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-ethernet-forwarding</name>
+        <revision>2020-04-17</revision>
+        <namespace>urn:o-ran:ethernet-fwd:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>o-ran-shared-cell</name>
+        <revision>2020-12-10</revision>
+        <namespace>urn:o-ran:shared-cell:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+      <module>
+        <name>solid-o-ran-operations</name>
+        <revision>2024-10-23</revision>
+        <namespace>urn:solid.co.kr:o-ran:operations:1.0</namespace>
+        <conformance-type>implement</conformance-type>
+      </module>
+    </modules-state>
+  </data>
+</rpc-reply>
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: message (len=4) flushed successfully.
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: received message (len=256):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="3">
+  <get-schema xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+    <identifier>solid-o-ran-operations</identifier>
+    <version>2024-10-23</version>
+    <format>yang</format>
+  </get-schema>
+</rpc>
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: sending message (len=980):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="3"/>
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: message (len=4) flushed successfully.
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: received message (len=317):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="4">
+  <get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <filter type="xpath" xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library" xmlns:yangmnt="urn:ietf:params:xml:ns:yang:ietf-yang-schema-mount" select="/yanglib:* | /yangmnt:*"/>
+  </get>
+</rpc>
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: sending message (len=365):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="4">
+  <rpc-error>
+    <error-type>application</error-type>
+    <error-tag>operation-failed</error-tag>
+    <error-severity>error</error-severity>
+    <error-message xml:lang="en">Module with the namespace "urn:ietf:params:xml:ns:yang:ietf-yang-schema-mount" could not be found.</error-message>
+  </rpc-error>
+</rpc-reply>
+May 12 09:36:09 local4.info netopeer2-server[6517]: Session 28: message (len=4) flushed successfully.
+May 12 09:36:50 local4.info netopeer2-server[6517]: Session 28: received message (len=138):
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
+  <close-session xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"/>
+</rpc>
+May 12 09:36:50 local4.info netopeer2-server[6517]: Session 28: sending message (len=91):
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
+  <ok/>
+</rpc-reply>
+May 12 09:36:50 local4.info netopeer2-server[6517]: Session 28: message (len=4) flushed successfully.
+
+
+CLI connection is closed by idle-timeout (600 seconds).
+

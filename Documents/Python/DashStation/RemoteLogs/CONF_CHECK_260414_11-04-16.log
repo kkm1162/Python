@@ -1,0 +1,1059 @@
+Client SENT :  verb 3
+Client SENT :  knownhosts --mode skip
+Client SENT :  listen --host 10.0.20.254 --port 4334 --login oranuser --timeout 300
+Waiting 300s for an SSH Call Home connection on port 4334...
+nc VERBOSE: Accepted a connection on 10.0.20.254:4334 from 10.0.20.126:46532.
+nc DEBUG: SSH: ssh_config_parse_file: Reading configuration data from /root/.ssh/config
+nc DEBUG: SSH: ssh_config_parse_file: Reading configuration data from /etc/ssh/ssh_config
+nc VERBOSE: SSH: ssh_config_parse_line: Unapplicable option: SendEnv, line: 51
+nc VERBOSE: SSH: ssh_config_parse_line: Unsupported option: HashKnownHosts, line: 52
+nc VERBOSE: SSH: ssh_connect: libssh 0.10.6 (c) 2003-2023 Aris Adamantiadis, Andreas Schneider and libssh contributors. Distributed under the LGPL, please refer to COPYING file for information about your rights, using threading threads_pthread
+nc VERBOSE: SSH: ssh_connect: Socket connecting, now waiting for the callbacks to work
+nc DEBUG: SSH: ssh_socket_pollcallback: Received POLLOUT in connecting state
+nc WARNING: SSH: socket_callback_connected: Socket connection callback: 1 (0)
+nc DEBUG: SSH: ssh_client_connection_callback: session_state=2
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: ssh_connect: current state : 2
+nc DEBUG: SSH: ssh_connect: current state : 2
+nc DEBUG: SSH: callback_receive_banner: Received banner: SSH-2.0-libssh_0.8.8
+nc DEBUG: SSH: ssh_client_connection_callback: session_state=3
+nc VERBOSE: SSH: ssh_client_connection_callback: SSH server banner: SSH-2.0-libssh_0.8.8
+nc VERBOSE: SSH: ssh_analyze_banner: Analyzing banner: SSH-2.0-libssh_0.8.8
+nc DEBUG: SSH: ssh_client_select_hostkeys: Order of wanted host keys: "ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,ssh-rsa,rsa-sha2-512,rsa-sha2-256"
+nc DEBUG: SSH: ssh_client_select_hostkeys: No key found in known_hosts; changing host key method to "ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,ssh-rsa,rsa-sha2-512,rsa-sha2-256"
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: packet_send2: packet: wrote [type=20, len=876, padding_size=4, comp=871, payload=871]
+nc DEBUG: SSH: ssh_send_kex: SSH_MSG_KEXINIT sent
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 20 [len=556,padding=4,comp=551,payload=551]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 20
+nc DEBUG: SSH: ssh_client_connection_callback: session_state=5
+nc VERBOSE: SSH: ssh_kex_select_methods: Negotiated curve25519-sha256,ssh-rsa,chacha20-poly1305@openssh.com,chacha20-poly1305@openssh.com,aead-poly1305,aead-poly1305,none,none,,
+nc DEBUG: SSH: packet_send2: packet: wrote [type=30, len=44, padding_size=6, comp=37, payload=37]
+nc DEBUG: SSH: ssh_connect: current state : 6
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: ssh_connect: current state : 6
+nc DEBUG: SSH: ssh_connect: current state : 6
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 31 [len=868,padding=11,comp=856,payload=856]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 31
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: packet_send2: packet: wrote [type=21, len=12, padding_size=10, comp=1, payload=1]
+nc DEBUG: SSH: crypt_set_algorithms2: Set output algorithm to chacha20-poly1305@openssh.com
+nc DEBUG: SSH: crypt_set_algorithms2: Set HMAC output algorithm to aead-poly1305
+nc DEBUG: SSH: crypt_set_algorithms2: Set input algorithm to chacha20-poly1305@openssh.com
+nc DEBUG: SSH: crypt_set_algorithms2: Set HMAC input algorithm to aead-poly1305
+nc VERBOSE: SSH: ssh_init_rekey_state: Set rekey after 134217728 blocks
+nc VERBOSE: SSH: ssh_init_rekey_state: Set rekey after 134217728 blocks
+nc DEBUG: SSH: ssh_packet_send_newkeys: SSH_MSG_NEWKEYS sent
+nc DEBUG: SSH: ssh_connect: current state : 6
+nc DEBUG: SSH: ssh_connect: current state : 6
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 21 [len=12,padding=10,comp=1,payload=1]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 21
+nc VERBOSE: SSH: ssh_packet_newkeys: Received SSH_MSG_NEWKEYS
+nc VERBOSE: SSH: ssh_packet_newkeys: Signature verified and valid
+nc DEBUG: SSH: ssh_client_connection_callback: session_state=6
+nc DEBUG: SSH: ssh_packet_socket_callback: Processing 172 bytes left in socket buffer
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 7 [len=152,padding=10,comp=141,payload=141]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 7
+nc DEBUG: SSH: ssh_packet_ext_info: Received SSH_MSG_EXT_INFO
+nc DEBUG: SSH: ssh_packet_ext_info: Follows 1 extensions
+nc DEBUG: SSH: ssh_packet_ext_info: Extension: server-sig-algs=<ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,ssh-rsa,rsa-sha2-512,rsa-sha2-256,ssh-dss>
+nc DEBUG: SSH: ssh_connect: current state : 7
+nc VERBOSE: Server hostkey check mode: skip.
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: packet_send2: packet: wrote [type=5, len=24, padding_size=6, comp=17, payload=17]
+nc DEBUG: SSH: ssh_service_request: Sent SSH_MSG_SERVICE_REQUEST (service ssh-userauth)
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 6 [len=24,padding=6,comp=17,payload=17]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 6
+nc DEBUG: SSH: ssh_packet_service_accept: Received SSH_MSG_SERVICE_ACCEPT
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: packet_send2: packet: wrote [type=50, len=48, padding_size=8, comp=39, payload=39]
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 51 [len=32,padding=7,comp=24,payload=24]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 51
+nc WARNING: SSH: ssh_packet_userauth_failure: Access denied for 'none'. Authentication that can continue: publickey,password
+nc VERBOSE: SSH: ssh_packet_userauth_failure: Access denied for 'none'. Authentication that can continue: publickey,password
+nc VERBOSE: Publickey athentication.
+nc VERBOSE: No key pair specified.
+nc WARNING: Authentication denied.
+nc VERBOSE: Password authentication (host "10.0.20.126", user "oranuser").
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: packet_send2: packet: wrote [type=50, len=72, padding_size=9, comp=62, payload=62]
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 52 [len=8,padding=6,comp=1,payload=1]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 52
+nc DEBUG: SSH: ssh_packet_userauth_success: Authentication successful
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=13, in_blocks=22]
+nc VERBOSE: Authentication successful.
+nc VERBOSE: SSH: channel_open: Creating a channel 43 with 64000 window and 32768 max packet
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=16, in_blocks=25]
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: packet_send2: packet: wrote [type=90, len=32, padding_size=7, comp=24, payload=24]
+nc DEBUG: SSH: channel_open: Sent a SSH_MSG_CHANNEL_OPEN type session for channel 43
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 91 [len=24,padding=6,comp=17,payload=17]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 91
+nc DEBUG: SSH: ssh_packet_channel_open_conf: Received SSH2_MSG_CHANNEL_OPEN_CONFIRMATION
+nc VERBOSE: SSH: ssh_packet_channel_open_conf: Received a CHANNEL_OPEN_CONFIRMATION for channel 43:43
+nc VERBOSE: SSH: ssh_packet_channel_open_conf: Remote window : 32000, maxpacket : 35000
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=16, in_blocks=24]
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=19, in_blocks=27]
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: packet_send2: packet: wrote [type=98, len=40, padding_size=9, comp=30, payload=30]
+nc DEBUG: SSH: channel_request: Sent a SSH_MSG_CHANNEL_REQUEST subsystem
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 99 [len=16,padding=10,comp=5,payload=5]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 99
+nc DEBUG: SSH: ssh_packet_channel_success: Received SSH_CHANNEL_SUCCESS on channel (43:43)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=19, in_blocks=24]
+nc VERBOSE: SSH: channel_request: Channel request subsystem success
+ly VERBOSE: Searching for "ietf-inet-types" in "/root".
+ly VERBOSE: Module "ietf-inet-types" not found in local searchdirs.
+ly VERBOSE: Newer revision than "ietf-inet-types@2013-07-15" not found, using this as the latest revision.
+ly VERBOSE: Searching for "ietf-yang-types" in "/root".
+ly VERBOSE: Module "ietf-yang-types" not found in local searchdirs.
+ly VERBOSE: Newer revision than "ietf-yang-types@2013-07-15" not found, using this as the latest revision.
+nc DEBUG: Sending message:
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"><capabilities><capability>urn:ietf:params:netconf:base:1.0</capability><capability>urn:ietf:params:netconf:base:1.1</capability></capabilities></hello>
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=45, in_blocks=50]
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=224, padding_size=8, comp=215, payload=215]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 206 bytes
+nc DEBUG: Sending message:
+]]>]]>
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=46, in_blocks=25]
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=24, padding_size=8, comp=15, payload=15]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 6 bytes
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=3368,padding=6,comp=3361,payload=3361]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 3352 bytes data in 0 (local win=64000 remote win=31788)
+nc DEBUG: SSH: channel_default_bufferize: placing 3352 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=60648 remote win=31788)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=47, in_blocks=445]
+nc DEBUG: SSH: packet_send2: packet: wrote [type=93, len=16, padding_size=6, comp=9, payload=9]
+nc VERBOSE: SSH: grow_window: growing window (channel 43:43) to 1280000 bytes
+nc DEBUG: SSH: ssh_packet_socket_callback: Processing 44 bytes left in socket buffer
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=24,padding=8,comp=15,payload=15]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 6 bytes data in 0 (local win=1280000 remote win=31788)
+nc DEBUG: SSH: channel_default_bufferize: placing 6 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=1279994 remote win=31788)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=47, in_blocks=445]
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=47, in_blocks=445]
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3358 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3352 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3346 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3340 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3334 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3328 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3322 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3316 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3310 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3304 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3298 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3292 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3286 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3280 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3274 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3268 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3262 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3256 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3250 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3244 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3238 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3232 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3226 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3220 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3214 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3208 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3202 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3196 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3190 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3184 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3178 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3172 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3166 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3160 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3154 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3148 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3142 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3136 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3130 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3124 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3118 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3112 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3106 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3100 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3094 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3088 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3082 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3076 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3070 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3064 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3058 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3052 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3046 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3040 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3034 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3028 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3022 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3016 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3010 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 3004 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2998 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2992 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2986 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2980 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2974 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2968 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2962 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2956 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2950 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2944 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2938 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2932 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2926 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2920 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2914 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2908 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2902 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2896 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2890 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2884 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2878 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2872 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2866 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2860 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2854 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2848 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2842 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2836 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2830 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2824 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2818 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2812 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2806 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2800 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2794 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2788 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2782 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2776 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2770 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2764 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2758 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2752 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2746 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2740 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2734 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2728 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2722 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2716 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2710 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2704 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2698 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2692 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2686 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2680 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2674 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2668 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2662 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2656 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2650 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2644 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2638 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2632 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2626 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2620 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2614 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2608 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2602 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2596 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2590 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2584 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2578 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2572 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2566 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2560 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2554 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2548 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2542 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2536 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2530 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2524 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2518 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2512 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2506 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2500 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2494 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2488 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2482 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2476 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2470 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2464 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2458 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2452 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2446 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2440 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2434 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2428 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2422 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2416 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2410 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2404 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2398 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2392 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2386 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2380 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2374 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2368 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2362 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2356 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2350 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2344 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2338 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2332 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2326 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2320 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2314 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2308 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2302 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2296 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2290 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2284 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2278 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2272 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2266 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2260 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2254 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2248 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2242 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2236 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2230 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2224 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2218 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2212 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2206 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2200 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2194 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2188 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2182 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2176 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2170 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2164 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2158 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2152 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2146 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2140 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2134 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2128 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2122 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2116 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2110 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2104 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2098 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2092 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2086 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2080 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2074 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2068 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2062 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2056 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2050 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2044 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2038 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2032 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2026 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2020 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2014 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2008 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 2002 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1996 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1990 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1984 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1978 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1972 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1966 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1960 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1954 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1948 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1942 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1936 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1930 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1924 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1918 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1912 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1906 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1900 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1894 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1888 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1882 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1876 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1870 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1864 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1858 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1852 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1846 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1840 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1834 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1828 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1822 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1816 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1810 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1804 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1798 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1792 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1786 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1780 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1774 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1768 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1762 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1756 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1750 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1744 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1738 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1732 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1726 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1720 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1714 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1708 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1702 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1696 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1690 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1684 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1678 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1672 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1666 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1660 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1654 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1648 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1642 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1636 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1630 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1624 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1618 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1612 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1606 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1600 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1594 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1588 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1582 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1576 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1570 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1564 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1558 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1552 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1546 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1540 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1534 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1528 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1522 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1516 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1510 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1504 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1498 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1492 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1486 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1480 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1474 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1468 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1462 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1456 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1450 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1444 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1438 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1432 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1426 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1420 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1414 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1408 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1402 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1396 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1390 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1384 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1378 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1372 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1366 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1360 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1354 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1348 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1342 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1336 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1330 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1324 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1318 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1312 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1306 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1300 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1294 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1288 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1282 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1276 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1270 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1264 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1258 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1252 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1246 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1240 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1234 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1228 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1222 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1216 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1210 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1204 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1198 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1192 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1186 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1180 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1174 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1168 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1162 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1156 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1150 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1144 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1138 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1132 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1126 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1120 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1114 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1108 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1102 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1096 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1090 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1084 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1078 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1072 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1066 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1060 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1054 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1048 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1042 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1036 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1030 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1024 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1018 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1012 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1006 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 1000 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 994 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 988 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 982 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 976 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 970 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 964 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 958 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 952 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 946 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 940 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 934 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 928 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 922 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 916 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 910 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 904 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 898 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 892 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 886 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 880 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 874 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 868 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 862 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 856 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 850 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 844 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 838 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 832 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 826 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 820 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 814 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 808 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 802 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 796 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 790 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 784 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 778 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 772 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 766 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 760 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 754 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 748 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 742 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 736 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 730 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 724 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 718 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 712 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 706 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 700 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 694 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 688 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 682 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 676 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 670 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 664 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 658 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 652 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 646 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 640 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 634 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 628 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 622 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 616 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 610 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 604 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 598 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 592 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 586 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 580 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 574 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 568 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 562 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 556 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 550 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 544 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 538 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 532 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 526 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 520 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 514 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 508 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 502 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 496 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 490 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 484 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 478 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 472 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 466 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 460 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 454 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 448 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 442 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 436 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 430 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 424 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 418 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 412 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 406 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 400 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 394 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 388 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 382 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 376 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 370 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 364 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 358 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 352 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 346 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 340 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 334 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 328 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 322 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 316 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 310 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 304 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 298 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 292 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 286 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 280 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 274 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 268 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 262 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 256 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 250 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 244 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 238 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 232 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 226 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 220 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 214 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 208 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 202 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 196 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 190 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 184 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 178 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 172 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 166 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 160 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 154 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 148 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 142 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 136 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 130 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 124 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 118 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 112 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 106 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 100 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 94 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 88 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 82 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 76 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 70 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 64 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 58 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 52 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 46 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 40 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 34 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 28 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 22 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 16 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (6) buffered : 10 bytes. Window: 1279994
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (4) buffered : 4 bytes. Window: 1279994
+nc DEBUG: Received message:
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"><capabilities><capability>urn:ietf:params:netconf:base:1.0</capability><capability>urn:ietf:params:netconf:base:1.1</capability><capability>urn:ietf:params:netconf:capability:writable-running:1.0</capability><capability>urn:ietf:params:netconf:capability:rollback-on-error:1.0</capability><capability>urn:ietf:params:netconf:capability:startup:1.0</capability><capability>urn:ietf:params:netconf:capability:url:1.0</capability><capability>urn:ietf:params:netconf:capability:xpath:1.0</capability><capability>urn:ietf:params:netconf:capability:with-defaults:1.0?basic-mode=explicit&amp;also-supported=report-all,report-all-tagged,trim,explicit</capability><capability>urn:ietf:params:netconf:capability:notification:1.0</capability><capability>urn:ietf:params:netconf:capability:interleave:1.0</capability><capability>urn:ietf:params:xml:ns:yang:ietf-yang-metadata?module=ietf-yang-metadata&amp;revision=2016-08-05</capability><capability>urn:ietf:params:xml:ns:yang:1?module=yang&amp;revision=2017-02-20</capability><capability>urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2013-07-15</capability><capability>urn:ietf:params:xml:ns:yang:ietf-yang-types?module=ietf-yang-types&amp;revision=2013-07-15</capability><capability>urn:ietf:params:netconf:capability:yang-library:1.0?revision=2019-01-04&amp;module-set-id=65</capability><capability>urn:ietf:params:xml:ns:yang:ietf-netconf-acm?module=ietf-netconf-acm&amp;revision=2018-02-14</capability><capability>urn:ietf:params:xml:ns:netconf:base:1.0?module=ietf-netconf&amp;revision=2011-06-01&amp;features=writable-running,rollback-on-error,startup,url,xpath</capability><capability>urn:ietf:params:xml:ns:yang:ietf-netconf-notifications?module=ietf-netconf-notifications&amp;revision=2012-02-06</capability><capability>urn:ietf:params:xml:ns:netconf:notification:1.0?module=notifications&amp;revision=2008-07-14</capability><capability>urn:ietf:params:xml:ns:netmod:notification?module=nc-notifications&amp;revision=2008-07-14</capability><capability>urn:ietf:params:xml:ns:yang:ietf-x509-cert-to-name?module=ietf-x509-cert-to-name&amp;revision=2014-12-10</capability><capability>urn:ietf:params:xml:ns:yang:ietf-netconf-with-defaults?module=ietf-netconf-with-defaults&amp;revision=2011-06-01</capability><capability>urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04</capability><capability>urn:ietf:params:xml:ns:yang:iana-crypt-hash?module=iana-crypt-hash&amp;revision=2014-08-06</capability><capability>urn:ietf:params:xml:ns:yang:ietf-system?module=ietf-system&amp;revision=2014-08-06&amp;features=authentication,local-users</capability><capability>urn:ietf:params:xml:ns:yang:iana-if-type?module=iana-if-type&amp;revision=2017-01-19</capability><capability>urn:ieee:std:802.1Q:yang:ieee802-dot1q-types?module=ieee802-dot1q-types&amp;revision=2020-06-04</capability><capability>urn:ieee:std:802.1Q:yang:ieee802-types?module=ieee802-types&amp;revision=2020-06-04</capability><capability>urn:ieee:std:802.1X:yang:ieee802-dot1x-types?module=ieee802-dot1x-types&amp;revision=2020-02-18</capability><capability>urn:ieee:std:802.1X:yang:ieee802-dot1x?module=ieee802-dot1x&amp;revision=2020-02-18</capability></capabilities><session-id>20</session-id></hello>
+
+nc VERBOSE: Capability for <get-schema> support found.
+nc VERBOSE: Capability for yang-library support found.
+nc VERBOSE: Capability for XPath filter support found.
+nc VERBOSE: Reading module "ietf-netconf@<latest>" from local file "/usr/local/share/yang/modules/netopeer2/ietf-netconf@2013-09-29.yang".
+nc VERBOSE: Reading module "ietf-netconf-acm@2018-02-14" from local file "/usr/local/share/yang/modules/netopeer2/ietf-netconf-acm@2018-02-14.yang".
+nc VERBOSE: Reading module "ietf-yang-metadata@2016-08-05" from local file "/usr/local/share/yang/modules/libyang/ietf-yang-metadata@2016-08-05.yang".
+nc VERBOSE: Reading module "ietf-yang-library@2019-01-04" from local file "/usr/local/share/yang/modules/netopeer2/ietf-yang-library@2019-01-04.yang".
+nc VERBOSE: Unable to identify revision of the import module "ietf-datastores" from the available server side information.
+nc VERBOSE: Reading module "ietf-datastores@<latest>" from server via get-schema.
+nc DEBUG: Sending message:
+
+#220
+
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=48, in_blocks=446]
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=24, padding_size=8, comp=15, payload=15]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 6 bytes
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 93 [len=16,padding=6,comp=9,payload=9]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 93
+nc VERBOSE: SSH: channel_rcv_change_window: Adding 1248206 bytes to channel (43:43) (from 31782 bytes)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=48, in_blocks=446]
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: Sending message:
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1"><get-schema xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring"><identifier>ietf-datastores</identifier><format>yang</format></get-schema></rpc>
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=76, in_blocks=474]
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=240, padding_size=10, comp=229, payload=229]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 220 bytes
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: Sending message:
+
+##
+
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=77, in_blocks=447]
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=24, padding_size=10, comp=13, payload=13]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 4 bytes
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=24,padding=7,comp=16,payload=16]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 7 bytes data in 0 (local win=1279994 remote win=1279764)
+nc DEBUG: SSH: channel_default_bufferize: placing 7 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=1279987 remote win=1279764)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=77, in_blocks=448]
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (2) buffered : 7 bytes. Window: 1279987
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 5 bytes. Window: 1279987
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 4 bytes. Window: 1279987
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 3 bytes. Window: 1279987
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 2 bytes. Window: 1279987
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 1 bytes. Window: 1279987
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (2816) buffered : 0 bytes. Window: 1279987
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (2816) buffered : 0 bytes. Window: 1279987
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=2832,padding=6,comp=2825,payload=2825]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 2816 bytes data in 0 (local win=1279987 remote win=1279764)
+nc DEBUG: SSH: channel_default_bufferize: placing 2816 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=1277171 remote win=1279764)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=77, in_blocks=801]
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (2) buffered : 0 bytes. Window: 1277171
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=24,padding=10,comp=13,payload=13]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 4 bytes data in 0 (local win=1277171 remote win=1279764)
+nc DEBUG: SSH: channel_default_bufferize: placing 4 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=1277167 remote win=1279764)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=77, in_blocks=802]
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 2 bytes. Window: 1277167
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 1 bytes. Window: 1277167
+nc DEBUG: Received message:
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1"><data xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">module ietf-datastores {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:ietf-datastores";
+  prefix ds;
+
+  organization
+    "IETF Network Modeling (NETMOD) Working Group";
+  contact
+    "WG Web:   &lt;https://datatracker.ietf.org/wg/netmod/&gt;
+
+     WG List:  &lt;mailto:netmod@ietf.org&gt;
+
+     Author:   Martin Bjorklund
+               &lt;mailto:mbj@tail-f.com&gt;
+
+     Author:   Juergen Schoenwaelder
+               &lt;mailto:j.schoenwaelder@jacobs-university.de&gt;
+
+     Author:   Phil Shafer
+               &lt;mailto:phil@juniper.net&gt;
+
+     Author:   Kent Watsen
+               &lt;mailto:kwatsen@juniper.net&gt;
+
+     Author:   Rob Wilton
+               &lt;rwilton@cisco.com&gt;";
+  description
+    "This YANG module defines a set of identities for identifying
+     datastores.
+
+     Copyright (c) 2018 IETF Trust and the persons identified as
+     authors of the code.  All rights reserved.
+
+     Redistribution and use in source and binary forms, with or
+     without modification, is permitted pursuant to, and subject to
+     the license terms contained in, the Simplified BSD License set
+     forth in Section 4.c of the IETF Trust's Legal Provisions
+     Relating to IETF Documents
+     (https://trustee.ietf.org/license-info).
+
+     This version of this YANG module is part of RFC 8342
+     (https://www.rfc-editor.org/info/rfc8342); see the RFC itself
+     for full legal notices.";
+
+  revision 2018-02-14 {
+    description
+      "Initial revision.";
+    reference
+      "RFC 8342: Network Management Datastore Architecture (NMDA)";
+  }
+
+  identity datastore {
+    description
+      "Abstract base identity for datastore identities.";
+  }
+
+  identity conventional {
+    base datastore;
+    description
+      "Abstract base identity for conventional configuration
+       datastores.";
+  }
+
+  identity running {
+    base conventional;
+    description
+      "The running configuration datastore.";
+  }
+
+  identity candidate {
+    base conventional;
+    description
+      "The candidate configuration datastore.";
+  }
+
+  identity startup {
+    base conventional;
+    description
+      "The startup configuration datastore.";
+  }
+
+  identity intended {
+    base conventional;
+    description
+      "The intended configuration datastore.";
+  }
+
+  identity dynamic {
+    base datastore;
+    description
+      "Abstract base identity for dynamic configuration datastores.";
+  }
+
+  identity operational {
+    base datastore;
+    description
+      "The operational state datastore.";
+  }
+
+  typedef datastore-ref {
+    type identityref {
+      base datastore;
+    }
+    description
+      "A datastore identity reference.";
+  }
+}
+</data></rpc-reply>
+
+nc DEBUG: Sending message:
+
+#237
+
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=78, in_blocks=803]
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=24, padding_size=8, comp=15, payload=15]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 6 bytes
+nc DEBUG: Sending message:
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2"><get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"><filter type="xpath" xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library" select="/yanglib:*"/></get></rpc>
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=108, in_blocks=832]
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=256, padding_size=9, comp=246, payload=246]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 237 bytes
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: Sending message:
+
+##
+
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=109, in_blocks=803]
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=24, padding_size=10, comp=13, payload=13]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 4 bytes
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=24,padding=6,comp=17,payload=17]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 8 bytes data in 0 (local win=1277167 remote win=1279517)
+nc DEBUG: SSH: channel_default_bufferize: placing 8 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=1277159 remote win=1279517)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=109, in_blocks=804]
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (2) buffered : 8 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 6 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 5 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 4 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 3 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 2 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 1 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (12936) buffered : 0 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (12936) buffered : 0 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: partial packet (read len) [len=12952, receivedlen=4096, to_be_read=12972]
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (12936) buffered : 0 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: partial packet (read len) [len=12952, receivedlen=8192, to_be_read=12972]
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (12936) buffered : 0 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: partial packet (read len) [len=12952, receivedlen=12288, to_be_read=12972]
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (12936) buffered : 0 bytes. Window: 1277159
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=12952,padding=6,comp=12945,payload=12945]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 12936 bytes data in 0 (local win=1277159 remote win=1279517)
+nc DEBUG: SSH: channel_default_bufferize: placing 12936 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=1264223 remote win=1279517)
+nc DEBUG: SSH: ssh_packet_socket_callback: Processing 44 bytes left in socket buffer
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=24,padding=10,comp=13,payload=13]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 4 bytes data in 0 (local win=1264223 remote win=1279517)
+nc DEBUG: SSH: channel_default_bufferize: placing 4 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=1264219 remote win=1279517)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=109, in_blocks=2423]
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=109, in_blocks=2423]
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (2) buffered : 4 bytes. Window: 1264219
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 2 bytes. Window: 1264219
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 1 bytes. Window: 1264219
+nc DEBUG: Received message:
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2"><data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"><yang-library xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library"><content-id>65</content-id><schema><name>complete</name><module-set>complete</module-set></schema></yang-library><modules-state xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library"><module-set-id>65</module-set-id><module><name>ietf-yang-metadata</name><revision>2016-08-05</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-yang-metadata</namespace><conformance-type>import</conformance-type></module><module><name>yang</name><revision>2017-02-20</revision><namespace>urn:ietf:params:xml:ns:yang:1</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-inet-types</name><revision>2013-07-15</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-inet-types</namespace><conformance-type>import</conformance-type></module><module><name>ietf-yang-types</name><revision>2013-07-15</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-yang-types</namespace><conformance-type>import</conformance-type></module><module><name>ietf-datastores</name><revision>2018-02-14</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-datastores</namespace><conformance-type>import</conformance-type></module><module><name>ietf-yang-library</name><revision>2019-01-04</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-yang-library</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-netconf-acm</name><revision>2018-02-14</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-acm</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-netconf</name><revision>2011-06-01</revision><namespace>urn:ietf:params:xml:ns:netconf:base:1.0</namespace><feature>writable-running</feature><feature>rollback-on-error</feature><feature>startup</feature><feature>url</feature><feature>xpath</feature><conformance-type>implement</conformance-type></module><module><name>ietf-netconf-notifications</name><revision>2012-02-06</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-notifications</namespace><conformance-type>implement</conformance-type></module><module><name>notifications</name><revision>2008-07-14</revision><namespace>urn:ietf:params:xml:ns:netconf:notification:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>nc-notifications</name><revision>2008-07-14</revision><namespace>urn:ietf:params:xml:ns:netmod:notification</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-x509-cert-to-name</name><revision>2014-12-10</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-x509-cert-to-name</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-keystore</name><revision>2016-10-31</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-keystore</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-netconf-with-defaults</name><revision>2011-06-01</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-with-defaults</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-netconf-monitoring</name><revision>2010-10-04</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-datastores</name><revision>2017-08-17</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-datastores</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-ssh-server</name><revision>2016-11-02</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-ssh-server</namespace><conformance-type>import</conformance-type></module><module><name>ietf-tls-server</name><revision>2016-11-02</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-tls-server</namespace><conformance-type>import</conformance-type></module><module><name>ietf-netconf-server</name><revision>2016-11-02</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-netconf-server</namespace><feature>listen</feature><feature>ssh-listen</feature><feature>tls-listen</feature><feature>call-home</feature><feature>ssh-call-home</feature><feature>tls-call-home</feature><conformance-type>implement</conformance-type></module><module><name>iana-crypt-hash</name><revision>2014-08-06</revision><namespace>urn:ietf:params:xml:ns:yang:iana-crypt-hash</namespace><conformance-type>import</conformance-type></module><module><name>ietf-system</name><revision>2014-08-06</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-system</namespace><feature>authentication</feature><feature>local-users</feature><conformance-type>implement</conformance-type></module><module><name>ietf-crypto-types</name><revision>2022-12-12</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-crypto-types</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-interfaces</name><revision>2018-02-20</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-interfaces</namespace><feature>if-mib</feature><conformance-type>implement</conformance-type></module><module><name>ietf-ip</name><revision>2018-02-22</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-ip</namespace><conformance-type>implement</conformance-type></module><module><name>iana-hardware</name><revision>2018-03-13</revision><namespace>urn:ietf:params:xml:ns:yang:iana-hardware</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-hardware</name><revision>2018-03-13</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-hardware</namespace><feature>hardware-state</feature><feature>hardware-sensor</feature><conformance-type>implement</conformance-type></module><module><name>ietf-dhcpv6-types</name><revision>2018-09-04</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-dhcpv6-types</namespace><conformance-type>implement</conformance-type></module><module><name>iana-if-type</name><revision>2017-01-19</revision><namespace>urn:ietf:params:xml:ns:yang:iana-if-type</namespace><conformance-type>implement</conformance-type></module><module><name>ietf-dhcpv6-common</name><revision>2021-01-29</revision><namespace>urn:ietf:params:xml:ns:yang:ietf-dhcpv6-common</namespace><conformance-type>implement</conformance-type></module><module><name>ieee802-dot1q-cfm-types</name><revision>2020-06-04</revision><namespace>urn:ieee:std:802.1Q:yang:ieee802-dot1q-cfm-types</namespace><conformance-type>implement</conformance-type></module><module><name>ieee802-dot1q-types</name><revision>2020-06-04</revision><namespace>urn:ieee:std:802.1Q:yang:ieee802-dot1q-types</namespace><conformance-type>implement</conformance-type></module><module><name>ieee802-types</name><revision>2020-06-04</revision><namespace>urn:ieee:std:802.1Q:yang:ieee802-types</namespace><conformance-type>implement</conformance-type></module><module><name>ieee802-dot1q-cfm</name><revision>2020-06-04</revision><namespace>urn:ieee:std:802.1Q:yang:ieee802-dot1q-cfm</namespace><conformance-type>implement</conformance-type></module><module><name>ieee802-dot1x-types</name><revision>2020-02-18</revision><namespace>urn:ieee:std:802.1X:yang:ieee802-dot1x-types</namespace><conformance-type>implement</conformance-type></module><module><name>ieee802-dot1x</name><revision>2020-02-18</revision><namespace>urn:ieee:std:802.1X:yang:ieee802-dot1x</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-common-yang-types</name><revision>2023-08-14</revision><namespace>urn:o-ran:common-yang-types:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-common-identity-refs</name><revision>2022-08-15</revision><namespace>urn:o-ran:wg1identityref:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-certificates</name><revision>2022-08-15</revision><namespace>urn:o-ran:certificates:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-wg4-features</name><revision>2024-04-15</revision><namespace>urn:o-ran:wg4feat:1.0</namespace><feature>EXT-ANT-DELAY-CONTROL</feature><feature>SUPERVISION-WITH-SESSION-ID</feature><conformance-type>implement</conformance-type></module><module><name>o-ran-usermgmt</name><revision>2023-12-11</revision><namespace>urn:o-ran:user-mgmt:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-supervision</name><revision>2022-12-05</revision><namespace>urn:o-ran:supervision:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-fm</name><revision>2024-04-15</revision><namespace>urn:o-ran:fm:1.0</namespace><feature>HISTORICAL-ALARM-LIST</feature><conformance-type>implement</conformance-type></module><module><name>o-ran-fan</name><revision>2021-12-01</revision><namespace>urn:o-ran:fan:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-hardware</name><revision>2024-04-15</revision><namespace>urn:o-ran:hardware:1.0</namespace><feature>ENERGYSAVING</feature><conformance-type>implement</conformance-type></module><module><name>o-ran-interfaces</name><revision>2024-04-15</revision><namespace>urn:o-ran:interfaces:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-ieee802-dot1q-cfm</name><revision>2023-04-10</revision><namespace>urn:o-ran:o-ran-ieee802-dot1q-cfm:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-mplane-int</name><revision>2021-12-01</revision><namespace>urn:o-ran:mplane-interfaces:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-dhcp</name><revision>2022-08-15</revision><namespace>urn:o-ran:dhcp:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-transceiver</name><revision>2023-04-10</revision><namespace>urn:o-ran:transceiver:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-trace</name><revision>2022-08-15</revision><namespace>urn:o-ran:trace:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-operations</name><revision>2024-04-15</revision><namespace>urn:o-ran:operations:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-troubleshooting</name><revision>2022-08-15</revision><namespace>urn:o-ran:troubleshooting:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-file-management</name><revision>2023-04-10</revision><namespace>urn:o-ran:file-management:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-software-management</name><revision>2024-04-15</revision><namespace>urn:o-ran:software-management:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-sync</name><revision>2024-04-15</revision><namespace>urn:o-ran:sync:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-compression-factors</name><revision>2023-08-14</revision><namespace>urn:o-ran:compression-factors:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-module-cap</name><revision>2024-04-15</revision><namespace>urn:o-ran:module-cap:1.0</namespace><feature>EAXC-ID-GROUP-SUPPORTED</feature><feature>CONFIGURABLE-TDD-PATTERN-SUPPORTED</feature><conformance-type>implement</conformance-type></module><module><name>o-ran-delay-management</name><revision>2024-04-15</revision><namespace>urn:o-ran:delay:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-processing-element</name><revision>2022-08-15</revision><namespace>urn:o-ran:processing-element:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-lbm</name><revision>2024-04-15</revision><namespace>urn:o-ran:lbm:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-uplane-conf</name><revision>2024-04-15</revision><namespace>urn:o-ran:uplane-conf:1.0</namespace><feature>EAXC-GAIN-CORRECTION</feature><conformance-type>implement</conformance-type></module><module><name>o-ran-performance-management</name><revision>2024-04-15</revision><namespace>urn:o-ran:performance-management:1.0</namespace><feature>GRANULARITY-TRANSPORT-MEASUREMENT</feature><feature>GRANULARITY-EAXC-ID-MEASUREMENT</feature><conformance-type>implement</conformance-type></module><module><name>o-ran-ethernet-forwarding</name><revision>2021-12-01</revision><namespace>urn:o-ran:ethernet-fwd:1.0</namespace><conformance-type>implement</conformance-type></module><module><name>o-ran-shared-cell</name><revision>2024-04-15</revision><namespace>urn:o-ran:shared-cell:1.0</namespace><conformance-type>implement</conformance-type></module></modules-state></data></rpc-reply>
+
+nc WARNING: Server implements module "yang" in revision "2017-02-20" but revision "2025-01-29" is already implemented and will be used instead.
+nc WARNING: Server implements module "ietf-netconf" in revision "2011-06-01" but revision "2013-09-29" is already implemented and will be used instead.
+nc VERBOSE: Reading module "ietf-netconf-notifications@2012-02-06" from local file "/usr/local/share/yang/modules/netopeer2/ietf-netconf-notifications@2012-02-06.yang".
+nc VERBOSE: Reading module "notifications@2008-07-14" from local file "/usr/local/share/yang/modules/netopeer2/notifications@2008-07-14.yang".
+nc VERBOSE: Reading module "nc-notifications@2008-07-14" from local file "/usr/local/share/yang/modules/netopeer2/nc-notifications@2008-07-14.yang".
+nc VERBOSE: Reading module "ietf-x509-cert-to-name@2014-12-10" from local file "/usr/local/share/yang/modules/netopeer2/ietf-x509-cert-to-name@2014-12-10.yang".
+nc VERBOSE: Reading module "ietf-keystore@2016-10-31" from local file "/usr/local/share/yang/modules/netopeer2/ietf-keystore@2016-10-31.yang".
+nc VERBOSE: Reading module "ietf-netconf-with-defaults@2011-06-01" from local file "/usr/local/share/yang/modules/netopeer2/ietf-netconf-with-defaults@2011-06-01.yang".
+nc WARNING: Server implements module "ietf-datastores" in revision "2017-08-17" but revision "2018-02-14" is already implemented and will be used instead.
+nc VERBOSE: Reading module "ietf-netconf-server@2016-11-02" from local file "/usr/local/share/yang/modules/netopeer2/ietf-netconf-server@2016-11-02.yang".
+nc VERBOSE: Reading module "ietf-ssh-server@2016-11-02" from local file "/usr/local/share/yang/modules/netopeer2/ietf-ssh-server@2016-11-02.yang".
+nc VERBOSE: Reading module "ietf-tls-server@2016-11-02" from local file "/usr/local/share/yang/modules/netopeer2/ietf-tls-server@2016-11-02.yang".
+nc VERBOSE: Reading module "ietf-system@2014-08-06" from local file "/usr/local/share/yang/modules/netopeer2/ietf-system@2014-08-06.yang".
+nc VERBOSE: Reading module "iana-crypt-hash@2014-08-06" from local file "/usr/local/share/yang/modules/netopeer2/iana-crypt-hash@2014-08-06.yang".
+nc VERBOSE: Reading module "ietf-crypto-types@2022-12-12" from local file "/usr/local/share/yang/modules/netopeer2/ietf-crypto-types@2022-12-12.yang".
+nc VERBOSE: Reading module "ietf-interfaces@2018-02-20" from local file "/usr/local/share/yang/modules/netopeer2/ietf-interfaces@2018-02-20.yang".
+nc VERBOSE: Reading module "ietf-ip@2018-02-22" from local file "/usr/local/share/yang/modules/netopeer2/ietf-ip@2018-02-22.yang".
+nc VERBOSE: Reading module "iana-hardware@2018-03-13" from local file "/usr/local/share/yang/modules/netopeer2/iana-hardware@2018-03-13.yang".
+nc VERBOSE: Reading module "ietf-hardware@2018-03-13" from local file "/usr/local/share/yang/modules/netopeer2/ietf-hardware@2018-03-13.yang".
+nc VERBOSE: Reading module "ietf-dhcpv6-types@2018-09-04" from local file "/usr/local/share/yang/modules/netopeer2/ietf-dhcpv6-types@2018-09-04.yang".
+nc VERBOSE: Reading module "iana-if-type@2017-01-19" from local file "/usr/local/share/yang/modules/netopeer2/iana-if-type@2017-01-19.yang".
+nc VERBOSE: Reading module "ietf-dhcpv6-common@2021-01-29" from local file "/usr/local/share/yang/modules/netopeer2/ietf-dhcpv6-common@2021-01-29.yang".
+nc VERBOSE: Reading module "ieee802-dot1q-cfm-types@2020-06-04" from local file "/usr/local/share/yang/modules/netopeer2/ieee802-dot1q-cfm-types@2020-06-04.yang".
+nc VERBOSE: Reading module "ieee802-dot1q-types@2020-06-04" from local file "/usr/local/share/yang/modules/netopeer2/ieee802-dot1q-types@2020-06-04.yang".
+nc VERBOSE: Reading module "ieee802-types@2020-06-04" from local file "/usr/local/share/yang/modules/netopeer2/ieee802-types@2020-06-04.yang".
+nc VERBOSE: Reading module "ieee802-dot1q-cfm@2020-06-04" from local file "/usr/local/share/yang/modules/netopeer2/ieee802-dot1q-cfm@2020-06-04.yang".
+nc VERBOSE: Reading module "ieee802-dot1x-types@2020-02-18" from local file "/usr/local/share/yang/modules/netopeer2/ieee802-dot1x-types@2020-02-18.yang".
+nc VERBOSE: Reading module "ieee802-dot1x@2020-02-18" from local file "/usr/local/share/yang/modules/netopeer2/ieee802-dot1x@2020-02-18.yang".
+nc VERBOSE: Reading module "o-ran-common-yang-types@2023-08-14" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-common-yang-types@2023-08-14.yang".
+nc VERBOSE: Reading module "o-ran-common-identity-refs@2022-08-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-common-identity-refs@2022-08-15.yang".
+nc VERBOSE: Reading module "o-ran-certificates@2022-08-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-certificates@2022-08-15.yang".
+nc VERBOSE: Reading module "o-ran-wg4-features@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-wg4-features@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-usermgmt@2023-12-11" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-usermgmt@2023-12-11.yang".
+nc VERBOSE: Reading module "o-ran-supervision@2022-12-05" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-supervision@2022-12-05.yang".
+nc VERBOSE: Reading module "o-ran-fm@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-fm@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-fan@2021-12-01" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-fan@2021-12-01.yang".
+nc VERBOSE: Reading module "o-ran-hardware@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-hardware@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-interfaces@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-interfaces@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-ieee802-dot1q-cfm@2023-04-10" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-ieee802-dot1q-cfm@2023-04-10.yang".
+nc VERBOSE: Reading module "o-ran-mplane-int@2021-12-01" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-mplane-int@2021-12-01.yang".
+nc VERBOSE: Reading module "o-ran-dhcp@2022-08-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-dhcp@2022-08-15.yang".
+nc VERBOSE: Reading module "o-ran-transceiver@2023-04-10" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-transceiver@2023-04-10.yang".
+nc VERBOSE: Reading module "o-ran-trace@2022-08-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-trace@2022-08-15.yang".
+nc VERBOSE: Reading module "o-ran-operations@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-operations@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-troubleshooting@2022-08-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-troubleshooting@2022-08-15.yang".
+nc VERBOSE: Reading module "o-ran-file-management@2023-04-10" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-file-management@2023-04-10.yang".
+nc VERBOSE: Reading module "o-ran-software-management@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-software-management@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-sync@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-sync@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-compression-factors@2023-08-14" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-compression-factors@2023-08-14.yang".
+nc VERBOSE: Reading module "o-ran-module-cap@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-module-cap@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-delay-management@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-delay-management@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-processing-element@2022-08-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-processing-element@2022-08-15.yang".
+nc VERBOSE: Reading module "o-ran-lbm@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-lbm@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-uplane-conf@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-uplane-conf@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-performance-management@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-performance-management@2024-04-15.yang".
+nc VERBOSE: Reading module "o-ran-ethernet-forwarding@2021-12-01" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-ethernet-forwarding@2021-12-01.yang".
+nc VERBOSE: Reading module "o-ran-shared-cell@2024-04-15" from local file "/usr/local/share/yang/modules/netopeer2/o-ran-shared-cell@2024-04-15.yang".
+nc DEBUG: Sending message:
+
+#317
+
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=110, in_blocks=2424]
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=24, padding_size=8, comp=15, payload=15]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 6 bytes
+nc DEBUG: Sending message:
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="3"><get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"><filter type="xpath" xmlns:yanglib="urn:ietf:params:xml:ns:yang:ietf-yang-library" xmlns:yangmnt="urn:ietf:params:xml:ns:yang:ietf-yang-schema-mount" select="/yanglib:* | /yangmnt:*"/></get></rpc>
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=150, in_blocks=2463]
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=336, padding_size=9, comp=326, payload=326]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 317 bytes
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: Sending message:
+
+##
+
+
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=151, in_blocks=2424]
+nc DEBUG: SSH: packet_send2: packet: wrote [type=94, len=24, padding_size=10, comp=13, payload=13]
+nc DEBUG: SSH: channel_write_common: ssh_channel_write wrote 4 bytes
+nc DEBUG: SSH: ssh_socket_unbuffered_write: Enabling POLLOUT for socket
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=24,padding=8,comp=15,payload=15]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 6 bytes data in 0 (local win=1264219 remote win=1279190)
+nc DEBUG: SSH: channel_default_bufferize: placing 6 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=1264213 remote win=1279190)
+nc DEBUG: SSH: ssh_packet_socket_callback: Processing 404 bytes left in socket buffer
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=384,padding=9,comp=374,payload=374]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 365 bytes data in 0 (local win=1264213 remote win=1279190)
+nc DEBUG: SSH: channel_default_bufferize: placing 365 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=1263848 remote win=1279190)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=151, in_blocks=2470]
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=151, in_blocks=2470]
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (2) buffered : 371 bytes. Window: 1263848
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 369 bytes. Window: 1263848
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 368 bytes. Window: 1263848
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 367 bytes. Window: 1263848
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 366 bytes. Window: 1263848
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (365) buffered : 365 bytes. Window: 1263848
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (2) buffered : 0 bytes. Window: 1263848
+nc DEBUG: SSH: ssh_packet_socket_callback: packet: read type 94 [len=24,padding=10,comp=13,payload=13]
+nc DEBUG: SSH: ssh_packet_process: Dispatching handler for packet type 94
+nc DEBUG: SSH: channel_rcv_data: Channel receiving 4 bytes data in 0 (local win=1263848 remote win=1279190)
+nc DEBUG: SSH: channel_default_bufferize: placing 4 bytes into channel buffer (stdout)
+nc DEBUG: SSH: channel_rcv_data: Channel windows are now (local win=1263844 remote win=1279190)
+nc DEBUG: SSH: ssh_packet_need_rekey: rekey: [data_rekey_needed=0, out_blocks=151, in_blocks=2471]
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 2 bytes. Window: 1263844
+nc DEBUG: SSH: ssh_channel_read_timeout: Read (1) buffered : 1 bytes. Window: 1263844
+nc DEBUG: Received message:
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="3"><rpc-error><error-type>application</error-type><error-tag>operation-failed</error-tag><error-severity>error</error-severity><error-message xml:lang="en">Module with the namespace "urn:ietf:params:xml:ns:yang:ietf-yang-schema-mount" could not be found.</error-message></rpc-error></rpc-reply>
+
+nc WARNING: Unexpected reply without data to a <get> RPC.

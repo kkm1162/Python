@@ -1,0 +1,1520 @@
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-37-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+250 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+16 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+*** System restart required ***
+Last login: Tue May 12 10:45:27 2026 from 192.168.9.194
+[?2004h]0;solid@OL4-RUC: ~solid@OL4-RUC:~$ ip neighbo | grep 10.0.20
+[?2004l[01;31m[K10.0.20[m[K.122 dev dasan FAILED 
+[01;31m[K10.0.20[m[K.103 dev dasan lladdr dc:c1:01:00:d2:24 STALE 
+[01;31m[K10.0.20[m[K.126 dev dasan lladdr 00:0a:35:00:00:0a REACHABLE 
+[01;31m[K10.0.20[m[K.108 dev dasan FAILED 
+[01;31m[K10.0.20[m[K.133 dev dasan lladdr dc:c1:01:00:00:09 STALE 
+[01;31m[K10.0.20[m[K.130 dev dasan INCOMPLETE 
+[01;31m[K10.0.20[m[K.127 dev dasan lladdr 00:0a:35:00:00:02 STALE 
+[01;31m[K10.0.20[m[K.100 dev dasan lladdr dc:c1:01:00:92:2d STALE 
+[01;31m[K10.0.20[m[K.106 dev dasan lladdr dc:c1:01:00:05:05 STALE 
+[01;31m[K10.0.20[m[K.134 dev dasan lladdr dc:c1:01:00:a6:24 STALE 
+[01;31m[K10.0.20[m[K.50 dev dasan lladdr d0:96:fb:9d:82:8e REACHABLE 
+[01;31m[K10.0.20[m[K.254 dev dasan FAILED 
+[01;31m[K10.0.20[m[K.101 dev dasan lladdr dc:c1:01:02:03:04 STALE 
+[01;31m[K10.0.20[m[K.102 dev dasan lladdr 00:0a:35:00:00:02 STALE 
+[01;31m[K10.0.20[m[K.128 dev dasan FAILED 
+[?2004h]0;solid@OL4-RUC: ~solid@OL4-RUC:~$ ssh admin@10.0.20.133
+[?2004lAuthorized uses only. All activity may be monitored and reported.
+
+(admin@10.0.20.133) Password: 
+Last login: Tue May 12 01:37:16 2026 from 10.0.20.254
+Security & OS hardening are being applied.
+
+Hello, this is ORAN-FW (version 0.0.1-gdb0ce5c).
+Copyright 2019-2028 SOLiD Inc.
+
+n78-ru# exit
+Connection to 10.0.20.133 closed.
+[?2004h]0;solid@OL4-RUC: ~solid@OL4-RUC:~$ ssh admin@10.0.20.106
+[?2004lThe authenticity of host '10.0.20.106 (10.0.20.106)' can't be established.
+ECDSA key fingerprint is SHA256:FIkgHtNCIgsspxUgQXu1L3UPY839Xes4UGbbRe3AqsM.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.0.20.106' (ECDSA) to the list of known hosts.
++------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+(admin@10.0.20.106) Password: 
+Last login: Fri Jan 23 14:14:56 2026
+Security & OS hardening are being applied.
+
+========================================================================
+ Developer mode enabled.
+========================================================================
+
+Hello, this is O-RAN.MP.DAEMON (version 0.17.1 (0.17.1-15-g844a6efc9)).
+Copyright 2019-2028 SOLiD Inc.
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session         call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# 
+
+CLI connection is closed by idle-timeout (600 seconds).
+
+Connection to 10.0.20.106 closed.
+[?2004h]0;solid@OL4-RUC: ~solid@OL4-RUC:~$ ssh admin@10.0.20.106
+[?2004l+------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+(admin@10.0.20.106) Password: 
+(admin@10.0.20.106) Password: 
+Last login: Tue May 12 02:29:10 2026 from 10.0.20.254
+Security & OS hardening are being applied.
+
+========================================================================
+ Developer mode enabled.
+========================================================================
+
+Hello, this is O-RAN.MP.DAEMON (version 0.17.1 (0.17.1-15-g844a6efc9)).
+Copyright 2019-2028 SOLiD Inc.
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session         call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# 
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# reset system user-config 
+System shall be reset by CLI
+System restart requested by CLI. 
+
+Broadcast message from root@localhost (Tue 2026-05-12 02:50:30 UTC):
+
+The system is going down for reboot NOW!
+
+Connection to 10.0.20.106 closed by remote host.
+Connection to 10.0.20.106 closed.
+[?2004h]0;solid@OL4-RUC: ~solid@OL4-RUC:~$ ssh admin@10.0.20.106
+[?2004l+------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+(admin@10.0.20.106) Password: 
+Last login: Tue May 12 02:44:21 2026 from 10.0.20.254
+Security & OS hardening are being applied.
+
+========================================================================
+ Developer mode enabled.
+========================================================================
+
+Hello, this is O-RAN.MP.DAEMON (version 0.17.1 (0.17.1-15-g844a6efc9)).
+Copyright 2019-2028 SOLiD Inc.
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session         call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show yang-module-data o-ran-mplane-int 
+
+O-RU 'o-ran-mplane-int' Data Information 
+XPATH  '/o-ran-mplane-int:mplane-info' 
+
+RU M-Plane Info: 
+======================================================================
+ (search-vlan-changed): false 
+ (copy-startup-required): false 
+ (configured-subif-existed): false 
+ (discovered-subif-existed): true 
+
+ ------------------------------------------------------------
+ rw mplane-info: 
+    rw searchable-mplane-access-vlans-info: 
+       rw searchable-access-vlans: 1 (untag) (vlan-discovery)
+       rw vlan-range: 
+          rw lowest-vlan-id: 1 
+          rw highest-vlan-id: 1 
+    .. (applied-searchable-mplane-access-vlans-info): 
+       rw searchable-access-vlans: 1 (untag) (vlan-discovery)
+       rw vlan-range: 
+          rw lowest-vlan-id: 1 
+          rw highest-vlan-id: 1 
+    rw m-plane-interfaces: 
+       rw m-plane-sub-interfaces: [interface-name sub-interface] 
+          rw interface-name: MPLANE-VLAN (vlan-discovery) 
+          .. (e-ifname): sys.1 
+          rw sub-interface(vid): 1 (untag) 
+          ro client-info: 
+             ro mplane-ipv4-info: [mplane-ipv4] 
+                ro mplane-ipv4: 10.0.20.254 
+             ro mplane-ipv4-info: [mplane-ipv4] 
+                ro mplane-ipv4: 10.0.20.253 
+       rw m-plane-ssh-ports: 
+          rw call-home-ssh-port: 4334 
+          rw server-ssh-port: 830 
+       rw m-plane-tls-ports: 
+          rw call-home-tls-port: 4335 
+          rw server-tls-port: 6513 
+    rw configured-client-info: 
+======================================================================
+
+
+nRU# show yang-module-data o-ran-mplane-int            
+o-ran-delay-management        o-ran-lbm                     o-ran-shared-cell             o-ran-troubleshooting
+o-ran-dhcp                    o-ran-module-cap              o-ran-software-management     o-ran-uplane-conf
+o-ran-ethernet-forwarding     o-ran-mplane-int              o-ran-supervision             o-ran-usermgmt
+o-ran-fan                     o-ran-operations              o-ran-sync                    
+o-ran-file-management         o-ran-performance-management  o-ran-trace                   
+o-ran-fm                      o-ran-processing-element      o-ran-transceiver             
+nRU# show yang-module-data o-ran-dhcp 
+
+O-RU 'o-ran-dhcp' Data Information 
+XPATH  '/o-ran-dhcp:dhcp' 
+
+RU DHCP Information: 
+============================================================
+ (dhcp-v4-client): enabled 
+ (dhcp-v6-client): enabled 
+ (product-code): RUTN44-N78eE.U 
+ (serial-number): 74800524C00001 
+ (vlan-discovery): succeeded 
+ (vlan-discovery-expire-time): 1/300 
+ (vlan-discovery-start-delay-time): -1/0 (disabled) 
+ (uplane-conf-wait-time): 3/600 
+ (if-up-changed): false 
+
+ ------------------------------------------------------------
+ ro m-plane-dhcp: 
+    ro private-enterprise-num: 53148 
+    ro vendor-class-data: o-ran-ru2/SOLiD/RUTN44-N78eE.U 
+       (vendor-class-type): product-code 
+
+ ------------------------------------------------------------
+ ro interfaces: [interface] 
+    ro interface: MPLANE-VLAN (vlan-discovery) 
+    .. (e-ifname): sys.1 
+    ro dhcpv4: 
+       (dhcp-client): started 
+          status: renew 
+          update-time: 2026-05-12T03:35:32+00:00 924333563 
+          lease-key: 74800524C00001 (client-id:<serial-number>)
+          client-ip: 10.0.20.106 
+          subnet-mask: 255.255.255.0 
+          lease-time: 83864 
+       ro client-id: 74800524C00001 
+       ro dhcp-server-identifier: 10.0.20.254 
+       ro domain-name: solid2.co.kr 
+       ro interface-mtu: 1500 
+       ro domain-name-servers: (count:2) 
+          ro domain-name-servers[1]: 192.168.55.100 
+          ro domain-name-servers[2]: 192.168.55.101 
+       ro default-gateways: (count:1) 
+          ro default-gateways[1]: 10.0.20.254 
+       ro netconf-clients: (count:2) 
+          ro netconf-clients: [client] 
+             ro client(address): 10.0.20.254 (ssh) 
+          ro netconf-clients: [client] 
+             ro client(address): 10.0.20.253 (ssh) 
+    ro dhcpv6: 
+       (dhcp-client): started 
+          status: initial 
+          failure-reason: initial: started, v1.29.3 
+          update-time: 2026-05-12T03:36:01+00:00 625744546 
+          lease-key: 74800524C00001+01000505 (client-id:<serial-number> + IAID:<LSB 4bytes of mac-address>)
+============================================================
+
+
+nRU# 
+
+CLI connection is closed by idle-timeout (600 seconds).
+
+Connection to 10.0.20.106 closed.
+[?2004h]0;solid@OL4-RUC: ~solid@OL4-RUC:~$ ssh admin@10.0.20.106
+[?2004l+------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+(admin@10.0.20.106) Password: 
+Last login: Tue May 12 03:27:43 2026 from 10.0.20.254
+Security & OS hardening are being applied.
+
+========================================================================
+ Developer mode enabled.
+========================================================================
+
+Hello, this is O-RAN.MP.DAEMON (version 0.17.1 (0.17.1-15-g844a6efc9)).
+Copyright 2019-2028 SOLiD Inc.
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 8    oranuser     10.0.20.254              2026-05-12T07:42:26+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 8    oranuser     10.0.20.254              2026-05-12T07:42:26+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session nRU# show yang-module-data o-ran-dhcp nRU# show [5Pnetconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 0/0/0/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session         call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home           session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 9    oranuser     10.0.20.254              2026-05-12T07:52:09+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 10   oranuser     10.0.20.254              2026-05-12T08:00:32+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 10   oranuser     10.0.20.254              2026-05-12T08:00:32+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 10   oranuser     10.0.20.254              2026-05-12T08:00:32+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 10   oranuser     10.0.20.254              2026-05-12T08:00:32+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session call-home 
+
+Netconf server call-home:
+----------------------------------------------------------------------------------------------------
+ client-name              endpoint-name    address                        port  
+----------------------------------------------------------------------------------------------------
+ dhcp.d120309f66b3b29c    ep.0             10.0.20.254                    4334  
+ dhcp.5140731e54ee6d2c    ep.0             10.0.20.253                    4334  
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server call-home [2Psession 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 11   oranuser     10.0.20.254              2026-05-12T08:03:04+02:00 3/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nRU# 
+
+CLI connection is closed by idle-timeout (600 seconds).
+
+Connection to 10.0.20.106 closed.
+[?2004h]0;solid@OL4-RUC: ~solid@OL4-RUC:~$ 

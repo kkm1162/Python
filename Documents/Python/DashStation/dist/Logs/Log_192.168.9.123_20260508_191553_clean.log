@@ -1,0 +1,139 @@
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-37-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+306 updates can be applied immediately.
+65 of these updates are standard security updates.
+To see these additional updates run: apt list --upgradable
+
+16 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+*** System restart required ***
+Last login: Fri May  8 13:16:22 2026 from 192.168.70.79
+solid@OL4-RUC:~$ ip neighbo | grep 10.0.20
+10.0.20.103 dev dasan FAILED 
+10.0.20.126 dev dasan lladdr 00:0a:35:00:00:0a REACHABLE 
+10.0.20.108 dev dasan FAILED 
+10.0.20.133 dev dasan lladdr dc:c1:01:00:00:09 STALE 
+10.0.20.130 dev dasan INCOMPLETE 
+10.0.20.100 dev dasan lladdr dc:c1:01:00:92:2d STALE 
+10.0.20.50 dev dasan lladdr d0:96:fb:9d:82:8e REACHABLE 
+10.0.20.254 dev dasan FAILED 
+10.0.20.101 dev dasan lladdr dc:c1:01:02:03:04 STALE 
+10.0.20.102 dev dasan lladdr 00:0a:35:00:00:02 STALE 
+10.0.20.128 dev dasan FAILED 
+solid@OL4-RUC:~$ ^C
+solid@OL4-RUC:~$ SSH ssh ad;minmin@10.0.20.126
++------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+(admin@10.0.20.126) Password: 
+Last login: Thu May  7 07:15:01 2026 from 10.0.20.254
+Security & OS hardening are being applied.
+
+========================================================================
+ Developer mode enabled.
+========================================================================
+
+Hello, this is O-RAN.MP.DAEMON (version 0.20.9 (0.20.9-11-gf67998ab6)).
+Copyright 2019-2028 SOLiD Inc.
+
+nDIU# show dhcp 
+
+DHCP 
+----------------------------------------------------------------------------------------------------
+ ifname          link   client   discovery  mplane   IP-address                          lease-time 
+----------------------------------------------------------------------------------------------------
+ sys.1           up     v4/up    *          *        10.0.20.126/255.255.255.0           77445      
+----------------------------------------------------------------------------------------------------
+ sys.1           up     v6/up    *          *        initial                             -          
+----------------------------------------------------------------------------------------------------
+ VLAN discovery succeeded. 
+   searchable-mplane-access-vlans-info: 
+     searchable-access-vlans: 1 (untag) (vlan-discovery) 
+     vlan-range: 
+       lowest-vlan-id: 1 
+       highest-vlan-id: 1 
+
+nDIU# show interface 
+
+Interface (all) 
+----------------------------------------------------------------------------------------------------
+ ifname          C   vlan            mac-address         mtu    discovery  mplane  dhcp    status     
+----------------------------------------------------------------------------------------------------
+ dbg             *   -               fe:73:68:30:a7:ad   1500                      -       disabled   
+ dbg.1               dbg / 1 (u)     fe:73:68:30:a7:ad   1500              *       -       disabled   
+ sys             *   -               00:0a:35:00:00:0a   1500                      -       up         
+ sys.1000        *   sys / 1000      00:0a:35:00:00:0a   1500                      -       up         
+ sys.1               sys / 1 (u)     00:0a:35:00:00:0a   1500   *          *       v4/v6   up         
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nDIU# show supplicant         ervision 
+
+ M-Plane connectivity monitoring: 
+------------------------------------------------------------------------------
+ Supervision state: normal 
+ Supervision action-of-failure: recovery-reset (close-session, reset-system) 
+ Supervision count-of-failure:  2 
+ Supervision reset-system-timer(180 secs): off 
+ Supervision time interval: supervision-noti-interval(60 secs) guard-time-overhead(10 secs) 
+
+ Netconf session supervision history: (latest 10 sessions)
+----------------------------------------------------------------------------------------------------------------
+ id    state      supervision  interval   count(tx/tx-err/rx)  supervision-timer 
+                               start-time                      end-time                 
+----------------------------------------------------------------------------------------------------------------
+ 63    stopped    normal       60/10      0/0/2                --           
+                               2026-05-08 01:34:43 +00:00      2026-05-08 01:35:49 +00:00      
+ 64    stopped    normal       60/10      0/0/4                --           
+                               2026-05-08 01:36:34 +00:00      2026-05-08 01:39:51 +00:00      
+ 65    stopped    normal       60/10      0/0/3                --           
+                               2026-05-08 01:40:51 +00:00      2026-05-08 01:43:28 +00:00      
+ 66    stopped    normal       60/10      0/0/1                --           
+                               2026-05-08 03:37:01 +00:00      2026-05-08 03:37:52 +00:00      
+ 67    stopped    normal       60/10      0/0/1                --           
+                               2026-05-08 03:40:37 +00:00      2026-05-08 03:41:06 +00:00      
+ 68    stopped    normal       60/10      0/0/14               --           
+                               2026-05-08 06:43:03 +00:00      2026-05-08 06:54:19 +00:00      
+ 69    stopped    normal       60/10      0/0/9                --           
+                               2026-05-08 10:14:53 +00:00      2026-05-08 10:22:29 +00:00      
+ 70    stopped    normal       60/10      0/0/19               --           
+                               2026-05-08 10:23:38 +00:00      2026-05-08 10:39:23 +00:00      
+ 71    stopped    normal       60/10      0/0/4                --           
+                               2026-05-08 11:00:08 +00:00      2026-05-08 11:03:20 +00:00      
+ 72    stopped    normal       60/10      0/0/7                --           
+                               2026-05-08 11:05:40 +00:00      2026-05-08 11:11:41 +00:00      
+----------------------------------------------------------------------------------------------------------------
+ 
+nDIU# 

@@ -1,0 +1,224 @@
+{
+    "settings": {
+        "teraterm_path": "C:\\Program Files (x86)\\teraterm\\ttermpro.exe",
+        "moba_path": "C:\\Program Files (x86)\\Mobatek\\MobaXterm\\MobaXterm.exe",
+        "log_path": "C:/Users/thelastsun/Documents/Python/DashStation/Logs",
+        "atom_path": "C:/Users/thelastsun/AppData/Local/atom/app-1.55.0/atom.exe"
+    },
+    "zones": {
+        "3": "RU",
+        "2": "L2SW",
+        "1": "RU_Controller",
+        "0": "etc"
+    },
+    "folders": {
+        "L2SW": {
+            "name": "L2SW",
+            "color": "#1976d2"
+        }
+    },
+    "sessions": [
+        {
+            "name": "192.168.9.249",
+            "type": "R",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "c2xhYg==",
+            "ru_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ru_pw": "",
+            "final_cmd": "",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": null,
+            "col_positions": {
+                "null": 1
+            },
+            "xml_path": "",
+            "bookmark": "",
+            "netconf_port": "830"
+        },
+        {
+            "name": "192.168.9.123",
+            "type": "S",
+            "ip": "192.168.9.123",
+            "port": "22",
+            "baud_rate": "115200",
+            "user": "solid",
+            "pw": "c29saWQxMjMh",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "ip neighbo | grep 10.0.20",
+            "ssh_interval": "2.0",
+            "moba_interval": "3.0",
+            "macro_steps": [],
+            "folder": null,
+            "col_positions": {
+                "null": 2
+            },
+            "xml_path": "",
+            "bookmark": "",
+            "netconf_port": "830"
+        },
+        {
+            "name": "192.168.9.249",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "port": "22",
+            "baud_rate": "115200",
+            "user": "slab",
+            "pw": "c2xhYg==",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "ip neighbo | grep 10.0.20",
+            "ssh_interval": "2.0",
+            "moba_interval": "3.0",
+            "macro_steps": [],
+            "folder": null,
+            "col_positions": {
+                "null": 3
+            },
+            "xml_path": "",
+            "bookmark": "",
+            "netconf_port": "830"
+        },
+        {
+            "name": "192.168.80.44(TEST_PC",
+            "type": "R",
+            "ip": "192.168.80.44",
+            "user": "solid",
+            "pw": "c29saWQxMjMh",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": null,
+            "col_positions": {
+                "null": 2
+            },
+            "xml_path": "",
+            "bookmark": "",
+            "netconf_port": "830"
+        },
+        {
+            "name": "L2SW_20",
+            "type": "S",
+            "ip": "192.168.9.123",
+            "user": "solid",
+            "pw": "c29saWQxMjMh",
+            "ru_cmd": "ssh admin@10.0.20.50",
+            "ru_pw": "MXEydzNlNHIhUUBXI0UkUg==",
+            "final_cmd": "en, show mac",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": null,
+            "col_positions": {
+                "null": 3
+            },
+            "xml_path": "",
+            "bookmark": "",
+            "netconf_port": "830"
+        },
+        {
+            "name": "10.0.10.125(SA), 10.0.10.71 (Administrator)",
+            "type": "M",
+            "ip": "",
+            "user": "",
+            "pw": "",
+            "ru_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ru_pw": "",
+            "final_cmd": "",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": null,
+            "col_positions": {
+                "null": 1,
+                "__ROOT__": 1
+            },
+            "xml_path": "",
+            "bookmark": "",
+            "netconf_port": "830"
+        },
+        {
+            "name": "L2SW_60",
+            "type": "S",
+            "ip": "192.168.9.249",
+            "user": "slab",
+            "pw": "c2xhYg==",
+            "ru_cmd": "ssh admin@10.0.60.50",
+            "ru_pw": "MXEydzNlNHIhUUBXI0UkUg==",
+            "final_cmd": "en, show mac",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": null,
+            "col_positions": {
+                "null": 2,
+                "__ROOT__": 2
+            },
+            "xml_path": "",
+            "bookmark": "",
+            "netconf_port": "830"
+        },
+        {
+            "name": "L2SW_30",
+            "type": "S",
+            "ip": "192.168.9.123",
+            "user": "solid",
+            "pw": "c29saWQxMjMh",
+            "ru_cmd": "ssh admin@10.0.30.50",
+            "ru_pw": "MXEydzNlNHIhUUBXI0UkUg==",
+            "final_cmd": "en, show mac-address",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "2",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": null,
+            "col_positions": {
+                "null": 2,
+                "__ROOT__": 2
+            },
+            "xml_path": "",
+            "bookmark": "",
+            "netconf_port": "830"
+        },
+        {
+            "name": "RF_Switch",
+            "type": "P",
+            "ip": "C:\\Users\\thelastsun\\Documents\\Python\\RF Switch\\dist\\RF_Switch_v1.0.exe",
+            "user": "",
+            "pw": "",
+            "ru_cmd": "",
+            "ru_pw": "",
+            "final_cmd": "",
+            "port": "22",
+            "baud_rate": "115200",
+            "ssh_interval": "1.0",
+            "moba_interval": "2.0",
+            "macro_steps": [],
+            "folder": null,
+            "col_positions": {
+                "null": 1,
+                "__ROOT__": 1
+            },
+            "xml_path": "",
+            "bookmark": "",
+            "netconf_port": "830"
+        }
+    ]
+}

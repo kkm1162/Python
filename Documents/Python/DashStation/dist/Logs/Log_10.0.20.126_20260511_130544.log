@@ -1,0 +1,370 @@
++------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+Last login: Mon May 11 02:15:31 2026 from 10.0.20.254
+Security & OS hardening are being applied.
+
+========================================================================
+ Developer mode enabled.
+========================================================================
+
+Hello, this is O-RAN.MP.DAEMON (version 0.20.9 (0.20.9-11-gf67998ab6)).
+Copyright 2019-2028 SOLiD Inc.
+
+nDIU# ]
+% Unknown command.
+nDIU# 
+nDIU# sho wdh    w s neet  tconf-server 
+% Command incomplete.
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nDIU# ex  show 
+alarm               debug               interface           packet              software            test
+band-info           dfe                 inventory           performance         startup-config      transceiver
+call-home           dhcp                ip                  power               storage             transmitter
+certificate         dot1x               ipc                 processing-element  supervision         uplane
+cfm                 dpd                 ipc-server          receiver            supplicant          user
+cli                 dsp                 lbm                 reset               sync                version
+commandtree         ecpri               log                 rf-path-info        system              watchdog
+cuplane             environment         logging             rfm                 tdd-pattern         xmemory
+date                fitf                netconf-server      running-config      temperature         yang-module-data
+nDIU# show supervision 
+
+ M-Plane connectivity monitoring: 
+------------------------------------------------------------------------------
+ Supervision state: normal 
+ Supervision action-of-failure: recovery-reset (close-session, reset-system) 
+ Supervision count-of-failure:  2 
+ Supervision reset-system-timer(180 secs): off 
+ Supervision time interval: supervision-noti-interval(60 secs) guard-time-overhead(10 secs) 
+
+ Netconf session supervision history: (latest 10 sessions)
+----------------------------------------------------------------------------------------------------------------
+ id    state      supervision  interval   count(tx/tx-err/rx)  supervision-timer 
+                               start-time                      end-time                 
+----------------------------------------------------------------------------------------------------------------
+ 78    stopped    normal       60/10      0/0/13               --           
+                               2026-05-11 01:18:13 +00:00      2026-05-11 01:28:46 +00:00      
+ 79    stopped    normal       60/10      0/0/7                --           
+                               2026-05-11 01:29:55 +00:00      2026-05-11 01:35:56 +00:00      
+ 80    stopped    normal       60/10      0/0/4                --           
+                               2026-05-11 01:37:53 +00:00      2026-05-11 01:41:20 +00:00      
+ 81    stopped    normal       60/10      0/0/6                --           
+                               2026-05-11 01:42:16 +00:00      2026-05-11 01:46:46 +00:00      
+ 82    stopped    normal       60/10      0/0/38               --           
+                               2026-05-11 01:47:55 +00:00      2026-05-11 02:19:14 +00:00      
+ 83    stopped    normal       60/10      0/0/7                --           
+                               2026-05-11 02:22:36 +00:00      2026-05-11 02:28:24 +00:00      
+ 84    stopped    normal       60/10      0/0/17               --           
+                               2026-05-11 02:29:21 +00:00      2026-05-11 02:43:25 +00:00      
+ 85    stopped    normal       60/10      0/0/78               --           
+                               2026-05-11 02:44:21 +00:00      2026-05-11 03:49:26 +00:00      
+ 86    stopped    normal       60/10      0/0/0                --           
+                               2026-05-11 03:52:45 +00:00      2026-05-11 03:52:52 +00:00      
+ 87    stopped    normal       60/10      0/0/1                --           
+                               2026-05-11 04:02:01 +00:00      2026-05-11 04:02:48 +00:00      
+----------------------------------------------------------------------------------------------------------------
+ 
+nDIU# show supervision 
+
+
+ M-Plane connectivity monitoring: 
+------------------------------------------------------------------------------
+ Supervision state: normal 
+ Supervision action-of-failure: recovery-reset (close-session, reset-system) 
+ Supervision count-of-failure:  2 
+ Supervision reset-system-timer(180 secs): off 
+ Supervision time interval: supervision-noti-interval(60 secs) guard-time-overhead(10 secs) 
+
+ Netconf session supervision history: (latest 10 sessions)
+----------------------------------------------------------------------------------------------------------------
+ id    state      supervision  interval   count(tx/tx-err/rx)  supervision-timer 
+                               start-time                      end-time                 
+----------------------------------------------------------------------------------------------------------------
+ 78    stopped    normal       60/10      0/0/13               --           
+                               2026-05-11 01:18:13 +00:00      2026-05-11 01:28:46 +00:00      
+ 79    stopped    normal       60/10      0/0/7                --           
+                               2026-05-11 01:29:55 +00:00      2026-05-11 01:35:56 +00:00      
+ 80    stopped    normal       60/10      0/0/4                --           
+                               2026-05-11 01:37:53 +00:00      2026-05-11 01:41:20 +00:00      
+ 81    stopped    normal       60/10      0/0/6                --           
+                               2026-05-11 01:42:16 +00:00      2026-05-11 01:46:46 +00:00      
+ 82    stopped    normal       60/10      0/0/38               --           
+                               2026-05-11 01:47:55 +00:00      2026-05-11 02:19:14 +00:00      
+ 83    stopped    normal       60/10      0/0/7                --           
+                               2026-05-11 02:22:36 +00:00      2026-05-11 02:28:24 +00:00      
+ 84    stopped    normal       60/10      0/0/17               --           
+                               2026-05-11 02:29:21 +00:00      2026-05-11 02:43:25 +00:00      
+ 85    stopped    normal       60/10      0/0/78               --           
+                               2026-05-11 02:44:21 +00:00      2026-05-11 03:49:26 +00:00      
+ 86    stopped    normal       60/10      0/0/0                --           
+                               2026-05-11 03:52:45 +00:00      2026-05-11 03:52:52 +00:00      
+ 87    stopped    normal       60/10      0/0/1                --           
+                               2026-05-11 04:02:01 +00:00      2026-05-11 04:02:48 +00:00      
+----------------------------------------------------------------------------------------------------------------
+ 
+nDIU# 
+nDIU# show supervision 
+
+ M-Plane connectivity monitoring: 
+------------------------------------------------------------------------------
+ Supervision state: normal 
+ Supervision action-of-failure: recovery-reset (close-session, reset-system) 
+ Supervision count-of-failure:  2 
+ Supervision reset-system-timer(180 secs): off 
+ Supervision time interval: supervision-noti-interval(60 secs) guard-time-overhead(10 secs) 
+
+ Netconf session supervision history: (latest 10 sessions)
+----------------------------------------------------------------------------------------------------------------
+ id    state      supervision  interval   count(tx/tx-err/rx)  supervision-timer 
+                               start-time                      end-time                 
+----------------------------------------------------------------------------------------------------------------
+ 78    stopped    normal       60/10      0/0/13               --           
+                               2026-05-11 01:18:13 +00:00      2026-05-11 01:28:46 +00:00      
+ 79    stopped    normal       60/10      0/0/7                --           
+                               2026-05-11 01:29:55 +00:00      2026-05-11 01:35:56 +00:00      
+ 80    stopped    normal       60/10      0/0/4                --           
+                               2026-05-11 01:37:53 +00:00      2026-05-11 01:41:20 +00:00      
+ 81    stopped    normal       60/10      0/0/6                --           
+                               2026-05-11 01:42:16 +00:00      2026-05-11 01:46:46 +00:00      
+ 82    stopped    normal       60/10      0/0/38               --           
+                               2026-05-11 01:47:55 +00:00      2026-05-11 02:19:14 +00:00      
+ 83    stopped    normal       60/10      0/0/7                --           
+                               2026-05-11 02:22:36 +00:00      2026-05-11 02:28:24 +00:00      
+ 84    stopped    normal       60/10      0/0/17               --           
+                               2026-05-11 02:29:21 +00:00      2026-05-11 02:43:25 +00:00      
+ 85    stopped    normal       60/10      0/0/78               --           
+                               2026-05-11 02:44:21 +00:00      2026-05-11 03:49:26 +00:00      
+ 86    stopped    normal       60/10      0/0/0                --           
+                               2026-05-11 03:52:45 +00:00      2026-05-11 03:52:52 +00:00      
+ 87    stopped    normal       60/10      0/0/1                --           
+                               2026-05-11 04:02:01 +00:00      2026-05-11 04:02:48 +00:00      
+----------------------------------------------------------------------------------------------------------------
+ 
+nDIU# show supervision 
+
+ M-Plane connectivity monitoring: 
+------------------------------------------------------------------------------
+ Supervision state: normal 
+ Supervision action-of-failure: recovery-reset (close-session, reset-system) 
+ Supervision count-of-failure:  2 
+ Supervision reset-system-timer(180 secs): off 
+ Supervision time interval: supervision-noti-interval(60 secs) guard-time-overhead(10 secs) 
+
+ Netconf session supervision history: (latest 10 sessions)
+----------------------------------------------------------------------------------------------------------------
+ id    state      supervision  interval   count(tx/tx-err/rx)  supervision-timer 
+                               start-time                      end-time                 
+----------------------------------------------------------------------------------------------------------------
+ 79    stopped    normal       60/10      0/0/7                --           
+                               2026-05-11 01:29:55 +00:00      2026-05-11 01:35:56 +00:00      
+ 80    stopped    normal       60/10      0/0/4                --           
+                               2026-05-11 01:37:53 +00:00      2026-05-11 01:41:20 +00:00      
+ 81    stopped    normal       60/10      0/0/6                --           
+                               2026-05-11 01:42:16 +00:00      2026-05-11 01:46:46 +00:00      
+ 82    stopped    normal       60/10      0/0/38               --           
+                               2026-05-11 01:47:55 +00:00      2026-05-11 02:19:14 +00:00      
+ 83    stopped    normal       60/10      0/0/7                --           
+                               2026-05-11 02:22:36 +00:00      2026-05-11 02:28:24 +00:00      
+ 84    stopped    normal       60/10      0/0/17               --           
+                               2026-05-11 02:29:21 +00:00      2026-05-11 02:43:25 +00:00      
+ 85    stopped    normal       60/10      0/0/78               --           
+                               2026-05-11 02:44:21 +00:00      2026-05-11 03:49:26 +00:00      
+ 86    stopped    normal       60/10      0/0/0                --           
+                               2026-05-11 03:52:45 +00:00      2026-05-11 03:52:52 +00:00      
+ 87    stopped    normal       60/10      0/0/1                --           
+                               2026-05-11 04:02:01 +00:00      2026-05-11 04:02:48 +00:00      
+ 88    running    normal       60/10      0/0/0                running (will be tx notification after 54 secs) 
+                               2026-05-11 04:07:09 +00:00                                      
+----------------------------------------------------------------------------------------------------------------
+ 
+nDIU# show supervision [4h           [4lnetconf-server session [Ksession 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 88   oranuser     10.0.20.254              2026-05-11T06:07:07+02:00 4/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 88   oranuser     10.0.20.254              2026-05-11T06:07:07+02:00 4/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 88   oranuser     10.0.20.254              2026-05-11T06:07:07+02:00 4/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 88   oranuser     10.0.20.254              2026-05-11T06:07:07+02:00 4/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+^[[A
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 88   oranuser     10.0.20.254              2026-05-11T06:07:07+02:00 4/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 88   oranuser     10.0.20.254              2026-05-11T06:07:07+02:00 4/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 88   oranuser     10.0.20.254              2026-05-11T06:07:07+02:00 4/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 88   oranuser     10.0.20.254              2026-05-11T06:07:07+02:00 4/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 88   oranuser     10.0.20.254              2026-05-11T06:07:07+02:00 4/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ 88   oranuser     10.0.20.254              2026-05-11T06:07:07+02:00 4/1/1/0
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nDIU# show netconf-server session 
+
+Netconf server session:
+----------------------------------------------------------------------------------------------------
+ id   username     source-host              login-time              rpc/bad-rpc/rpc-err/noti
+----------------------------------------------------------------------------------------------------
+ No active Netconf session.
+----------------------------------------------------------------------------------------------------
+
+nDIU# 
+nDIU# 
+nDIU# 
+nDIU# exit

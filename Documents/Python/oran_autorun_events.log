@@ -1,0 +1,201 @@
+[2026-04-30 10:50:35] AUTO 순서 저장 P0=16개 P1=16개
+[2026-04-30 10:50:56] Port 0 AUTO RUN 중지 요청
+[2026-04-30 10:50:56] Port 0 시험 종료 요청 reason=auto-stop
+[2026-04-30 10:50:56] Port 0 AUTO RUN 중지 완료
+[2026-04-30 10:50:56] Port 0 시험 종료 완료
+[2026-04-30 10:51:06] Port 0 AUTO RUN 시작 항목절체_min=10.0 guard간격_min=2.0 files=16
+[2026-04-30 10:51:06] Port 0 AUTO 절체 시작 -> 000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 10:51:06] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 10:51:06] Port 0 AUTO rate 적용 24Gbps (000a35000102_uplane_std_random_max_24g.pcap)
+[2026-04-30 10:51:06] Port 0 시험 종료 완료
+[2026-04-30 10:51:06] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 10:51:07] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_std_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 10:51:07] Port 0 AUTO 송출 시작 -> 000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 10:51:07] Port 0 항목 절체(송출 유지) 600.0초 (10.000분)
+[2026-04-30 11:01:09] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:01:09] Port 0 AUTO 송출 종료 -> 000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 11:01:09] Port 0 Guard Time(항목 간) 120.0초 (2.000분)
+[2026-04-30 11:01:11] Port 0 시험 종료 완료
+[2026-04-30 11:03:10] Port 0 AUTO 절체 시작 -> 000a35000102_uplane_jumbo_random_max_24g.pcap
+[2026-04-30 11:03:10] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:03:10] Port 0 AUTO rate 적용 24Gbps (000a35000102_uplane_jumbo_random_max_24g.pcap)
+[2026-04-30 11:03:11] Port 0 시험 종료 완료
+[2026-04-30 11:03:11] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 11:03:12] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_jumbo_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 11:03:12] Port 0 AUTO 송출 시작 -> 000a35000102_uplane_jumbo_random_max_24g.pcap
+[2026-04-30 11:03:12] Port 0 항목 절체(송출 유지) 600.0초 (10.000분)
+[2026-04-30 11:13:15] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:13:15] Port 0 AUTO 송출 종료 -> 000a35000102_uplane_jumbo_random_max_24g.pcap
+[2026-04-30 11:13:15] Port 0 Guard Time(항목 간) 120.0초 (2.000분)
+[2026-04-30 11:13:16] Port 0 시험 종료 완료
+[2026-04-30 11:15:15] Port 0 AUTO 절체 시작 -> 000a35000102_uplane_fixed9000_max_24g.pcap
+[2026-04-30 11:15:15] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:15:15] Port 0 AUTO rate 적용 24Gbps (000a35000102_uplane_fixed9000_max_24g.pcap)
+[2026-04-30 11:15:16] Port 0 시험 종료 완료
+[2026-04-30 11:15:16] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 11:15:17] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_fixed9000_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 11:15:17] Port 0 AUTO 송출 시작 -> 000a35000102_uplane_fixed9000_max_24g.pcap
+[2026-04-30 11:15:17] Port 0 항목 절체(송출 유지) 600.0초 (10.000분)
+[2026-04-30 11:34:54] AUTO 순서 저장 P0=2개 P1=2개
+[2026-04-30 11:35:05] Port 0 AUTO RUN 시작 항목절체_min=1.0 guard간격_min=1.0 files=2
+[2026-04-30 11:35:05] Port 0 AUTO 절체 시작 -> 000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 11:35:05] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:35:05] Port 0 AUTO rate 적용 24Gbps (000a35000102_uplane_std_random_max_24g.pcap)
+[2026-04-30 11:35:06] Port 0 시험 종료 완료
+[2026-04-30 11:35:06] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 11:35:07] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_std_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 11:35:07] Port 0 AUTO 송출 시작 -> 000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 11:35:07] Port 0 항목 절체(송출 유지) 60.0초 (1.000분)
+[2026-04-30 11:36:07] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:36:07] Port 0 AUTO 송출 종료 -> 000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 11:36:07] Port 0 Guard Time(항목 간) 60.0초 (1.000분)
+[2026-04-30 11:36:08] Port 0 시험 종료 완료
+[2026-04-30 11:37:08] Port 0 AUTO 절체 시작 -> 000a35000102_uplane_jumbo_random_max_24g.pcap
+[2026-04-30 11:37:08] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:37:08] Port 0 AUTO rate 적용 24Gbps (000a35000102_uplane_jumbo_random_max_24g.pcap)
+[2026-04-30 11:37:08] Port 0 시험 종료 완료
+[2026-04-30 11:37:08] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 11:37:10] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_jumbo_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 11:37:10] Port 0 AUTO 송출 시작 -> 000a35000102_uplane_jumbo_random_max_24g.pcap
+[2026-04-30 11:37:10] Port 0 항목 절체(송출 유지) 60.0초 (1.000분)
+[2026-04-30 11:38:10] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:38:10] Port 0 AUTO 송출 종료 -> 000a35000102_uplane_jumbo_random_max_24g.pcap
+[2026-04-30 11:38:10] Port 0 AUTO RUN 완료(선택 파일 1회 실행)
+[2026-04-30 11:38:10] Port 0 시험 종료 요청 reason=auto-stop
+[2026-04-30 11:38:11] Port 0 시험 종료 완료
+[2026-04-30 11:38:12] Port 0 시험 종료 완료
+[2026-04-30 11:38:40] COORD AUTO RUN 시작 mode=sequential-ports 항목절체_min=1.0 guard간격_min=1.0 files=2
+[2026-04-30 11:38:40] COORD AUTO 시험 항목 -> phase=P0 idx=1/2 pcap=000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 11:38:40] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:38:41] Port 0 시험 종료 완료
+[2026-04-30 11:38:41] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 11:38:42] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_std_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 11:38:42] COORD 항목 절체(송출 유지) 60.0초 (1.000분) port=0 idx=1
+[2026-04-30 11:39:42] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:39:42] COORD AUTO P0 idx=1 송출 종료
+[2026-04-30 11:39:42] COORD Guard Time(항목 간) 60.0초 (1.000분) port=0 idx=1
+[2026-04-30 11:39:43] Port 0 시험 종료 완료
+[2026-04-30 11:40:42] COORD AUTO 시험 항목 -> phase=P0 idx=2/2 pcap=000a35000102_uplane_jumbo_random_max_24g.pcap
+[2026-04-30 11:40:42] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:40:43] Port 0 시험 종료 완료
+[2026-04-30 11:40:43] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 11:40:43] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_jumbo_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 11:40:44] COORD 항목 절체(송출 유지) 60.0초 (1.000분) port=0 idx=2
+[2026-04-30 11:41:44] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:41:44] COORD AUTO P0 idx=2 송출 종료
+[2026-04-30 11:41:44] COORD Guard Time(항목 간) 60.0초 (1.000분) port=0 idx=2
+[2026-04-30 11:41:46] Port 0 시험 종료 완료
+[2026-04-30 11:42:44] COORD AUTO P0 전체 항목 완료 -> P1 진행
+[2026-04-30 11:42:44] COORD AUTO 시험 항목 -> phase=P1 idx=1/2 pcap=000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 11:42:44] Port 1 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:42:47] Port 1 시험 종료 완료
+[2026-04-30 11:42:47] Port 1 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 11:42:48] Port 1 시험 시작 reason=auto-switch pcap=000a35000102_uplane_std_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 11:42:48] COORD 항목 절체(송출 유지) 60.0초 (1.000분) port=1 idx=1
+[2026-04-30 11:43:48] Port 1 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:43:48] COORD AUTO P1 idx=1 송출 종료
+[2026-04-30 11:43:48] COORD Guard Time(항목 간) 60.0초 (1.000분) port=1 idx=1
+[2026-04-30 11:43:50] Port 1 시험 종료 완료
+[2026-04-30 11:44:48] COORD AUTO 시험 항목 -> phase=P1 idx=2/2 pcap=000a35000102_uplane_jumbo_random_max_24g.pcap
+[2026-04-30 11:44:48] Port 1 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:44:49] Port 1 시험 종료 완료
+[2026-04-30 11:44:49] Port 1 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 11:44:50] Port 1 시험 시작 reason=auto-switch pcap=000a35000102_uplane_jumbo_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 11:44:50] COORD 항목 절체(송출 유지) 60.0초 (1.000분) port=1 idx=2
+[2026-04-30 11:45:51] Port 1 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:45:51] COORD AUTO P1 idx=2 송출 종료
+[2026-04-30 11:45:51] Port 1 시험 종료 완료
+[2026-04-30 11:51:21] AUTO 순서 저장 P0=2개 P1=2개
+[2026-04-30 11:51:59] AUTO 순서 저장 P0=16개 P1=16개
+[2026-04-30 11:53:36] AUTO 순서 저장 P0=16개 P1=16개
+[2026-04-30 11:53:59] COORD AUTO RUN 시작 mode=sequential-ports 항목절체_min=10.0 guard간격_min=2.0 files_p0=16 files_p1=16
+[2026-04-30 11:53:59] COORD AUTO 시험 항목 -> phase=P0 idx=1/16 pcap=000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 11:53:59] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 11:54:00] Port 0 시험 종료 완료
+[2026-04-30 11:54:00] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 11:54:01] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_std_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 11:54:01] COORD 항목 절체(송출 유지) 600.0초 (10.000분) port=0 idx=1
+[2026-04-30 12:04:02] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 12:04:02] COORD AUTO P0 idx=1 송출 종료
+[2026-04-30 12:04:02] COORD Guard Time(항목 간) 120.0초 (2.000분) port=0 idx=1
+[2026-04-30 12:04:04] Port 0 시험 종료 완료
+[2026-04-30 12:06:02] COORD AUTO 시험 항목 -> phase=P0 idx=2/16 pcap=000a35000102_uplane_jumbo_random_max_24g.pcap
+[2026-04-30 12:06:02] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 12:06:04] Port 0 시험 종료 완료
+[2026-04-30 12:06:04] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 12:06:05] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_jumbo_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 12:06:05] COORD 항목 절체(송출 유지) 600.0초 (10.000분) port=0 idx=2
+[2026-04-30 12:16:06] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 12:16:06] COORD AUTO P0 idx=2 송출 종료
+[2026-04-30 12:16:06] COORD Guard Time(항목 간) 120.0초 (2.000분) port=0 idx=2
+[2026-04-30 12:16:07] Port 0 시험 종료 완료
+[2026-04-30 12:18:07] COORD AUTO 시험 항목 -> phase=P0 idx=3/16 pcap=000a35000102_uplane_fixed9000_max_24g.pcap
+[2026-04-30 12:18:07] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 12:18:07] Port 0 시험 종료 완료
+[2026-04-30 12:18:08] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 12:18:08] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_fixed9000_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 12:18:08] COORD 항목 절체(송출 유지) 600.0초 (10.000분) port=0 idx=3
+[2026-04-30 12:28:10] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 12:28:10] COORD AUTO P0 idx=3 송출 종료
+[2026-04-30 12:28:10] COORD Guard Time(항목 간) 120.0초 (2.000분) port=0 idx=3
+[2026-04-30 12:28:12] Port 0 시험 종료 완료
+[2026-04-30 12:30:10] COORD AUTO 시험 항목 -> phase=P0 idx=4/16 pcap=000a35000102_uplane_fixed64_max_19p0g.pcap
+[2026-04-30 12:30:10] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 12:30:11] Port 0 시험 종료 완료
+[2026-04-30 12:30:12] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 12:30:12] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_fixed64_max_19p0g.pcap rate=19.0Gbps duration_min=0.0
+[2026-04-30 12:30:12] COORD 항목 절체(송출 유지) 600.0초 (10.000분) port=0 idx=4
+[2026-04-30 12:33:42] COORD AUTO RUN 중지 요청 -> port=0 (순차 전체 정지)
+[2026-04-30 12:33:42] Port 0 시험 종료 요청 reason=auto-stop
+[2026-04-30 12:33:42] Port 1 시험 종료 요청 reason=auto-stop
+[2026-04-30 12:33:45] COORD AUTO RUN 중지 완료
+[2026-04-30 12:33:47] Port 0 시험 종료 완료
+[2026-04-30 12:33:47] Port 1 시험 종료 완료
+[2026-04-30 12:34:22] AUTO 순서 저장 P0=16개 P1=16개
+[2026-04-30 12:34:26] COORD AUTO RUN 시작 mode=sequential-ports 항목절체_min=210.0 guard간격_min=10.0 files_p0=16 files_p1=16
+[2026-04-30 12:34:26] COORD AUTO 시험 항목 -> phase=P0 idx=1/16 pcap=000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 12:34:26] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 12:34:27] Port 0 시험 종료 완료
+[2026-04-30 12:34:27] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 12:34:27] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_std_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 12:34:28] COORD 항목 절체(송출 유지) 12600.0초 (210.000분) port=0 idx=1
+[2026-04-30 12:34:39] COORD AUTO RUN 중지 요청 -> port=0 (순차 전체 정지)
+[2026-04-30 12:34:39] Port 0 시험 종료 요청 reason=auto-stop
+[2026-04-30 12:34:39] Port 1 시험 종료 요청 reason=auto-stop
+[2026-04-30 12:34:42] COORD AUTO RUN 중지 완료
+[2026-04-30 12:34:44] Port 1 시험 종료 완료
+[2026-04-30 12:34:45] Port 0 시험 종료 완료
+[2026-04-30 12:34:51] COORD AUTO RUN 시작 mode=sequential-ports 항목절체_min=220.0 guard간격_min=10.0 files_p0=16 files_p1=16
+[2026-04-30 12:34:51] COORD AUTO 시험 항목 -> phase=P0 idx=1/16 pcap=000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 12:34:52] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 12:34:52] Port 0 시험 종료 완료
+[2026-04-30 12:34:52] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 12:34:54] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_std_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 12:34:54] COORD 항목 절체(송출 유지) 13200.0초 (220.000분) port=0 idx=1
+[2026-04-30 12:35:11] COORD AUTO RUN 중지 요청 -> port=0 (순차 전체 정지)
+[2026-04-30 12:35:11] Port 0 시험 종료 요청 reason=auto-stop
+[2026-04-30 12:35:11] Port 1 시험 종료 요청 reason=auto-stop
+[2026-04-30 12:35:14] COORD AUTO RUN 중지 완료
+[2026-04-30 12:35:16] Port 0 시험 종료 완료
+[2026-04-30 12:35:16] Port 1 시험 종료 완료
+[2026-04-30 12:35:19] COORD AUTO RUN 시작 mode=sequential-ports 항목절체_min=240.0 guard간격_min=10.0 files_p0=16 files_p1=16
+[2026-04-30 12:35:19] COORD AUTO 시험 항목 -> phase=P0 idx=1/16 pcap=000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 12:35:19] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 12:35:23] Port 0 시험 종료 완료
+[2026-04-30 12:35:23] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 12:35:24] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_std_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 12:35:25] COORD 항목 절체(송출 유지) 14400.0초 (240.000분) port=0 idx=1
+[2026-04-30 12:37:07] AUTO 순서 저장 P0=16개 P1=16개
+[2026-04-30 12:37:26] COORD AUTO RUN 중지 요청 -> port=0 (순차 전체 정지)
+[2026-04-30 12:37:26] Port 0 시험 종료 요청 reason=auto-stop
+[2026-04-30 12:37:26] Port 1 시험 종료 요청 reason=auto-stop
+[2026-04-30 12:37:29] COORD AUTO RUN 중지 완료
+[2026-04-30 12:37:30] Port 0 시험 종료 완료
+[2026-04-30 12:37:30] Port 1 시험 종료 완료
+[2026-04-30 12:38:50] COORD AUTO RUN 시작 mode=sequential-ports 항목절체_min=240.0 guard간격_min=10.0 files_p0=16 files_p1=16
+[2026-04-30 12:38:50] COORD AUTO 시험 항목 -> phase=P0 idx=1/16 pcap=000a35000102_uplane_std_random_max_24g.pcap
+[2026-04-30 12:38:50] Port 0 시험 종료 요청 reason=auto-switch
+[2026-04-30 12:38:51] Port 0 시험 종료 완료
+[2026-04-30 12:38:51] Port 0 AUTO 절체 ready 대기 후 시작 재개
+[2026-04-30 12:38:52] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_std_random_max_24g.pcap rate=24Gbps duration_min=0.0
+[2026-04-30 12:38:52] COORD 항목 절체(송출 유지) 14400.0초 (240.000분) port=0 idx=1

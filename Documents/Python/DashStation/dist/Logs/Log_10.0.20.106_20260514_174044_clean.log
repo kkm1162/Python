@@ -1,0 +1,396 @@
++------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+Last login: Thu May 14 08:31:38 2026
+Security & OS hardening are being applied.
+
+========================================================================
+ Developer mode enabled.
+========================================================================
+
+Hello, this is O-RAN.MP.DAEMON (version 0.17.1 (0.17.1-15-g844a6efc9)).
+Copyright 2019-2028 SOLiD Inc.
+
+nRU# sho wsod     w software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Software download is in progress. (201 MB/ 271 Mbps/ 5 s/ oran)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Software download is in progress. (282 MB/ 277 Mbps/ 8 s/ oran)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Download: successfully completed
+
+nRU# 
+nRU# show software detail nRU# exitshow software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Download: successfully completed
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Download: successfully completed
+
+nRU# sho wso    w software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Download: successfully completed
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Download: successfully completed
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Download: successfully completed
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Software download is in progress. (132 MB/ 264 Mbps/ 4004 ms/ oran)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Software download is in progress. (223 MB/ 323 Mbps/ 5 s/ oran)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Software download is in progress. (288 MB/ 330 Mbps/ 6 s/ oran)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Software download is in progress. (89 MB/ 220 Mbps/ 3254 ms/ oran)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Software download is in progress. (202 MB/ 312 Mbps/ 5 s/ oran)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Software download is in progress. (277 MB/ 322 Mbps/ 6 s/ oran)
+
+nRU# show software detail 
+^[[A
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Download: successfully completed
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Download: successfully completed
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# show software detail 
+
+Software Information 
+----------------------------------------------------------------------------------------------------
+ SLOT       VERSION                             BUILD-DATE                  STATUS
+----------------------------------------------------------------------------------------------------
+ factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
+ first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
+ second     unknown                             unknown                     INVALID
+----------------------------------------------------------------------------------------------------
+ Install(extract-version): Can't extract download software package. (Phoenix_nDAU_FIRMWARE_v020705_20260326_120721.tgz) (free space: 205 MB)
+
+nRU# 
+
+CLI connection is closed by idle-timeout (600 seconds).
+

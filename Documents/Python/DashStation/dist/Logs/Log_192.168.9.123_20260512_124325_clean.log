@@ -1,0 +1,896 @@
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-37-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+250 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+16 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+*** System restart required ***
+Last login: Tue May 12 11:56:54 2026 from 192.168.80.244
+solid@OL4-RUC:~$ ip neighbo | grep 10.0.20
+10.0.20.122 dev dasan FAILED 
+10.0.20.103 dev dasan lladdr dc:c1:01:00:d2:24 STALE 
+10.0.20.126 dev dasan lladdr 00:0a:35:00:00:0a REACHABLE 
+10.0.20.108 dev dasan FAILED 
+10.0.20.133 dev dasan lladdr dc:c1:01:00:00:09 STALE 
+10.0.20.130 dev dasan INCOMPLETE 
+10.0.20.127 dev dasan FAILED 
+10.0.20.100 dev dasan lladdr dc:c1:01:00:92:2d STALE 
+10.0.20.106 dev dasan lladdr dc:c1:01:00:05:05 REACHABLE 
+10.0.20.134 dev dasan lladdr dc:c1:01:00:a6:24 STALE 
+10.0.20.50 dev dasan lladdr d0:96:fb:9d:82:8e REACHABLE 
+10.0.20.254 dev dasan FAILED 
+10.0.20.101 dev dasan lladdr dc:c1:01:02:03:04 STALE 
+10.0.20.102 dev dasan lladdr 00:0a:35:00:00:02 STALE 
+10.0.20.128 dev dasan FAILED 
+solid@OL4-RUC:~$ ssh admin@10.0.20.102
+Authorized uses only. All activity may be monitored and reported.
+
+(admin@10.0.20.102) Password: 
+Last login: Tue Feb 10 01:00:02 2026
+Security & OS hardening are being applied.
+admin@moru-M:~$ exit
+logout
+Connection to 10.0.20.102 closed.
+solid@OL4-RUC:~$ ssh admin@10.0.20.10226
++------------------------------ WARNING! ------------------------------+
+ This computer system and network is PRIVATE and PROPRIETARY and may
+ only be accessed by authorized users. Unauthorized use of this
+ computer system or network is strictly prohibited and maybe subject to
+ criminal prosecution, employee discipline up to and including
+ discharge, or the termination of vendor/service contracts.
+
+ The owner, or its agents, may monitor any activity or communication on
+ the computer system or network. The owner, or its agents, may retrieve
+ any information stored within the computer system or network. By
+ accessing and using this computer system or network, you are
+ consenting to such monitoring and information retrieval for law
+ enforcement and other purposes.
+
+ Users should have no expectation of privacy as to any communication on
+ or information stored within the computer system or network, including
+ information stored locally or remotely on a hard drive or other media
+ in use with this computer system or network.
++----------------------------------------------------------------------+
+
+(admin@10.0.20.126) Password: 
+(admin@10.0.20.126) Password: 
+Last login: Tue May 12 02:19:51 2026 from 10.0.20.254
+Security & OS hardening are being applied.
+
+========================================================================
+ Developer mode enabled.
+========================================================================
+
+Hello, this is O-RAN.MP.DAEMON (version 0.20.9 (0.20.9-11-gf67998ab6)).
+Copyright 2019-2028 SOLiD Inc.
+
+nDIU# x exit
+Connection to 10.0.20.126 closed.
+solid@OL4-RUC:~$ 
+solid@OL4-RUC:~$ 
+solid@OL4-RUC:~$ 델리리그 럭스델리리그 럭스sudo tcpdump -ni eth0 'tcp and port 4334' -vvsudo tcpdump -ni eth0 'tcp and port 4334' -vv
+델리리그: command not found
+solid@OL4-RUC:~$ sudo tcpdump -ni eth0 'tcp and port 4334' -vvsudo tcpdump -ni eth0 'tcp and port 4334' -vv
+tcpdump: eth0: No such device exists
+(No such device exists)
+solid@OL4-RUC:~$ sudo tcpdump -ni eth0 'tcp and port 4334' -vvDDdasnaan
+tcpdump: listening on dasan, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+13:46:10.703871 IP (tos 0x0, ttl 64, id 56178, offset 0, flags [DF], proto TCP (6), length 60)
+    10.0.20.127.60754 > 10.0.20.254.4334: Flags [S], cksum 0x7e2e (correct), seq 4242581958, win 64240, options [mss 1460,sackOK,TS val 2628931529 ecr 0,nop,wscale 7], length 0
+13:46:11.718898 IP (tos 0x0, ttl 64, id 56179, offset 0, flags [DF], proto TCP (6), length 60)
+    10.0.20.127.60754 > 10.0.20.254.4334: Flags [S], cksum 0x7a37 (correct), seq 4242581958, win 64240, options [mss 1460,sackOK,TS val 2628932544 ecr 0,nop,wscale 7], length 0
+13:46:12.742914 IP (tos 0x0, ttl 64, id 56180, offset 0, flags [DF], proto TCP (6), length 60)
+    10.0.20.127.60754 > 10.0.20.254.4334: Flags [S], cksum 0x7637 (correct), seq 4242581958, win 64240, options [mss 1460,sackOK,TS val 2628933568 ecr 0,nop,wscale 7], length 0
+13:46:13.094695 IP (tos 0x0, ttl 64, id 18256, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.126.51666 > 10.0.20.254.4334: Flags [.], cksum 0x3621 (correct), seq 371893308, ack 3143952822, win 501, length 0
+13:46:13.094722 IP (tos 0x0, ttl 64, id 43543, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.254.4334 > 10.0.20.126.51666: Flags [.], cksum 0x3d96 (incorrect -> 0x353f), seq 1, ack 1, win 726, length 0
+13:46:13.214585 IP (tos 0x0, ttl 64, id 43544, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.254.4334 > 10.0.20.126.51666: Flags [.], cksum 0x3d96 (incorrect -> 0x3540), seq 0, ack 1, win 726, length 0
+13:46:13.214736 IP (tos 0x0, ttl 64, id 18257, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.126.51666 > 10.0.20.254.4334: Flags [.], cksum 0x3620 (correct), seq 1, ack 1, win 501, length 0
+13:46:13.273341 IP (tos 0x0, ttl 64, id 6182, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.101.54502 > 10.0.20.254.4334: Flags [S], cksum 0x7b48 (correct), seq 223135828, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:13.770897 IP (tos 0x0, ttl 64, id 56181, offset 0, flags [DF], proto TCP (6), length 60)
+    10.0.20.127.60754 > 10.0.20.254.4334: Flags [S], cksum 0x7233 (correct), seq 4242581958, win 64240, options [mss 1460,sackOK,TS val 2628934596 ecr 0,nop,wscale 7], length 0
+13:46:14.296380 IP (tos 0x0, ttl 64, id 6183, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.101.54502 > 10.0.20.254.4334: Flags [S], cksum 0x7b48 (correct), seq 223135828, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:14.790913 IP (tos 0x0, ttl 64, id 56182, offset 0, flags [DF], proto TCP (6), length 60)
+    10.0.20.127.60754 > 10.0.20.254.4334: Flags [S], cksum 0x6e37 (correct), seq 4242581958, win 64240, options [mss 1460,sackOK,TS val 2628935616 ecr 0,nop,wscale 7], length 0
+13:46:15.631193 IP (tos 0x0, ttl 64, id 63210, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.102.36736 > 10.0.20.254.4334: Flags [S], cksum 0x8c9a (correct), seq 2469754494, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:16.247441 IP (tos 0x0, ttl 64, id 17831, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.103.51928 > 10.0.20.254.4334: Flags [S], cksum 0x439f (correct), seq 4091290489, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:16.312396 IP (tos 0x0, ttl 64, id 6184, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.101.54502 > 10.0.20.254.4334: Flags [S], cksum 0x7b48 (correct), seq 223135828, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:16.657320 IP (tos 0x0, ttl 64, id 63211, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.102.36736 > 10.0.20.254.4334: Flags [S], cksum 0x8c9a (correct), seq 2469754494, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:17.266917 IP (tos 0x0, ttl 64, id 17832, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.103.51928 > 10.0.20.254.4334: Flags [S], cksum 0x439f (correct), seq 4091290489, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:18.214833 IP (tos 0x0, ttl 64, id 18258, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.126.51666 > 10.0.20.254.4334: Flags [.], cksum 0x3621 (correct), seq 0, ack 1, win 501, length 0
+13:46:18.214860 IP (tos 0x0, ttl 64, id 43545, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.254.4334 > 10.0.20.126.51666: Flags [.], cksum 0x3d96 (incorrect -> 0x353f), seq 1, ack 1, win 726, length 0
+13:46:18.334588 IP (tos 0x0, ttl 64, id 43546, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.254.4334 > 10.0.20.126.51666: Flags [.], cksum 0x3d96 (incorrect -> 0x3540), seq 0, ack 1, win 726, length 0
+13:46:18.334834 IP (tos 0x0, ttl 64, id 18259, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.126.51666 > 10.0.20.254.4334: Flags [.], cksum 0x3620 (correct), seq 1, ack 1, win 501, length 0
+13:46:18.669411 IP (tos 0x0, ttl 64, id 63212, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.102.36736 > 10.0.20.254.4334: Flags [S], cksum 0x8c9a (correct), seq 2469754494, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:18.804823 IP (tos 0x0, ttl 64, id 54500, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.101.41402 > 10.0.20.254.4334: Flags [S], cksum 0x8603 (correct), seq 1784320951, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:19.282981 IP (tos 0x0, ttl 64, id 17833, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.103.51928 > 10.0.20.254.4334: Flags [S], cksum 0x439f (correct), seq 4091290489, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:19.832427 IP (tos 0x0, ttl 64, id 54501, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.101.41402 > 10.0.20.254.4334: Flags [S], cksum 0x8603 (correct), seq 1784320951, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:20.396091 IP (tos 0x0, ttl 64, id 11741, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.106.50806 > 10.0.20.254.4334: Flags [S], cksum 0x35e9 (correct), seq 3928506178, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:20.396131 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.254.4334 > 10.0.20.106.50806: Flags [R.], cksum 0x7198 (correct), seq 0, ack 3928506179, win 0, length 0
+13:46:21.852495 IP (tos 0x0, ttl 64, id 54502, offset 0, flags [DF], proto TCP (6), length 52)
+    10.0.20.101.41402 > 10.0.20.254.4334: Flags [S], cksum 0x8603 (correct), seq 1784320951, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+13:46:23.334863 IP (tos 0x0, ttl 64, id 18260, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.126.51666 > 10.0.20.254.4334: Flags [.], cksum 0x3621 (correct), seq 0, ack 1, win 501, length 0
+13:46:23.334891 IP (tos 0x0, ttl 64, id 43547, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.254.4334 > 10.0.20.126.51666: Flags [.], cksum 0x3d96 (incorrect -> 0x353f), seq 1, ack 1, win 726, length 0
+13:46:23.454542 IP (tos 0x0, ttl 64, id 43548, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.254.4334 > 10.0.20.126.51666: Flags [.], cksum 0x3d96 (incorrect -> 0x3540), seq 0, ack 1, win 726, length 0
+13:46:23.454661 IP (tos 0x0, ttl 64, id 18261, offset 0, flags [DF], proto TCP (6), length 40)
+    10.0.20.126.51666 > 10.0.20.254.4334: Flags [.], cksum 0x3620 (correct), seq 1, ack 1, win 501, length 0
+^C
+31 packets captured
+33 packets received by filter
+0 packets dropped by kernel
+solid@OL4-RUC:~$ sudo tcpdump -ni dasan 'tcp and port 4334' -vv | grep 10.0.20.106
+tcpdump: listening on dasan, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+    10.0.20.106.35358 > 10.0.20.254.4334: Flags [S], cksum 0x0987 (correct), seq 1604137608, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+    10.0.20.254.4334 > 10.0.20.106.35358: Flags [R.], cksum 0x4536 (correct), seq 0, ack 1604137609, win 0, length 0
+    10.0.20.106.55494 > 10.0.20.254.4334: Flags [S], cksum 0x037a (correct), seq 1727718031, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+    10.0.20.254.4334 > 10.0.20.106.55494: Flags [R.], cksum 0x3f29 (correct), seq 0, ack 1727718032, win 0, length 0
+    10.0.20.106.49144 > 10.0.20.254.4334: Flags [S], cksum 0x5d1d (correct), seq 2738906484, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+    10.0.20.254.4334 > 10.0.20.106.49144: Flags [R.], cksum 0x98cc (correct), seq 0, ack 2738906485, win 0, length 0
+    10.0.20.106.38208 > 10.0.20.254.4334: Flags [S], cksum 0xb789 (correct), seq 3665034892, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+    10.0.20.254.4334 > 10.0.20.106.38208: Flags [R.], cksum 0xf338 (correct), seq 0, ack 3665034893, win 0, length 0
+    10.0.20.106.39516 > 10.0.20.254.4334: Flags [S], cksum 0xed12 (correct), seq 3917198559, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+    10.0.20.254.4334 > 10.0.20.106.39516: Flags [R.], cksum 0x28c2 (correct), seq 0, ack 3917198560, win 0, length 0
+    10.0.20.106.42154 > 10.0.20.254.4334: Flags [S], cksum 0x2cc2 (correct), seq 939269218, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+    10.0.20.254.4334 > 10.0.20.106.42154: Flags [R.], cksum 0x6871 (correct), seq 0, ack 939269219, win 0, length 0
+    10.0.20.106.40016 > 10.0.20.254.4334: Flags [S], cksum 0x6f21 (correct), seq 1176294460, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+    10.0.20.254.4334 > 10.0.20.106.40016: Flags [R.], cksum 0xaad0 (correct), seq 0, ack 1176294461, win 0, length 0
+    10.0.20.106.44768 > 10.0.20.254.4334: Flags [S], cksum 0x9d84 (correct), seq 1660515948, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+    10.0.20.254.4334 > 10.0.20.106.44768: Flags [R.], cksum 0xd933 (correct), seq 0, ack 1660515949, win 0, length 0
+^C188 packets captured
+188 packets received by filter
+0 packets dropped by kernel
+
+solid@OL4-RUC:~$ ss -lntp | grep 4334ss -lntp | grep 4334
+solid@OL4-RUC:~$ sudo iptables -L INPUT -n -v --line-numberssudo iptables -L INPUT -n -v --line-numbers
+Chain INPUT (policy ACCEPT 181M packets, 54G bytes)
+num   pkts bytes target     prot opt in     out     source               destination         
+1       15   780 ACCEPT     6    --  *      *       10.0.20.106          0.0.0.0/0            tcp dpt:4334
+2     1999  251K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+3      212 34806 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+4      945 73854 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+5      177 33110 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+6      143 31134 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+7      226 35450 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+8        0     0 ACCEPT     6    --  *      *       10.0.20.128          0.0.0.0/0            tcp dpt:4334
+9    18917 1040K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+10     236 41722 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+11     320 50154 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+12     148 31430 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+13     598 55250 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+14    1371 95358 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+15     968 74094 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+16      80 27822 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+17     723  198K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+18     217  179K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+19     122  167K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+20     307  184K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+21     195  178K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+22     223  179K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+23     177  177K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+24     152  7904 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+25     418  190K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+26    3990  240K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+27       1    52 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+28       4   208 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+29     207 43358 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+30     139 39322 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+31     185 43534 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+32     283 58426 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+33     186 39114 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+34     238 45018 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+35     531 66102 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+36      84 25966 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+37     148 33666 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+38     230 38746 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+39     369 43190 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+40     193 34002 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+41      66 27166 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+42     141 31342 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+43     104 29206 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+44     122 30066 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+45     117 29822 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+46     202 34374 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+47     154 33018 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+48      99 30522 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+49      45 24018 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+50      53 24434 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+51      53 24422 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+52      57 24630 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+53     180 31026 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+54      44 23966 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+55      41 23798 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+56      64 24994 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+57      42 23850 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+58     155 53984 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+59     557 33420 ACCEPT     6    --  *      *       10.0.20.130          0.0.0.0/0            tcp dpt:4334
+60    103K 5358K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+61   10782  591K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+62    3090  165K DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+63       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+64       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+65       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+66       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+67       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+68       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+69       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+70       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+71       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+72       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+73       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+74       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+75       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+76       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+77       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+78       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+79       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+80       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+81       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+82       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+83       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+84       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+85       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+86       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+87       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+88       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+89       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+90       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+91       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+92       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+93       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+94       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+95       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+96       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+97       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+98       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+99       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+100      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+101      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+102      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+103      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+104      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+105      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+106      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+107      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+108      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+109      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+110      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+111      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+112      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+113      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+solid@OL4-RUC:~$ 
+solid@OL4-RUC:~$ 
+solid@OL4-RUC:~$ 
+solid@OL4-RUC:~$ sudo iptables -L INPUT -n -v --line-numberss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ solid@OL4-RUC:~$ solid@OL4-RUC:~$ solid@OL4-RUC:~$ solid@OL4-RUC:~$ solid@OL4-RUC:~$ solid@OL4-RUC:~$ solid@OL4-RUC:~$ solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334udo iptables -L INPUT -n -v --line-numbers
+Chain INPUT (policy ACCEPT 181M packets, 54G bytes)
+num   pkts bytes target     prot opt in     out     source               destination         
+1     2319  331K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+2      212 34806 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+3      945 73854 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+4      177 33110 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+5      143 31134 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+6      226 35450 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+7        0     0 ACCEPT     6    --  *      *       10.0.20.128          0.0.0.0/0            tcp dpt:4334
+8    18917 1040K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+9      236 41722 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+10     320 50154 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+11     148 31430 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+12     598 55250 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+13    1371 95358 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+14     968 74094 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+15      80 27822 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+16     723  198K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+17     217  179K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+18     122  167K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+19     307  184K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+20     195  178K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+21     223  179K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+22     177  177K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+23     152  7904 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+24     418  190K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+25    3990  240K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+26       1    52 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+27       4   208 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+28     207 43358 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+29     139 39322 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+30     185 43534 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+31     283 58426 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+32     186 39114 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+33     238 45018 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+34     531 66102 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+35      84 25966 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+36     148 33666 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+37     230 38746 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+38     369 43190 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+39     193 34002 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+40      66 27166 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+41     141 31342 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+42     104 29206 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+43     122 30066 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+44     117 29822 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+45     202 34374 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+46     154 33018 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+47      99 30522 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+48      45 24018 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+49      53 24434 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+50      53 24422 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+51      57 24630 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+52     180 31026 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+53      44 23966 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+54      41 23798 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+55      64 24994 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+56      42 23850 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+57     155 53984 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+58     557 33420 ACCEPT     6    --  *      *       10.0.20.130          0.0.0.0/0            tcp dpt:4334
+59    103K 5358K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+60   10782  591K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+61      87  4692 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+62       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+63       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+64       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+65       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+66       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+67       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+68       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+69       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+70       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+71       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+72       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+73       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+74       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+75       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+76       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+77       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+78       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+79       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+80       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+81       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+82       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+83       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+84       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+85       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+86       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+87       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+88       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+89       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+90       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+91       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+92       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+93       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+94       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+95       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+96       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+97       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+98       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+99       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+100      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+101      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+102      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+103      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+104      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+105      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+106      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+107      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+108      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+109      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+110      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+solid@OL4-RUC:~$ sudo iptables -L INPUT -n -v --line-numberss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ 
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+^[[Asolid@OL4-RUC:~$ ss -lntp | grep 4334
+^[[Asolid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334udo iptables -L INPUT -n -v --line-numberss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334udo iptables -L INPUT -n -v --line-numbers
+Chain INPUT (policy ACCEPT 181M packets, 54G bytes)
+num   pkts bytes target     prot opt in     out     source               destination         
+1        4   208 ACCEPT     6    --  *      *       10.0.20.106          0.0.0.0/0            tcp dpt:4334
+2     2529  405K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+3      212 34806 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+4      945 73854 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+5      177 33110 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+6      143 31134 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+7      226 35450 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+8        0     0 ACCEPT     6    --  *      *       10.0.20.128          0.0.0.0/0            tcp dpt:4334
+9    18917 1040K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+10     236 41722 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+11     320 50154 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+12     148 31430 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+13     598 55250 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+14    1371 95358 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+15     968 74094 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+16      80 27822 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+17     723  198K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+18     217  179K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+19     122  167K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+20     307  184K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+21     195  178K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+22     223  179K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+23     177  177K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+24     152  7904 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+25     418  190K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+26    3990  240K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+27       1    52 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+28       4   208 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+29     207 43358 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+30     139 39322 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+31     185 43534 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+32     283 58426 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+33     186 39114 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+34     238 45018 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+35     531 66102 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+36      84 25966 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+37     148 33666 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+38     230 38746 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+39     369 43190 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+40     193 34002 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+41      66 27166 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+42     141 31342 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+43     104 29206 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+44     122 30066 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+45     117 29822 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+46     202 34374 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+47     154 33018 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+48      99 30522 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+49      45 24018 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+50      53 24434 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+51      53 24422 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+52      57 24630 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+53     180 31026 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+54      44 23966 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+55      41 23798 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+56      64 24994 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+57      42 23850 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+58     155 53984 ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+59     557 33420 ACCEPT     6    --  *      *       10.0.20.130          0.0.0.0/0            tcp dpt:4334
+60    103K 5358K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+61   10782  591K ACCEPT     6    --  *      *       10.0.20.126          0.0.0.0/0            tcp dpt:4334
+62     170  9112 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+63       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+64       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+65       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+66       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+67       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+68       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+69       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+70       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+71       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+72       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+73       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+74       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+75       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+76       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+77       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+78       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+79       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+80       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+81       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+82       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+83       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+84       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+85       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+86       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+87       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+88       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+89       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+90       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+91       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+92       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+93       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+94       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+95       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+96       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+97       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+98       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+99       0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+100      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+101      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+102      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+103      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+104      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+105      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+106      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+107      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+108      0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:4334
+solid@OL4-RUC:~$ sudo iptables -L INPUT -n -v --line-numberss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ watch -n 0.5 'ss -lntp | grep 4334 || true'watch -n 0.5 'ss -lntp | grep 4334 || true'
+Every 0.5s: ss -lntp | grep 4334 || trueOL4-RUC: Tue May 12 14:12:45 20266789501234567893:00123456789LISTEN 0510.0.20.254:43340.0.0.0:*10123456789201234567893012345678940123456789501234567894:001234567891012345678920123456789301234LISTEN 0510.0.20.254:43340.0.0.0:*5678940123456789501234567895:00123456789101234>solid@OL4-RUC:~$ ifconfig
+24port: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.0.10.254  netmask 255.255.255.0  broadcast 10.0.10.255
+        inet6 fe80::8c84:8e35:cbe6:6df6  prefixlen 64  scopeid 0x20<link>
+        ether f8:e4:3b:08:7b:6d  txqueuelen 1000  (Ethernet)
+        RX packets 659773154  bytes 277209985422 (277.2 GB)
+        RX errors 0  dropped 25173  overruns 0  frame 0
+        TX packets 530630091  bytes 104532938205 (104.5 GB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+48port: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.0.30.254  netmask 255.255.255.0  broadcast 10.0.30.255
+        inet6 fe80::138a:e85d:2809:b16c  prefixlen 64  scopeid 0x20<link>
+        ether f8:e4:3b:43:59:f7  txqueuelen 1000  (Ethernet)
+        RX packets 47864854  bytes 3884017403 (3.8 GB)
+        RX errors 0  dropped 1666  overruns 0  frame 0
+        TX packets 9819336  bytes 5083626094 (5.0 GB)
+        TX errors 0  dropped 28 overruns 0  carrier 0  collisions 0
+
+dasan: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.0.20.254  netmask 255.255.255.0  broadcast 10.0.20.255
+        inet6 fe80::cbbb:4a25:c8ab:eb22  prefixlen 64  scopeid 0x20<link>
+        ether 00:e0:4c:68:0a:f0  txqueuelen 1000  (Ethernet)
+        RX packets 65557996  bytes 22188785701 (22.1 GB)
+        RX errors 0  dropped 676939  overruns 0  frame 0
+        TX packets 34310887  bytes 13254647792 (13.2 GB)
+        TX errors 0  dropped 20 overruns 0  carrier 0  collisions 0
+
+eth: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.9.123  netmask 255.255.255.0  broadcast 192.168.9.255
+        inet6 fe80::b671:ef7:c1c0:c89f  prefixlen 64  scopeid 0x20<link>
+        ether 70:5a:0f:37:54:ee  txqueuelen 1000  (Ethernet)
+        RX packets 690389040  bytes 135133837760 (135.1 GB)
+        RX errors 0  dropped 62015  overruns 0  frame 0
+        TX packets 706225955  bytes 308442622969 (308.4 GB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 20  memory 0xf3200000-f3220000  
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 17652555  bytes 3970682017 (3.9 GB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 17652555  bytes 3970682017 (3.9 GB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wifi: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.80.123  netmask 255.255.255.0  broadcast 192.168.80.255
+        inet6 fe80::405b:95fb:6b7:7eb  prefixlen 64  scopeid 0x20<link>
+        ether 7c:5c:f8:57:02:6a  txqueuelen 1000  (Ethernet)
+        RX packets 96378213  bytes 13181740509 (13.1 GB)
+        RX errors 0  dropped 4258  overruns 0  frame 0
+        TX packets 45564679  bytes 37401167458 (37.4 GB)
+        TX errors 0  dropped 79 overruns 0  carrier 0  collisions 0
+
+solid@OL4-RUC:~$ ip -br addr | grep 254ip -br addr | grep 254
+dasan            UP             10.0.20.254/24 fe80::cbbb:4a25:c8ab:eb22/64 
+48port           UP             10.0.30.254/24 fe80::138a:e85d:2809:b16c/64 
+24port           UP             10.0.10.254/24 fe80::8c84:8e35:cbe6:6df6/64 
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+ss -lntp | grep 4334ss -tnp | grep 4334
+ss -lntp | grep 4334
+ESTAB    0      0         10.0.20.254:4334     10.0.20.126:48074                                 
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+LISTEN 0      5        10.0.20.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334tn
+ESTAB    0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334lnttn
+ESTAB    0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334lnt
+solid@OL4-RUC:~$ ss -lntp | grep 4334tn
+ESTAB    0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+ESTAB    0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+ESTAB    0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+ESTAB 0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+ESTAB 0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334lnt
+solid@OL4-RUC:~$ ss -lntp | grep 4334tn
+ESTAB 0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+ESTAB 0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+ESTAB 0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+ESTAB 0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334lnttn
+ESTAB 0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334lnt
+LISTEN 0      5        10.0.30.254:4334       0.0.0.0:*          
+solid@OL4-RUC:~$ ss -lntp | grep 4334
+solid@OL4-RUC:~$ ss -lntp | grep 4334tn
+ESTAB    0      0         10.0.30.254:4334     10.0.30.120:40886                                 
+ESTAB    0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+ESTAB    0      0         10.0.30.254:4334     10.0.30.120:40886                                 
+ESTAB    0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+ESTAB    0      0         10.0.30.254:4334     10.0.30.120:40886                                 
+ESTAB    0      0         10.0.20.254:4334     10.0.20.106:32950                                 
+solid@OL4-RUC:~$ ss -lntp 'sport = :4334'ss -lntp 'sport = :4334'
+State          Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process          
+solid@OL4-RUC:~$ ss -lntp 'sport = :4334'
+State          Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process          
+solid@OL4-RUC:~$ ss -lntp 'sport = :4334'
+State          Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process          
+solid@OL4-RUC:~$ ss -lntp 'sport = :4334'
+State          Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process          
+solid@OL4-RUC:~$ ss -lntp 'sport = :4334'
+State          Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process          
+solid@OL4-RUC:~$ ss -lntp 'sport = :4334'tnp | grep 4334
+solid@OL4-RUC:~$ ss -tnp | grep 4334
+solid@OL4-RUC:~$ ss -tnp | grep 4334lntp 'sport = :4334'
+State           Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process         
+LISTEN          0               5                          10.0.20.254:4334                        0.0.0.0:*                            
+solid@OL4-RUC:~$ ss -lntp 'sport = :4334'tnp | grep 4334lntp 'sport = :4334'
+State          Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process          
+solid@OL4-RUC:~$ ss -lntp 'sport = :4334'tnp | grep 4334lntp 'sport = :4334'tnp | grep 4334
+ESTAB    0      0         10.0.20.254:4334     10.0.20.126:53678                                 
+solid@OL4-RUC:~$ ss -tnp | grep 4334lntp 'sport = :4334'
+State          Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process          
+solid@OL4-RUC:~$ 

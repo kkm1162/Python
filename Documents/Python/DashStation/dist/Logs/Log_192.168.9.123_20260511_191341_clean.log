@@ -1,0 +1,40 @@
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-37-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+255 updates can be applied immediately.
+12 of these updates are standard security updates.
+To see these additional updates run: apt list --upgradable
+
+16 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+*** System restart required ***
+Last login: Mon May 11 16:46:59 2026 from 192.168.80.244
+solid@OL4-RUC:~$ ip neighbo | grep 10.0.20
+10.0.20.122 dev dasan FAILED 
+10.0.20.103 dev dasan lladdr dc:c1:01:00:d2:24 REACHABLE 
+10.0.20.126 dev dasan lladdr 00:0a:35:00:00:0a REACHABLE 
+10.0.20.108 dev dasan FAILED 
+10.0.20.133 dev dasan lladdr dc:c1:01:00:00:09 REACHABLE 
+10.0.20.130 dev dasan INCOMPLETE 
+10.0.20.100 dev dasan lladdr dc:c1:01:00:92:2d STALE 
+10.0.20.50 dev dasan lladdr d0:96:fb:9d:82:8e REACHABLE 
+10.0.20.254 dev dasan FAILED 
+10.0.20.101 dev dasan lladdr dc:c1:01:02:03:04 STALE 
+10.0.20.102 dev dasan lladdr 00:0a:35:00:00:02 STALE 
+10.0.20.128 dev dasan FAILED 
+solid@OL4-RUC:~$ osa ps -ef | grep mini
+root      531363  480303  0 Apr15 ?        00:45:12 /bin/bash ./miniDU_callhome.sh
+root      531379  531363  0 Apr15 ?        00:00:00 /bin/bash ./miniDU_callhome.sh
+root     1847676       1  0 May07 ?        00:00:00 bash /var/tmp/miniDU_callhome.sh
+solid    2803048 2803015  0 19:13 pts/19   00:00:00 grep --color=auto mini
+solid@OL4-RUC:~$ sudo kill -9 531363531363
+solid@OL4-RUC:~$ sudo kill -9 531363531379531379
+kill: (531379): No such process
+solid@OL4-RUC:~$ sudo kill -9 53137918476761847676
+solid@OL4-RUC:~$ 
