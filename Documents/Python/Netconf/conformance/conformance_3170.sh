@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# O-RAN M-Plane 3.1.7.0 — Software Activation without Reset
+# O-RAN M-Plane 3.1.7.1 — Software Activation without Reset
 set -u
 set -o pipefail
 
@@ -278,6 +278,11 @@ echo "[$RESULT_ACT] STEP 4. Software Activation Event Completed."
 ########################################################################
 # STEP 5. Verify Active Slot Changed
 ########################################################################
+_activate_guard_raw="${ACTIVATE_GET_GUARD_SEC:-$(jq -r '.["software-management"]["activate-get-guard-sec"] // empty' "$CONFIG")}"
+_activate_guard_raw="${_activate_guard_raw//[!0-9]/}"
+ACTIVATE_GET_GUARD_SEC="${_activate_guard_raw:-5}"
+ACTIVATE_GET_POLL_SEC=2
+
 GET_ACTIVE_RPC="${NETCONF_TMP}/get/get_active_slot.xml"
 cat > "$GET_ACTIVE_RPC" <<EORPC
 <get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
@@ -292,35 +297,57 @@ cat > "$GET_ACTIVE_RPC" <<EORPC
 EORPC
 
 GET_ACTIVE_OUT="${NETCONF_TMP}/get/get_active_slot_out.xml"
-rm -f "$GET_ACTIVE_OUT"
-send_cmd "user-rpc --content $GET_ACTIVE_RPC --out $GET_ACTIVE_OUT"
 
-RESULT5="NOK"
-for _w in $(seq 1 60); do
-	if [[ -f "$GET_ACTIVE_OUT" ]]; then
-		if grep -aq "</data>" "$GET_ACTIVE_OUT" 2>/dev/null; then
-			break
-		fi
-	fi
-	sleep 0.5
-done
-
-ACTIVESLOT_STATUS=""
-if [[ -f "$GET_ACTIVE_OUT" ]]; then
-	ACTIVESLOT_STATUS=$(xmlstarlet sel -N x="urn:o-ran:software-management:1.0" -t -v "//x:active" "$GET_ACTIVE_OUT" 2>/dev/null) || true
+echo "[INFO] STEP 5: activate→GET guard ${ACTIVATE_GET_GUARD_SEC}s (some RUs delay active state)"
+if (( ACTIVATE_GET_GUARD_SEC > 0 )); then
+	sleep "$ACTIVATE_GET_GUARD_SEC"
 fi
 
-if [[ "$ACTIVESLOT_STATUS" == "true" ]]; then
-	RESULT5="OK"
-	echo "[$RESULT5] STEP 5. Check Active Status, $NONRUNNINGSLOT is Active now."
+RESULT5="NOK"
+ACTIVESLOT_STATUS=""
+_step5_deadline=$(($(date +%s) + ACTIVATE_GET_GUARD_SEC))
+_step5_try=0
+while :; do
+	_step5_try=$((_step5_try + 1))
+	rm -f "$GET_ACTIVE_OUT"
+	send_cmd "user-rpc --content $GET_ACTIVE_RPC --out $GET_ACTIVE_OUT"
+
+	for _w in $(seq 1 60); do
+		if [[ -f "$GET_ACTIVE_OUT" ]]; then
+			if grep -aq "</data>" "$GET_ACTIVE_OUT" 2>/dev/null; then
+				break
+			fi
+		fi
+		sleep 0.5
+	done
+
+	ACTIVESLOT_STATUS=""
+	if [[ -f "$GET_ACTIVE_OUT" ]]; then
+		ACTIVESLOT_STATUS=$(xmlstarlet sel -N x="urn:o-ran:software-management:1.0" -t -v "//x:active" "$GET_ACTIVE_OUT" 2>/dev/null) || true
+	fi
+
+	if [[ "$ACTIVESLOT_STATUS" == "true" ]]; then
+		RESULT5="OK"
+		break
+	fi
+
+	if (( $(date +%s) >= _step5_deadline )); then
+		break
+	fi
+	echo "[INFO] STEP 5: active not true yet (${ACTIVESLOT_STATUS:-empty}), retry GET in ${ACTIVATE_GET_POLL_SEC}s (try ${_step5_try})"
+	sleep "$ACTIVATE_GET_POLL_SEC"
+done
+
+if [[ "$RESULT5" == "OK" ]]; then
+	echo "[$RESULT5] STEP 5. Check Active Status, $NONRUNNINGSLOT is Active now (try ${_step5_try}, guard ${ACTIVATE_GET_GUARD_SEC}s)."
 else
-	echo "[$RESULT5] STEP 5. Check Active Status, $NONRUNNINGSLOT active is ${ACTIVESLOT_STATUS:-unknown}."
+	echo "[$RESULT5] STEP 5. Check Active Status, $NONRUNNINGSLOT active is ${ACTIVESLOT_STATUS:-unknown} (try ${_step5_try}, guard ${ACTIVATE_GET_GUARD_SEC}s)."
 	test_fail "active slot did not change to true after activation"
 	exit 1
 fi
 
 echo "[PASS]"
-echo "[INFO] 3.1.7.0 Software Activation completed. Detailed log: $LOG"
+echo "[INFO] 3.1.7.1 Software Activation completed. Detailed log: $LOG"
 trap - EXIT INT TERM HUP
 cleanup || true
 if [[ -n "${NETOPEER_COPROC_PID:-}" ]]; then

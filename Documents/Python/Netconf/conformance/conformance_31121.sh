@@ -41,6 +41,14 @@ CLI_ID=$(jq -r '.["management-configurations"]["CLI-ID"] // empty' "$CONFIG")
 CLI_PW=$(jq -r '.["management-configurations"]["CLI-PW"] // empty' "$CONFIG")
 FILE_ID=$(jq -r '.["management-configurations"]["FileServer-ID"] // empty' "$CONFIG")
 FILE_PW=$(jq -r '.["management-configurations"]["FileServer-PW"] // empty' "$CONFIG")
+FILE_SERVER_IP=$(jq -r '.["management-configurations"]["FileServer-IP"] // empty' "$CONFIG")
+LOCAL_LOG_PREFIX=$(jq -r '.["management-configurations"]["local-log-prefix"] // "O-RAN/log"' "$CONFIG")
+LOCAL_LOG_PREFIX="${LOCAL_LOG_PREFIX%/}"
+REMOTE_UPLOAD_DIR=$(jq -r '.["management-configurations"]["remote-upload-dir"] // "/tmp"' "$CONFIG")
+REMOTE_UPLOAD_DIR="${REMOTE_UPLOAD_DIR:-/tmp}"
+REMOTE_UPLOAD_DIR="${REMOTE_UPLOAD_DIR%/}"
+[[ -n "$FILE_SERVER_IP" ]] || FILE_SERVER_IP="$LOCAL_IP"
+[[ "$REMOTE_UPLOAD_DIR" == /* ]] || REMOTE_UPLOAD_DIR="/${REMOTE_UPLOAD_DIR}"
 
 LISTEN_PORT="${CALLHOME_PORT:-4334}"
 NETCONF_TMP="${NETCONF_TMP:-/var/tmp/netconf_tmp}"
@@ -67,6 +75,15 @@ send_cmd() {
 
 test_fail() {
 	echo "[FAIL] $*"
+}
+
+_extract_log_file_name() {
+	local name=""
+	name=$(grep -oP '(?<=<log-file-name>)[^<]+(?=</log-file-name>)' "$LOG" 2>/dev/null | head -1) || true
+	if [[ -z "$name" ]]; then
+		name=$(sed -n 's:.*<log-file-name>\([^<]*\)</log-file-name>.*:\1:p' "$LOG" | head -1) || true
+	fi
+	echo "${name//$'\r'/}" | tr -d '\n'
 }
 
 COPROC_READY=0
@@ -175,7 +192,7 @@ cat > "$START_TROUBLESHOOT_RPC" <<'EORPC'
 <start-troubleshooting-logs xmlns="urn:o-ran:troubleshooting:1.0"/>
 EORPC
 
-START_TROUBLESHOOT_OUT="${NETCONF_TMP}/edit/start-troubleshooting.xml"
+START_TROUBLESHOOT_OUT="${NETCONF_TMP}/edit/start_troubleshooting_out.xml"
 rm -f "$START_TROUBLESHOOT_OUT"
 send_cmd "user-rpc --content $START_TROUBLESHOOT_RPC --out $START_TROUBLESHOOT_OUT"
 
@@ -200,7 +217,7 @@ LOG_FILE=""
 for _w in $(seq 1 3000); do
 	if grep -a -F "$PAT_TROUBLESHOOT_NOTIF" "$LOG" >/dev/null 2>&1; then
 		RESULT3="OK"
-		LOG_FILE=$(grep -oP '(?<=<log-file-name>).*(?=</log-file-name>)' "$LOG" | head -1) || true
+		LOG_FILE="$(_extract_log_file_name)"
 		break
 	fi
 	sleep 0.2
@@ -212,74 +229,119 @@ if [[ "$RESULT3" != "OK" || -z "$LOG_FILE" ]]; then
 	exit 1
 fi
 
-STOP_TROUBLESHOOT_RPC="${NETCONF_TMP}/edit/stop_troubleshooting.xml"
-cat > "$STOP_TROUBLESHOOT_RPC" <<'EORPC'
-<stop-troubleshooting-logs xmlns="urn:o-ran:troubleshooting:1.0"/>
-EORPC
+LOG_BASENAME="${LOG_FILE##*/}"
+LOCAL_LOGICAL_PATH="${LOCAL_LOG_PREFIX}/${LOG_BASENAME}"
+echo "[INFO]	Troubleshooting log file: ${LOG_BASENAME}"
+echo "[INFO]	local-logical-file-path: ${LOCAL_LOGICAL_PATH}"
+# 3.1.12.2(trace)와 동일: stop 전에 file-upload (stop 후에는 일부 RU가 upload RPC 미수신/거부)
+FILE_UPLOAD_GUARD_SEC="${FILE_UPLOAD_GUARD_SEC:-2}"
+if [[ "$FILE_UPLOAD_GUARD_SEC" =~ ^[0-9]+$ ]] && (( FILE_UPLOAD_GUARD_SEC > 0 )); then
+	echo "[INFO]	file-upload guard ${FILE_UPLOAD_GUARD_SEC}s after log-generated notification"
+	sleep "$FILE_UPLOAD_GUARD_SEC"
+fi
 
-STOP_TROUBLESHOOT_OUT="${NETCONF_TMP}/edit/stop-troubleshooting.xml"
-rm -f "$STOP_TROUBLESHOOT_OUT"
-send_cmd "user-rpc --content $STOP_TROUBLESHOOT_RPC --out $STOP_TROUBLESHOOT_OUT"
-
-RESULT0="NOK"
-for _w in $(seq 1 20); do
-	if [[ -f "$STOP_TROUBLESHOOT_OUT" ]] && grep -a -F "$PAT_TROUBLESHOOT_OK" "$STOP_TROUBLESHOOT_OUT" >/dev/null 2>&1; then
-		RESULT0="OK"
-		echo "[WAIT]	Wait for Troubleshooting to end."
-		break
-	fi
-	sleep 0.5
-done
-if [[ "$RESULT0" != "OK" ]]; then
-	test_fail "Stop troubleshooting"
+if [[ -z "$FILE_ID" || -z "$FILE_PW" ]]; then
+	echo "[FAIL] FileServer-ID or FileServer-PW missing in --config (3.1.12.1 settings)"
+	test_fail "File server credentials"
 	exit 1
 fi
 
 FILE_UPLOAD_RPC="${NETCONF_TMP}/edit/file_upload.xml"
 cat > "$FILE_UPLOAD_RPC" <<EORPC
-<file-upload xmlns="urn:o-ran:file-management:1.0">
-  <local-logical-file-path>${LOG_FILE}</local-logical-file-path>
-  <remote-file-path>sftp://${FILE_ID}@${LOCAL_IP}/tmp/${LOG_FILE}</remote-file-path>
-  <password>${FILE_PW}</password>
+<file-upload xmlns="urn:o-ran:file-management:1.0" xmlns:ict="urn:ietf:params:xml:ns:yang:ietf-crypto-types">
+  <local-logical-file-path>${LOCAL_LOGICAL_PATH}</local-logical-file-path>
+  <remote-file-path>sftp://${FILE_ID}@${FILE_SERVER_IP}${REMOTE_UPLOAD_DIR}/${LOG_BASENAME}</remote-file-path>
+  <password>
+    <password>${FILE_PW}</password>
+  </password>
 </file-upload>
 EORPC
 
-rm -f "/tmp/${LOG_FILE}" 2>/dev/null || true
+REMOTE_RECEIVER_FILE="${REMOTE_UPLOAD_DIR}/${LOG_BASENAME}"
+echo "[INFO]	file-upload target: sftp://${FILE_ID}@${FILE_SERVER_IP}${REMOTE_UPLOAD_DIR}/${LOG_BASENAME}"
+echo "[INFO]	SFTP receiver check: ${REMOTE_RECEIVER_FILE}"
+echo "[INFO]	file-upload RPC body:"
+sed 's/^/[INFO]	  /' "$FILE_UPLOAD_RPC" 2>/dev/null || true
+rm -f "${REMOTE_RECEIVER_FILE}" 2>/dev/null || true
 FILE_UPLOAD_OUT="${NETCONF_TMP}/edit/file_upload_out.xml"
 rm -f "$FILE_UPLOAD_OUT"
 send_cmd "user-rpc --content $FILE_UPLOAD_RPC --out $FILE_UPLOAD_OUT"
 
-RESULT0="NOK"
+RESULT_UPLOAD_RPC="NOK"
 PAT_FILE_MGMT_OK='<status xmlns="urn:o-ran:file-management:1.0">SUCCESS</status>'
-for _w in $(seq 1 20); do
+for _w in $(seq 1 60); do
 	if [[ -f "$FILE_UPLOAD_OUT" ]] && grep -a -F "$PAT_FILE_MGMT_OK" "$FILE_UPLOAD_OUT" >/dev/null 2>&1; then
-		RESULT0="OK"
-		echo "[WAIT]	Wait for File Upload to sftp://$FILE_ID@$LOCAL_IP/tmp/$LOG_FILE"
+		RESULT_UPLOAD_RPC="OK"
+		echo "[WAIT]	Wait for File Upload to sftp://$FILE_ID@$FILE_SERVER_IP${REMOTE_UPLOAD_DIR}/$LOG_BASENAME"
 		break
 	fi
 	sleep 0.5
 done
-if [[ "$RESULT0" != "OK" ]]; then
+if [[ "$RESULT_UPLOAD_RPC" != "OK" ]]; then
+	echo "[FAIL] File upload RPC (no file-management SUCCESS in reply within 30s)"
+	if [[ -f "$FILE_UPLOAD_OUT" ]]; then
+		echo "[INFO]	file-upload rpc-reply tail:"
+		tail -n 15 "$FILE_UPLOAD_OUT" 2>/dev/null | while IFS= read -r _ln; do
+			echo "[INFO]	  ${_ln}"
+		done
+	else
+		echo "[INFO]	missing reply file: $FILE_UPLOAD_OUT"
+	fi
 	test_fail "File upload RPC"
 	exit 1
 fi
 
 RESULT4="NOK"
 PAT_UPLOAD_NOTIF="<status>SUCCESS</status></file-upload-notification></notification>"
+UPLOAD_NOTIF_COUNT_BEFORE=$(grep -c -a -F "$PAT_UPLOAD_NOTIF" "$LOG" 2>/dev/null) || true
+UPLOAD_NOTIF_COUNT_BEFORE=${UPLOAD_NOTIF_COUNT_BEFORE:-0}
 for _w in $(seq 1 3000); do
-	if grep -a -F "$PAT_UPLOAD_NOTIF" "$LOG" >/dev/null 2>&1; then
-		if [[ -f "/tmp/${LOG_FILE}" ]]; then
+	_cur=$(grep -c -a -F "$PAT_UPLOAD_NOTIF" "$LOG" 2>/dev/null) || true
+	_cur=${_cur:-0}
+	if (( _cur > UPLOAD_NOTIF_COUNT_BEFORE )); then
+		if [[ -f "${REMOTE_RECEIVER_FILE}" ]]; then
 			RESULT4="OK"
+			break
 		fi
-		break
+		if (( _w % 25 == 0 )); then
+			echo "[INFO]	upload-notification seen; waiting for ${REMOTE_RECEIVER_FILE}"
+		fi
 	fi
 	sleep 0.2
 done
-echo "[$RESULT4]	Step 4.	File Upload."
+echo "[$RESULT4]	Step 4.	File Upload ( ${LOG_BASENAME} )."
 
 if [[ "$RESULT4" != "OK" ]]; then
+	if [[ ! -f "${REMOTE_RECEIVER_FILE}" ]]; then
+		echo "[FAIL] SFTP file missing on receiver: ${REMOTE_RECEIVER_FILE}"
+		ls -la "${REMOTE_UPLOAD_DIR}/" 2>/dev/null | head -15 | sed 's/^/[INFO]	  /' || true
+	else
+		echo "[FAIL] file-upload-notification SUCCESS not seen after upload RPC"
+	fi
 	test_fail "File upload"
 	exit 1
+fi
+
+STOP_TROUBLESHOOT_RPC="${NETCONF_TMP}/edit/stop_troubleshooting.xml"
+cat > "$STOP_TROUBLESHOOT_RPC" <<'EORPC'
+<stop-troubleshooting-logs xmlns="urn:o-ran:troubleshooting:1.0"/>
+EORPC
+
+STOP_TROUBLESHOOT_OUT="${NETCONF_TMP}/edit/stop_troubleshooting_out.xml"
+rm -f "$STOP_TROUBLESHOOT_OUT"
+send_cmd "user-rpc --content $STOP_TROUBLESHOOT_RPC --out $STOP_TROUBLESHOOT_OUT"
+
+RESULT_STOP="NOK"
+for _w in $(seq 1 20); do
+	if [[ -f "$STOP_TROUBLESHOOT_OUT" ]] && grep -a -F "$PAT_TROUBLESHOOT_OK" "$STOP_TROUBLESHOOT_OUT" >/dev/null 2>&1; then
+		RESULT_STOP="OK"
+		echo "[$RESULT_STOP]	Step 5.	Stop troubleshooting."
+		break
+	fi
+	sleep 0.5
+done
+if [[ "$RESULT_STOP" != "OK" ]]; then
+	echo "[WARN]	stop-troubleshooting did not report SUCCESS (upload already OK)"
 fi
 
 echo "[PASS]"

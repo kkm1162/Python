@@ -1,7 +1,7 @@
 """
 O-RAN M-Plane 3.1.x 시험 스크립트 매핑 (로컬 ./conformance/*.sh).
 GUI는 CONFORMANCE_SPEC_ROWS 순서로 표시하며, 로컬에 파일이 있는 항목만 보여 줍니다.
-3.1.8.0 은 목록에 없음 — 3.1.8.x 실행 전 conformance_3180_init_user.sh 를 자동 실행합니다.
+3.1.8.0 / 3.1.8.0_1 은 목록에 없음 — 3180 은 3.1.8.1 직전, 3180_1 은 3.1.8.6 종료·시험 중지 후 자동 실행합니다.
 """
 
 from __future__ import annotations
@@ -37,6 +37,7 @@ CONFORMANCE_SPEC_ROWS: tuple[tuple[tuple[int, int, int, int], str, str, str, str
 
 # 3.1.8.x 사전 단계 (목록 비표시). 3.1.8.0 항목은 삭제하고 이 스크립트로 대체.
 CONFORMANCE_SCRIPT_PRE_3180 = "conformance_3180_init_user.sh"
+CONFORMANCE_SCRIPT_POST_3180_1 = "conformance_3180_1_init_user.sh"
 CONFORMANCE_SCRIPTS_318X: frozenset[str] = frozenset(
     {f"conformance_318{i}.sh" for i in range(1, 7)}
 )
@@ -52,3 +53,107 @@ CONFORMANCE_TESTS: tuple[tuple[str, str, str], ...] = (
 
 CONFORMANCE_REMOTE_DIR = "/var/tmp/conformance"
 CONFORMANCE_REMOTE_GUI_CONFIG_NAME = "_gui_management_config.json"
+
+# 표 참조(3.1.x.x) → 상세 설명창 [시험 설명] (기술 문서 톤, 쉬운 표현)
+CONFORMANCE_SPEC_DESCRIPTIONS_KO: dict[str, str] = {
+    "3.1.1.1": (
+        "3.1.1.1 (Call Home 연결): O-RU가 서버로 역방향(Call Home) SSH·NETCONF 세션을 "
+        "수립하고, 허용된 계정으로 인증에 성공하는지 확인합니다."
+    ),
+    "3.1.1.2": (
+        "3.1.1.2 (인증 실패): 잘못된 ID/비밀번호로 Call Home 시 인증이 거부되고 "
+        "NETCONF 세션이 수립되지 않는지 확인하는 부정(Negative) 시험입니다."
+    ),
+    "3.1.2.1": (
+        "3.1.2.1 (이벤트 구독): Call Home 로그인 후 NETCONF notification "
+        "구독(create-subscription)이 정상 응답(OK)으로 완료되는지 확인합니다."
+    ),
+    "3.1.3.1": (
+        "3.1.3.1 (연결 감시·정상): O-RU supervision notification 수신 시 "
+        "watchdog-reset RPC로 응답하여 세션이 유지되는지 확인하는 정(Positive) 시험입니다."
+    ),
+    "3.1.3.2": (
+        "3.1.3.2 (연결 감시·부정): watchdog-reset을 의도적으로 중단했을 때 O-RU가 "
+        "supervision 실패를 감지하고 세션을 종료하는지 확인하는 부정(Negative) 시험입니다."
+    ),
+    "3.1.4.1": (
+        "3.1.4.1 (YANG 라이브러리·전체): 필터 없이 yang-library 등을 조회하여 "
+        "구현 모듈·revision이 O-RAN M-Plane 요구사항과 일치하는지 확인합니다."
+    ),
+    "3.1.4.2": (
+        "3.1.4.2 (필터 조회): subtree/xpath 필터로 지정한 노드만 반환되고 "
+        "요청 범위 밖 데이터가 포함되지 않는지 확인합니다."
+    ),
+    "3.1.5.1": (
+        "3.1.5.1 (알람 notification): 외부 장비(예: L2 스위치)로 링크 장애·복구를 유발한 뒤 "
+        "alarm notification(Occur/Clear)이 NETCONF로 수신되는지 확인합니다."
+    ),
+    "3.1.5.2": (
+        "3.1.5.2 (활성 알람 조회): 알람이 활성화된 상태에서 active-alarm-list "
+        "조회 시 해당 알람이 응답에 포함되는지 확인합니다."
+    ),
+    "3.1.6.1": (
+        "3.1.6.1 (S/W 다운로드·설치): 원격 SFTP의 정상 패키지를 download·install하여 "
+        "non-running 슬롯 상태가 VALID로 보고되는지 확인하는 정(Positive) 시험입니다."
+    ),
+    "3.1.6.2": (
+        "3.1.6.2 (S/W 설치 부정): 손상·누락 패키지 설치 시 FILE_NOT_FOUND·INTEGRITY_ERROR 등 "
+        "오류로 설치가 거부되는지 확인하는 부정(Negative) 시험입니다."
+    ),
+    "3.1.7.1": (
+        "3.1.7.1 (S/W 활성화): install 완료 슬롯에 activate를 수행했을 때 "
+        "재부팅 없이 active 슬롯으로 전환되는지 확인합니다."
+    ),
+    "3.1.8.0-prep": (
+        "3.1.8.0 (사전 NACM 정리): 3.1.8.1 직전에 Settings NETCONF 계정으로 로그인하여 "
+        "NACM 그룹 매핑을 기준 상태로 맞춥니다. (목록 비표시·자동 실행)"
+    ),
+    "3.1.8.0.1-prep": (
+        "3.1.8.0_1 (사후 정리): 3.1.8.6 종료 또는 시험 중지 후 sudouser로 NACM 잔여 매핑을 "
+        "제거하고 sudouser RU 계정을 삭제합니다. (목록 비표시·자동 실행)"
+    ),
+    "3.1.8.1": (
+        "3.1.8.1 (계정·NACM 생성): sudo 권한으로 nmsuser·fmpmuser 등 역할별 계정을 "
+        "o-ran-usermgmt에 생성하고 NACM 그룹에 올바르게 등록되는지 확인하는 정(Positive) 시험입니다."
+    ),
+    "3.1.8.2": (
+        "3.1.8.2 (비밀번호 노출 차단): sudouser로 user-mgmt 조회 시 password 노드가 "
+        "응답에 노출되지 않는지 확인하는 부정(Negative) 시험입니다."
+    ),
+    "3.1.8.3": (
+        "3.1.8.3 (NMS 권한 부정): nmsuser로 사용자 생성 등 권한 밖 edit 시 "
+        "error-tag access-denied가 반환되는지 확인합니다."
+    ),
+    "3.1.8.4": (
+        "3.1.8.4 (FM-PM 권한 부정): fmpmuser로 인터페이스(VLAN·MAC 등) 변경 edit 시 "
+        "access-denied로 거부되는지 확인합니다."
+    ),
+    "3.1.8.5": (
+        "3.1.8.5 (SWM 권한 부정): swmuser로 FM 알람 목록 등 권한 밖 데이터 조회 시 "
+        "허용 범위를 벗어난 정보가 반환되지 않는지 확인합니다."
+    ),
+    "3.1.8.6": (
+        "3.1.8.6 (계층 계정·다중 세션): sudouser로 oranuser2·oranuser3를 추가하고 "
+        "각 계정 Call Home·NACM 그룹이 기대와 일치하는지 확인하는 정(Positive) 시험입니다."
+    ),
+    "3.1.10.1": (
+        "3.1.10.1 (U-Plane 설정): CU-Plane·processing-element·PDSCH/PUSCH/PRACH 등 "
+        "U-Plane 구성이 적용되고 상태가 ACTIVE로 전환되는지 확인하는 정(Positive) 시험입니다."
+    ),
+    "3.1.10.2": (
+        "3.1.10.2 (U-Plane 설정 부정): CC 간 eAxC-ID 중복 등 잘못된 구성 시 "
+        "O-RU가 오류를 보고하고 설정을 거부하는지 확인하는 부정(Negative) 시험입니다."
+    ),
+    "3.1.12.1": (
+        "3.1.12.1 (트러블슈팅 로그): troubleshooting 로그 생성·원격(SFTP) 업로드 "
+        "절차가 완료되는지 확인합니다."
+    ),
+    "3.1.12.2": (
+        "3.1.12.2 (트레이스 로그): trace 수집 시작·중지 시 생성된 로그 파일이 "
+        "순차적으로 원격 서버에 업로드되는지 확인합니다."
+    ),
+    "3.1.13.1": (
+        "3.1.13.1 (이더넷 연결 모니터링): Ethernet connectivity monitoring(LBM/LBR) "
+        "요청·응답으로 링크 건전성을 확인합니다."
+    ),
+}

@@ -72,6 +72,17 @@ _ALARM_TEST_FIELDS: list[dict[str, Any]] = [
     },
 ]
 
+_SWM_ACTIVATE_GUARD_FIELDS: list[dict[str, Any]] = [
+    {
+        "key": "activate_get_guard_sec",
+        "label": "Activate→GET guard (sec)",
+        "default": "5",
+        "hint": "software-activate 완료 후 active 슬롯 GET 전 대기(초). 반영이 느린 RU는 10~30 권장",
+        "env_var": "ACTIVATE_GET_GUARD_SEC",
+        "wide": False,
+    },
+]
+
 _SWM_TEST_FIELDS: list[dict[str, Any]] = [
     {
         "key": "swm_pkg_path",
@@ -108,6 +119,150 @@ _SWM_TEST_FIELDS: list[dict[str, Any]] = [
         "wide": False,
     },
 ]
+
+_IFACE_TEST_FIELDS: list[dict[str, Any]] = [
+    {
+        "key": "to_du_if_name",
+        "label": "To-DU interface (base)",
+        "default": "",
+        "hint": "예: sys — CUplane-interface base-interface",
+        "env_var": None,
+        "wide": False,
+    },
+    {
+        "key": "to_du_vlan",
+        "label": "VLAN ID",
+        "default": "1",
+        "hint": "L2 VLAN ID (CUplane-interface name)",
+        "env_var": None,
+        "wide": False,
+    },
+]
+
+_CONFORMANCE_INTERFACE_SHARED_KEY = "conformance_interface_shared"
+_CONFORMANCE_3110X_SHARED_KEY = "conformance_3110x_shared"
+_CONFORMANCE_318X_SHARED_KEY = "conformance_318x_shared"
+_CONFORMANCE_3112X_SHARED_KEY = "conformance_3112x_shared"
+
+_318X_TEST_FIELDS: list[dict[str, Any]] = [
+    {
+        "key": "conf_v11_mode",
+        "label": "Conformance 사양",
+        "default": "after",
+        "hint": "3.1.8.1 / 3180 사전 단계의 oranuser@o-ran.org NACM 기대값",
+        "wide": True,
+        "choices": [
+            ("before", "v11.0 이전 — oranuser@o-ran.org 미포함"),
+            ("after", "v11.0 이후 — oranuser@o-ran.org 포함"),
+        ],
+    },
+] + _IFACE_TEST_FIELDS
+
+_CONFORMANCE_ORU_BOOST_SCRIPT = "oru_show_system_boost.sh"
+_CONFORMANCE_3112X_SCRIPTS: frozenset[str] = frozenset(
+    {"conformance_31121.sh", "conformance_31122.sh"}
+)
+
+_LOG_3112X_FIELDS: list[dict[str, Any]] = [
+    {
+        "key": "oru_log_boost_enable",
+        "label": "O-RU log 부스트",
+        "default": "0",
+        "hint": "start-trace 직후부터 1초 간격 show system (켜면 trace가 빨리 끝나 last=true 조기 가능). 수동 시험과 동일하게 하려면 끄기",
+        "choices": [
+            ("1", "사용"),
+            ("0", "사용 안 함"),
+        ],
+    },
+    {
+        "key": "oru_cli_id",
+        "label": "O-RU SSH ID",
+        "default": "",
+        "hint": "비우면 Settings → CLI-ID",
+        "env_var": None,
+        "wide": False,
+    },
+    {
+        "key": "oru_cli_pw",
+        "label": "O-RU SSH PW",
+        "default": "",
+        "hint": "비우면 Settings → CLI-PW",
+        "env_var": None,
+        "wide": False,
+        "password": True,
+    },
+    {
+        "key": "file_server_ip",
+        "label": "SFTP server IP",
+        "default": "",
+        "hint": "RU가 업로드할 SFTP 호스트 (비우면 LOCAL_IP)",
+        "env_var": None,
+        "wide": False,
+    },
+    {
+        "key": "file_server_id",
+        "label": "SFTP user ID",
+        "default": "solid",
+        "hint": "remote-file-path: sftp://ID@host/...",
+        "env_var": None,
+        "wide": False,
+    },
+    {
+        "key": "file_server_pw",
+        "label": "SFTP password",
+        "default": "",
+        "hint": "file-upload password (ACORN: nested leaf)",
+        "env_var": None,
+        "wide": False,
+    },
+    {
+        "key": "local_log_prefix",
+        "label": "RU local log prefix",
+        "default": "O-RAN/log",
+        "hint": "local-logical-file-path = {prefix}/{notification 파일명}",
+        "env_var": None,
+        "wide": True,
+    },
+    {
+        "key": "remote_upload_dir",
+        "label": "SFTP save directory",
+        "default": "/tmp",
+        "hint": "remote-file-path 및 PASS 시 파일 존재 확인 경로 (miniDU)",
+        "env_var": None,
+        "wide": True,
+    },
+]
+
+_CONFORMANCE_INTERFACE_SCRIPTS: frozenset[str] = frozenset(
+    {
+        "conformance_3184.sh",
+        "conformance_31101.sh",
+        "conformance_31102.sh",
+        "conformance_31131.sh",
+    }
+)
+
+_CONFORMANCE_MPLANE_SCRIPTS: frozenset[str] = frozenset(
+    {
+        "conformance_31101.sh",
+        "conformance_31102.sh",
+    }
+)
+
+_CONFORMANCE_HELPER_SCRIPTS: tuple[str, ...] = ("conformance_mplane_xlsx_common.sh",)
+
+_MPLANE_3110X_FIELDS: list[dict[str, Any]] = [
+    {
+        "key": "mplane_xlsx_path",
+        "label": "M-Plane Excel (.xlsx)",
+        "default": "",
+        "hint": "Control-Sheet + PDSCH/PUSCH/PRACH/ACTIVE. CUplane → PE → PDSCH → PUSCH → PRACH → ACTIVE.",
+        "env_var": None,
+        "wide": True,
+        "file_picker": True,
+        "file_types": [("Excel workbook", "*.xlsx"), ("All files", "*.*")],
+    },
+] + _IFACE_TEST_FIELDS
 
 _CONFORMANCE_PER_TEST_SCHEMA: dict[str, dict[str, Any]] = {
     "conformance_3131.sh": {
@@ -161,6 +316,85 @@ _CONFORMANCE_PER_TEST_SCHEMA: dict[str, dict[str, Any]] = {
         "shared_with": "conformance_3161.sh",
         "fields": _SWM_TEST_FIELDS,
     },
+    "conformance_3170.sh": {
+        "title": "3.1.7.1 Software Activation (no reset)",
+        "fields": _SWM_ACTIVATE_GUARD_FIELDS,
+    },
+    "conformance_31101.sh": {
+        "title": "3.1.10.1 U-Plane (M-Plane xlsx)",
+        "settings_key": _CONFORMANCE_3110X_SHARED_KEY,
+        "shared_with": "conformance_31102.sh",
+        "fields": _MPLANE_3110X_FIELDS,
+    },
+    "conformance_31102.sh": {
+        "title": "3.1.10.2 U-Plane (M-Plane xlsx, duplicate eAxC)",
+        "settings_key": _CONFORMANCE_3110X_SHARED_KEY,
+        "shared_with": "conformance_31101.sh",
+        "fields": _MPLANE_3110X_FIELDS,
+    },
+    "conformance_3181.sh": {
+        "title": "3.1.8.x 공통 (Access Control)",
+        "settings_key": _CONFORMANCE_318X_SHARED_KEY,
+        "shared_with": "conformance_3186.sh",
+        "fields": _318X_TEST_FIELDS,
+    },
+    "conformance_3182.sh": {
+        "title": "3.1.8.x 공통 (Access Control)",
+        "settings_key": _CONFORMANCE_318X_SHARED_KEY,
+        "shared_with": "conformance_3181.sh",
+        "fields": _318X_TEST_FIELDS,
+    },
+    "conformance_3183.sh": {
+        "title": "3.1.8.x 공통 (Access Control)",
+        "settings_key": _CONFORMANCE_318X_SHARED_KEY,
+        "shared_with": "conformance_3181.sh",
+        "fields": _318X_TEST_FIELDS,
+    },
+    "conformance_3184.sh": {
+        "title": "3.1.8.x 공통 (Access Control)",
+        "settings_key": _CONFORMANCE_318X_SHARED_KEY,
+        "shared_with": "conformance_3181.sh",
+        "fields": _318X_TEST_FIELDS,
+    },
+    "conformance_3185.sh": {
+        "title": "3.1.8.x 공통 (Access Control)",
+        "settings_key": _CONFORMANCE_318X_SHARED_KEY,
+        "shared_with": "conformance_3181.sh",
+        "fields": _318X_TEST_FIELDS,
+    },
+    "conformance_3186.sh": {
+        "title": "3.1.8.x 공통 (Access Control)",
+        "settings_key": _CONFORMANCE_318X_SHARED_KEY,
+        "shared_with": "conformance_3181.sh",
+        "fields": _318X_TEST_FIELDS,
+    },
+    "conformance_31121.sh": {
+        "title": "3.1.12.1 Log Management",
+        "settings_key": _CONFORMANCE_3112X_SHARED_KEY,
+        "shared_with": "conformance_31122.sh",
+        "fields": _LOG_3112X_FIELDS,
+    },
+    "conformance_31122.sh": {
+        "title": "3.1.12.2 Trace",
+        "settings_key": _CONFORMANCE_3112X_SHARED_KEY,
+        "shared_with": "conformance_31121.sh",
+        "fields": _LOG_3112X_FIELDS
+        + [
+            {
+                "key": "trace_oru_end_timeout_sec",
+                "label": "ORU trace 종료 대기(초)",
+                "default": "600",
+                "hint": "GUI는 stop-trace 미전송. O-RU가 스스로 last=true 보낼 때까지 대기(초).",
+                "env_var": "TRACE_ORU_END_TIMEOUT",
+                "wide": False,
+            },
+        ],
+    },
+    "conformance_31131.sh": {
+        "title": "3.1.13.1 Connectivity (To-DU interface)",
+        "settings_key": _CONFORMANCE_INTERFACE_SHARED_KEY,
+        "fields": _IFACE_TEST_FIELDS,
+    },
 }
 
 
@@ -186,6 +420,19 @@ class ConformanceRunOptions:
 
 class ConformanceMixin:
     """Tk methods mixed into CallhomeGUI (expects self.fields, self.after, self.append_log, …)."""
+
+    def _conformance_scripts_318x(self) -> frozenset[str]:
+        return getattr(_conf_manifest, "CONFORMANCE_SCRIPTS_318X", frozenset())
+
+    def _conformance_is_318x_script(self, fname: str) -> bool:
+        pre = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_PRE_3180", "")
+        return fname in self._conformance_scripts_318x() or fname == pre
+
+    def _conformance_settings_store_key(self, fname: str) -> str:
+        schema = _CONFORMANCE_PER_TEST_SCHEMA.get(fname)
+        if schema and schema.get("settings_key"):
+            return str(schema["settings_key"])
+        return fname
 
     def _conformance_local_dir(self) -> Path:
         d = _conformance_bundle_root() / "conformance"
@@ -246,6 +493,17 @@ class ConformanceMixin:
             if self._conformance_script_local_path(fn) and fn not in seen:
                 seen.add(fn)
                 out.append(fn)
+        for fn in _CONFORMANCE_HELPER_SCRIPTS:
+            if self._conformance_script_local_path(fn) and fn not in seen:
+                seen.add(fn)
+                out.append(fn)
+        if self._conformance_script_local_path(_CONFORMANCE_ORU_BOOST_SCRIPT) and _CONFORMANCE_ORU_BOOST_SCRIPT not in seen:
+            seen.add(_CONFORMANCE_ORU_BOOST_SCRIPT)
+            out.append(_CONFORMANCE_ORU_BOOST_SCRIPT)
+        post1 = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_POST_3180_1", "")
+        if post1 and self._conformance_script_local_path(post1) and post1 not in seen:
+            seen.add(post1)
+            out.append(post1)
         return out
 
     @staticmethod
@@ -257,7 +515,17 @@ class ConformanceMixin:
         pre = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_PRE_3180", "")
         if pre:
             m[pre] = "3.1.8.0-prep"
+        post1 = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_POST_3180_1", "")
+        if post1:
+            m[post1] = "3.1.8.0.1-prep"
         return m
+
+    @staticmethod
+    def _conformance_spec_description_ko(ref: str) -> str:
+        descs = getattr(_conf_manifest, "CONFORMANCE_SPEC_DESCRIPTIONS_KO", None)
+        if not isinstance(descs, dict):
+            return ""
+        return str(descs.get(ref, "") or "").strip()
 
     def _conformance_host_run_log_path(self, script_fname: str) -> str:
         """원격 tee 로그: CONFORMANCE_REMOTE_DIR/logs/<PRODUCT>/ (일반 사용자 쓰기 가능)."""
@@ -286,13 +554,17 @@ class ConformanceMixin:
         spec_ref: str,
         host_log_path: str,
         log_line: Any,
+        *,
+        oru_boost_defer_trigger: str | None = None,
     ) -> int:
         """원격에서 스크립트 1개 실행. 취소 시 -2, 그 외 원격 exit code. stdout/stderr는 host_log_path에 tee."""
-        cfg_payload = self._conformance_effective_config_json_text()
+        if not self._conformance_prepare_mplane_bundle(fname, log_line):
+            return 1
+        cfg_payload = self._conformance_effective_config_json_text(for_script=fname)
         cfg_b2 = cfg_payload.encode("utf-8")
         sftp.putfo(io.BytesIO(cfg_b2), cfg_remote, len(cfg_b2))
         log_line(f"refreshed ORU config on host (실행 직전 Settings 반영, {len(cfg_payload)} bytes)")
-        envp = self._conformance_bash_env_exports(opts)
+        envp = self._conformance_bash_env_exports(opts, fname)
         per_test_envp = self._conformance_per_test_env_exports(fname)
         rp_q = shlex.quote(f"{remote_dir}/{fname}")
         cfg_q = shlex.quote(cfg_remote)
@@ -339,13 +611,31 @@ class ConformanceMixin:
                     b = ch.recv(4096)
                     s = b.decode(errors="replace")
                     if s:
-                        log_line(s.rstrip("\n"))
+                        for _line in s.splitlines():
+                            _ln = _line.rstrip("\n")
+                            if _ln:
+                                log_line(_ln)
+                            if (
+                                oru_boost_defer_trigger
+                                and oru_boost_defer_trigger in _ln
+                                and not getattr(self, "_conformance_oru_boost_active", False)
+                                and self._conformance_oru_boost_enabled(fname)
+                            ):
+                                if self._conformance_start_oru_show_system_boost(
+                                    client, sftp, remote_dir, fname, log_line
+                                ):
+                                    log_line(
+                                        f"[O-RU boost] deferred start (after: {oru_boost_defer_trigger!r})"
+                                    )
                     got = True
                 if ch.recv_stderr_ready():
                     b = ch.recv_stderr(4096)
                     s = b.decode(errors="replace")
                     if s:
-                        log_line(s.rstrip("\n"))
+                        for _line in s.splitlines():
+                            _ln = _line.rstrip("\n")
+                            if _ln:
+                                log_line(_ln)
                     got = True
                 if ch.exit_status_ready() and not ch.recv_ready() and not ch.recv_stderr_ready():
                     break
@@ -354,10 +644,196 @@ class ConformanceMixin:
             rc = ch.recv_exit_status()
             st = "PASS" if rc == 0 else "FAIL"
             log_line(f"---- END {fname} exit={rc} [{st}] ----")
+            if fname in ("conformance_31121.sh", "conformance_31122.sh"):
+                self._conformance_verify_log_upload_on_host(sftp, fname, host_log_path, log_line)
             return int(rc)
         finally:
             with self._conformance_run_transport_lock:
                 self._conformance_run_script_channel = None
+
+    def _conformance_3112x_settings(self) -> dict[str, str]:
+        store = self._conformance_per_test_settings.get(_CONFORMANCE_3112X_SHARED_KEY, {})
+        if not store:
+            store = self._conformance_per_test_settings.get("conformance_31121.sh", {})
+        return {
+            "remote_upload_dir": (store.get("remote_upload_dir") or "/tmp").strip() or "/tmp",
+        }
+
+    def _conformance_oru_boost_enabled(self, fname: str) -> bool:
+        if fname not in _CONFORMANCE_3112X_SCRIPTS:
+            return False
+        mode = (self._conformance_get_per_test_val(fname, "oru_log_boost_enable") or "1").strip()
+        return mode != "0"
+
+    def _conformance_oru_boost_credentials(self, fname: str) -> tuple[str, str, str] | None:
+        host = ""
+        try:
+            host = str(self.fields.get("ALLOWED_IP", tk.StringVar()).get()).strip()  # type: ignore[union-attr]
+        except Exception:
+            pass
+        if not host:
+            return None
+        oru_id = self._conformance_get_per_test_val(fname, "oru_cli_id").strip()
+        oru_pw = self._conformance_get_per_test_val(fname, "oru_cli_pw").strip()
+        if not oru_id:
+            try:
+                oru_id = str(self.fields.get("CLI-ID", tk.StringVar()).get()).strip()  # type: ignore[union-attr]
+            except Exception:
+                oru_id = ""
+        if not oru_pw:
+            try:
+                oru_pw = str(self.fields.get("CLI-PW", tk.StringVar()).get()).strip()  # type: ignore[union-attr]
+            except Exception:
+                oru_pw = ""
+        if not oru_id or not oru_pw:
+            return None
+        return host, oru_id, oru_pw
+
+    def _conformance_upload_oru_boost_script(self, sftp: Any, remote_dir: str, log_line: Any) -> bool:
+        lp = self._conformance_script_local_path(_CONFORMANCE_ORU_BOOST_SCRIPT)
+        if lp is None:
+            log_line(f"[ERROR] 로컬 부스트 스크립트 없음: {_CONFORMANCE_ORU_BOOST_SCRIPT}")
+            return False
+        rp = f"{remote_dir.rstrip('/')}/{_CONFORMANCE_ORU_BOOST_SCRIPT}"
+        try:
+            text = lp.read_text(encoding="utf-8", errors="replace")
+            data = text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+            sftp.putfo(io.BytesIO(data), rp, len(data))
+            sftp.chmod(rp, 0o755)
+            return True
+        except Exception as exc:
+            log_line(f"[ERROR] O-RU 부스트 스크립트 업로드 실패: {exc}")
+            return False
+
+    def _conformance_stop_oru_show_system_boost(self, client: Any, remote_dir: str, log_line: Any) -> None:
+        was_active = bool(getattr(self, "_conformance_oru_boost_active", False))
+        self._conformance_oru_boost_active = False
+        self._conformance_oru_boost_remote_dir = None
+        rd = remote_dir.rstrip("/")
+        pid_file = f"{rd}/.oru_boost.pid"
+        pf = shlex.quote(pid_file)
+        script_pat = shlex.quote(_CONFORMANCE_ORU_BOOST_SCRIPT)
+        cred = self._conformance_oru_boost_credentials("conformance_31122.sh")
+        extra_kill = ""
+        if cred:
+            host, oru_id, _pw = cred
+            extra_kill = (
+                f"pkill -f {shlex.quote(f'sshpass.*{oru_id}@{host}')} 2>/dev/null || true; "
+                f"pkill -f {shlex.quote(f'{oru_id}@{host}')} 2>/dev/null || true; "
+            )
+        cmd = (
+            f"if [[ -f {pf} ]]; then "
+            f"pid=$(cat {pf} 2>/dev/null); "
+            f"if [[ -n \"$pid\" ]]; then "
+            f"kill -TERM -- -\"$pid\" 2>/dev/null || kill -TERM \"$pid\" 2>/dev/null || true; "
+            f"sleep 0.3; "
+            f"kill -KILL -- -\"$pid\" 2>/dev/null || kill -KILL \"$pid\" 2>/dev/null || true; "
+            f"fi; "
+            f"rm -f {pf}; "
+            f"fi; "
+            f"pkill -TERM -f {script_pat} 2>/dev/null || true; "
+            f"sleep 0.2; "
+            f"pkill -KILL -f {script_pat} 2>/dev/null || true; "
+            f"{extra_kill}"
+        )
+        try:
+            _stdin, _stdout, _stderr = client.exec_command(f"bash -lc {shlex.quote(cmd)}")
+            _stdout.channel.recv_exit_status()
+            if was_active:
+                log_line("[O-RU boost] stopped show system loop")
+            else:
+                log_line("[O-RU boost] orphan cleanup (show system loop)")
+        except Exception as exc:
+            log_line(f"[WARN] O-RU boost stop: {exc}")
+
+    def _conformance_start_oru_show_system_boost(
+        self, client: Any, sftp: Any, remote_dir: str, fname: str, log_line: Any
+    ) -> bool:
+        if not self._conformance_oru_boost_enabled(fname):
+            return True
+        cred = self._conformance_oru_boost_credentials(fname)
+        if cred is None:
+            log_line(
+                "[WARN] O-RU log 부스트: ALLOWED_IP·O-RU ID/PW(또는 Settings CLI-ID/CLI-PW)가 필요합니다 — 건너뜀"
+            )
+            return True
+        host, oru_id, oru_pw = cred
+        if not self._conformance_upload_oru_boost_script(sftp, remote_dir, log_line):
+            return False
+        self._conformance_stop_oru_show_system_boost(client, remote_dir, log_line)
+        rp = f"{remote_dir.rstrip('/')}/{_CONFORMANCE_ORU_BOOST_SCRIPT}"
+        pid_file = f"{remote_dir.rstrip('/')}/.oru_boost.pid"
+        log_path = "/var/tmp/oru_show_system_boost.log"
+        runner = (
+            f"export ORU_BOOST_IP={shlex.quote(host)} "
+            f"ORU_BOOST_ID={shlex.quote(oru_id)} "
+            f"ORU_BOOST_PW={shlex.quote(oru_pw)} "
+            f"ORU_BOOST_INTERVAL=1; "
+            f"setsid bash {shlex.quote(rp)} >>{shlex.quote(log_path)} 2>&1 & "
+            f"echo $! > {shlex.quote(pid_file)}"
+        )
+        try:
+            _stdin, _stdout, _stderr = client.exec_command(f"bash -lc {shlex.quote(runner)}")
+            rc = _stdout.channel.recv_exit_status()
+            if rc != 0:
+                err = _stderr.read().decode(errors="replace").strip()
+                log_line(f"[ERROR] O-RU boost start failed (rc={rc}){': ' + err if err else ''}")
+                return False
+            pid = _stdout.read().decode(errors="replace").strip()
+            self._conformance_oru_boost_active = True
+            self._conformance_oru_boost_remote_dir = remote_dir.rstrip("/")
+            log_line(
+                f"[O-RU boost] started: vtysh show system every 1s → {oru_id}@{host}"
+                + (f" (pid {pid})" if pid else "")
+            )
+            return True
+        except Exception as exc:
+            log_line(f"[ERROR] O-RU boost start: {exc}")
+            return False
+
+    def _conformance_verify_log_upload_on_host(
+        self,
+        sftp: Any,
+        fname: str,
+        host_log_path: str,
+        log_line: Any,
+    ) -> None:
+        """After 3.1.12.x run, confirm uploaded file exists under configured SFTP save directory."""
+        remote_dir = self._conformance_3112x_settings()["remote_upload_dir"].rstrip("/") or "/tmp"
+        log_line(f"[GUI] SFTP save directory check: {remote_dir}/")
+        text = ""
+        try:
+            with sftp.open(host_log_path, "r") as hf:
+                raw = hf.read()
+            text = raw.decode("utf-8", errors="replace") if isinstance(raw, bytes) else str(raw)
+        except Exception as exc:
+            log_line(f"[GUI] Upload verify: cannot read host log ({exc})")
+            return
+        receivers = re.findall(r"SFTP receiver check:\s*(\S+)", text)
+        receiver = receivers[-1].strip() if receivers else ""
+        if not receiver:
+            m = re.search(r"Step 4\.\s*File Upload\s*\(\s*([^)\s]+)\s*\)", text)
+            if m:
+                receiver = f"{remote_dir}/{m.group(1).strip()}"
+        if not receiver:
+            log_line("[GUI] Upload verify: no receiver path in log (Step 4 / SFTP receiver check)")
+            return
+        if not receiver.startswith("/"):
+            receiver = f"{remote_dir}/{receiver.lstrip('/')}"
+        try:
+            st = sftp.stat(receiver)
+            size = getattr(st, "st_size", None)
+            log_line(f"[GUI] Upload verify OK: {receiver}" + (f" ({size} bytes)" if size is not None else ""))
+        except OSError as exc:
+            log_line(f"[GUI] Upload verify FAIL: missing {receiver} ({exc})")
+            try:
+                names = sftp.listdir(remote_dir)
+                preview = ", ".join(sorted(names)[:12])
+                if len(names) > 12:
+                    preview += f", … (+{len(names) - 12})"
+                log_line(f"[GUI]   listing {remote_dir}: {preview or '(empty)'}")
+            except OSError as exc2:
+                log_line(f"[GUI]   cannot list {remote_dir}: {exc2}")
 
     def _conformance_build_management_config_json(self) -> str:
         f = self.fields
@@ -391,13 +867,18 @@ class ConformanceMixin:
         swm_ip = (swm_settings.get("swm_server_ip") or "").strip()
         swm_id = (swm_settings.get("swm_server_id") or "root").strip()
         swm_pkg = (swm_settings.get("swm_pkg_path") or "").strip()
+        swm_obj: dict[str, Any] = {}
         if swm_pkg and swm_ip:
             pkg_filename = os.path.basename(swm_pkg)
             swm_path = f"sftp://{swm_id}@{swm_ip}/tmp/netconf_PKG/{pkg_filename}"
-            obj["software-management"] = {
-                "path": swm_path,
-                "password": swm_pw,
-            }
+            swm_obj["path"] = swm_path
+            swm_obj["password"] = swm_pw
+        guard_settings = self._conformance_per_test_settings.get("conformance_3170.sh", {})
+        guard = (guard_settings.get("activate_get_guard_sec") or "").strip()
+        if guard:
+            swm_obj["activate-get-guard-sec"] = guard
+        if swm_obj:
+            obj["software-management"] = swm_obj
         return json.dumps(obj, ensure_ascii=True, indent=2)
 
     @staticmethod
@@ -428,15 +909,259 @@ class ConformanceMixin:
         if isinstance(pe, dict) and pe.get("to-DU-processing-element") is None:
             pe["to-DU-processing-element"] = {"enable": False, "name": {}, "ODUMAC": {}}
 
-    def _conformance_effective_config_json_text(self) -> str:
-        """ORU JSON for remote --config: always from current Settings (GUI) only."""
+    def _conformance_effective_config_json_text(self, for_script: str | None = None) -> str:
+        """ORU JSON for remote --config: Settings + per-test (M-Plane xlsx, interface, SWM)."""
         gui_txt = self._conformance_build_management_config_json()
         gui_obj = json.loads(gui_txt)
+        if for_script:
+            self._conformance_apply_interface_from_per_test(gui_obj, for_script)
+            self._conformance_apply_mplane_from_bundle(gui_obj, for_script)
+            self._conformance_apply_log_fileserver_from_per_test(gui_obj, for_script)
         self._conformance_apply_config_stubs(gui_obj)
         gui_obj = self._conformance_strip_json_nulls(gui_obj)
         return json.dumps(gui_obj, ensure_ascii=True, indent=2)
 
-    def _conformance_bash_env_exports(self, opts: ConformanceRunOptions) -> str:
+    def _conformance_mplane_bundle_cache(self) -> dict[str, Any]:
+        if not hasattr(self, "_conformance_mplane_bundles"):
+            self._conformance_mplane_bundles = {}  # type: ignore[attr-defined]
+        return self._conformance_mplane_bundles  # type: ignore[attr-defined]
+
+    def _conformance_resolve_mplane_xlsx_path(self, fname: str) -> str:
+        path = self._conformance_get_per_test_val(fname, "mplane_xlsx_path").strip()
+        if not path:
+            try:
+                gv = getattr(self, "mplane_xlsx_path", None)
+                if gv is not None:
+                    path = str(gv.get()).strip()
+            except Exception:
+                pass
+        if not path:
+            return ""
+        try:
+            norm = getattr(self, "_normalize_mplane_workbook_path", None)
+            if callable(norm):
+                return str(norm(path)).strip()
+        except Exception:
+            pass
+        return str(Path(path).expanduser().resolve())
+
+    def _conformance_prepare_mplane_bundle(self, fname: str, log_line: Any) -> bool:
+        if fname not in _CONFORMANCE_MPLANE_SCRIPTS:
+            return True
+        cache = self._conformance_mplane_bundle_cache()
+        cache.pop(fname, None)
+        xlsx = self._conformance_resolve_mplane_xlsx_path(fname)
+        if not xlsx:
+            log_line("[INFO] M-Plane xlsx 미지정 — miniDU 템플릿(레거시) 경로")
+            return True
+        if not os.path.isfile(xlsx):
+            log_line(f"[ERROR] M-Plane xlsx 없음: {xlsx}")
+            return False
+        try:
+            import mplane_conformance as mc
+
+            bundle = mc.prepare_mplane_conformance_bundle(
+                xlsx,
+                to_du_if_name=self._conformance_get_per_test_val(fname, "to_du_if_name").strip(),
+                to_du_vlan=self._conformance_get_per_test_val(fname, "to_du_vlan").strip() or "1",
+                duplicate_eaxc=(fname == "conformance_31102.sh"),
+            )
+        except Exception as exc:
+            log_line(f"[ERROR] M-Plane xlsx 로드 실패: {exc}")
+            return False
+        cache[fname] = bundle
+        log_line(f"M-Plane xlsx 준비: {xlsx} ({len(bundle.remote_files)} RPC)")
+        for w in bundle.warnings[:12]:
+            log_line(f"  [M-Plane] {w}")
+        if len(bundle.warnings) > 12:
+            log_line(f"  [M-Plane] … 외 {len(bundle.warnings) - 12}건")
+        return True
+
+    def _conformance_apply_mplane_from_bundle(self, root: dict[str, Any], for_script: str | None) -> None:
+        if not for_script or for_script not in _CONFORMANCE_MPLANE_SCRIPTS:
+            return
+        bundle = self._conformance_mplane_bundle_cache().get(for_script)
+        if bundle is None:
+            return
+        try:
+            import mplane_conformance as mc
+
+            root.update(mc.mplane_config_json_entries(bundle))
+        except Exception:
+            pass
+
+    def _conformance_mplane_templates_local_dir(self) -> Path:
+        return _conformance_bundle_root() / "conformance" / "mplane_templates"
+
+    def _conformance_upload_mplane_templates(self, sftp: Any, log_line: Any) -> None:
+        tpl_root = self._conformance_mplane_templates_local_dir()
+        if not tpl_root.is_dir():
+            return
+        try:
+            import mplane_conformance as mc
+
+            remote_tpl = mc.MPLANE_REMOTE_TEMPLATE_DIR
+            for local_path in tpl_root.rglob("*"):
+                if not local_path.is_file():
+                    continue
+                rel = local_path.relative_to(tpl_root).as_posix()
+                remote_path = f"{remote_tpl}/{rel}"
+                parent = str(PurePosixPath(remote_path).parent)
+                parts = parent.strip("/").split("/")
+                cur = ""
+                for p in parts:
+                    cur = f"{cur}/{p}" if cur else f"/{p}"
+                    try:
+                        sftp.stat(cur)
+                    except OSError:
+                        sftp.mkdir(cur)
+                sftp.put(str(local_path), remote_path)
+                try:
+                    sftp.chmod(remote_path, 0o644)
+                except OSError:
+                    pass
+        except Exception as exc:
+            log_line(f"WARN M-Plane template upload: {exc}")
+
+    def _conformance_upload_mplane_helper_scripts(self, sftp: Any, remote_dir: str, log_line: Any) -> bool:
+        for helper in _CONFORMANCE_HELPER_SCRIPTS:
+            lp = self._conformance_script_local_path(helper)
+            if lp is None:
+                log_line(f"[ERROR] 로컬 helper 없음: {helper}")
+                return False
+            rp = f"{remote_dir}/{helper}"
+            try:
+                text = lp.read_text(encoding="utf-8", errors="replace")
+                data = text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+                sftp.putfo(io.BytesIO(data), rp, len(data))
+                sftp.chmod(rp, 0o755)
+                log_line(f"uploaded {helper}")
+            except Exception as exc:
+                log_line(f"[ERROR] helper 업로드 실패 ({helper}): {exc}")
+                return False
+        return True
+
+    def _conformance_upload_mplane_assets(
+        self, sftp: Any, fname: str, remote_dir: str, log_line: Any
+    ) -> bool:
+        if fname not in _CONFORMANCE_MPLANE_SCRIPTS:
+            return True
+        if not self._conformance_upload_mplane_helper_scripts(sftp, remote_dir, log_line):
+            return False
+        self._conformance_upload_mplane_templates(sftp, log_line)
+        bundle = self._conformance_mplane_bundle_cache().get(fname)
+        if bundle is None:
+            return True
+        try:
+            import mplane_conformance as mc
+            import mplane_control as _mp
+
+            rpc_dir = mc.MPLANE_REMOTE_RPC_DIR
+            parts = rpc_dir.strip("/").split("/")
+            cur = ""
+            for p in parts:
+                cur = f"{cur}/{p}" if cur else f"/{p}"
+                try:
+                    sftp.stat(cur)
+                except OSError:
+                    sftp.mkdir(cur)
+
+            for step in _mp.SEND_ORDER:
+                rpath = bundle.remote_files.get(step)
+                body = (bundle.rpc.get(step) or "").strip()
+                if not rpath or not body:
+                    continue
+                data = body.encode("utf-8")
+                sftp.putfo(io.BytesIO(data), rpath, len(data))
+                try:
+                    sftp.chmod(rpath, 0o644)
+                except OSError:
+                    pass
+                log_line(f"M-Plane RPC 업로드: {step} → {rpath}")
+            dup_path = bundle.remote_files.get("PDSCH-duplicate-eaxc")
+            dup_body = (bundle.duplicate_pdsch_rpc or "").strip()
+            if dup_path and dup_body:
+                data = dup_body.encode("utf-8")
+                sftp.putfo(io.BytesIO(data), dup_path, len(data))
+                try:
+                    sftp.chmod(dup_path, 0o644)
+                except OSError:
+                    pass
+                log_line(f"M-Plane RPC 업로드: PDSCH-duplicate-eaxc → {dup_path}")
+            return True
+        except Exception as exc:
+            log_line(f"[ERROR] M-Plane RPC 업로드 실패: {exc}")
+            return False
+
+    def _conformance_apply_log_fileserver_from_per_test(
+        self, root: dict[str, Any], for_script: str | None
+    ) -> None:
+        if not for_script or for_script not in ("conformance_31121.sh", "conformance_31122.sh"):
+            return
+        store = self._conformance_per_test_settings.get(_CONFORMANCE_3112X_SHARED_KEY, {})
+        if not store:
+            store = self._conformance_per_test_settings.get(for_script, {})
+        mc = root.setdefault("management-configurations", {})
+        if not isinstance(mc, dict):
+            return
+        fs_ip = (store.get("file_server_ip") or "").strip()
+        fs_id = (store.get("file_server_id") or "").strip()
+        fs_pw = (store.get("file_server_pw") or "").strip()
+        log_prefix = (store.get("local_log_prefix") or "O-RAN/log").strip()
+        remote_dir = (store.get("remote_upload_dir") or "/tmp").strip() or "/tmp"
+        if fs_ip:
+            mc["FileServer-IP"] = fs_ip
+        if fs_id:
+            mc["FileServer-ID"] = fs_id
+        if fs_pw:
+            mc["FileServer-PW"] = fs_pw
+        oru_id = (store.get("oru_cli_id") or "").strip()
+        oru_pw = (store.get("oru_cli_pw") or "").strip()
+        if oru_id:
+            mc["CLI-ID"] = oru_id
+        if oru_pw:
+            mc["CLI-PW"] = oru_pw
+        if log_prefix:
+            mc["local-log-prefix"] = log_prefix.rstrip("/")
+        mc["remote-upload-dir"] = remote_dir.rstrip("/") or "/tmp"
+
+    def _conformance_apply_interface_from_per_test(self, root: dict[str, Any], for_script: str | None) -> None:
+        if not isinstance(root, dict) or not for_script:
+            return
+        if for_script not in _CONFORMANCE_INTERFACE_SCRIPTS:
+            return
+        ifname = self._conformance_get_per_test_val(for_script, "to_du_if_name").strip()
+        if not ifname:
+            return
+        vlan = self._conformance_get_per_test_val(for_script, "to_du_vlan").strip() or "1"
+        bundle = (
+            self._conformance_mplane_bundle_cache().get(for_script)
+            if for_script in _CONFORMANCE_MPLANE_SCRIPTS
+            else None
+        )
+        pe_name = ifname
+        odu_mac = ""
+        if bundle is not None:
+            pe_name = str(bundle.merged.get("pe_name") or pe_name).strip() or pe_name
+            odu_mac = str(bundle.merged.get("odu_mac") or "").strip()
+        iface_entry = {"0": ifname}
+        vlan_entry = {"0": vlan}
+        root["interface-configurations"] = {
+            "to-DU-interface": {
+                "enable": True,
+                "name": [iface_entry],
+                "vlan": [vlan_entry],
+            },
+        }
+        root["processing-element-configurations"] = {
+            "to-DU-processing-element": {
+                "enable": True,
+                "name": [{"0": pe_name}],
+                "ODUMAC": [{"0": odu_mac}],
+            },
+        }
+
+    def _conformance_bash_env_exports(self, opts: ConformanceRunOptions, fname: str | None = None) -> str:
         parts: list[str] = []
         for key in ("USER", "PASSWORD", "ALLOWED_IP", "LOCAL_IP", "CALLHOME_PORT", "NETCONF_PORT", "PRODUCT", "LOG_PATH"):
             var = self.fields.get(key)
@@ -462,6 +1187,24 @@ class ConformanceMixin:
         parts.append("export SUPERVISION_RESET=/var/tmp/netconf_tmp/supervision_reset.xml")
         parts.append("export NETCONF_CONTROL_FIFO=/var/tmp/netconf_tmp/netconf_control.fifo")
         parts.append("export CMD_LOCK_FILE=/var/tmp/netconf_tmp/netconf_cmd.lock")
+        if fname in _CONFORMANCE_MPLANE_SCRIPTS:
+            gui_running = bool(getattr(self, "is_running", False))
+            gui_session = bool(getattr(self, "session_established", False))
+            if gui_running and gui_session:
+                parts.append("export CONFORMANCE_GUI_NETCONF=1")
+                gui_log_dir = ""
+                try:
+                    lp = self.fields.get("LOG_PATH")
+                    if lp is not None:
+                        gui_log_dir = str(lp.get()).strip()
+                except Exception:
+                    gui_log_dir = ""
+                if gui_log_dir:
+                    parts.append(f"export CONFORMANCE_GUI_LOG_DIR={shlex.quote(gui_log_dir)}")
+                parts.append(
+                    "export CONFORMANCE_GUI_NETCONF_HINT="
+                    + shlex.quote("GUI Start 후 Conformance 실행 → M-Plane 은 Netconf Client FIFO (edit-config)")
+                )
         return " ; ".join(parts) + (" ; " if parts else "")
 
     def _conformance_remote_prepare_netconf_tmp(self, client: Any, log_line: Any) -> None:
@@ -721,6 +1464,11 @@ class ConformanceMixin:
                     log_line(f"uploaded {fname}")
                 except Exception as exc:
                     log_line(f"FAILED {fname}: {exc}")
+            try:
+                self._conformance_upload_mplane_helper_scripts(sftp, remote_dir, log_line)
+                self._conformance_upload_mplane_templates(sftp, log_line)
+            except Exception as exc:
+                log_line(f"WARN M-Plane helper/template sync: {exc}")
             sftp.close()
             if not silent:
                 self.after(0, lambda: messagebox.showinfo("Conformance", "스크립트 동기화 완료. 로그를 확인하세요."))
@@ -881,6 +1629,19 @@ class ConformanceMixin:
                     self.after(0, self._conformance_refresh_row_result_labels)
                     continue
 
+                if not self._conformance_prepare_mplane_bundle(fname, log_line):
+                    self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
+                    self.after(0, self._conformance_refresh_row_result_labels)
+                    continue
+                if fname in _CONFORMANCE_MPLANE_SCRIPTS and getattr(self, "is_running", False) and getattr(
+                    self, "session_established", False
+                ):
+                    log_line("M-Plane: GUI Netconf 세션 사용 (Start 활성 → FIFO edit-config 경로)")
+                if not self._conformance_upload_mplane_assets(sftp, fname, remote_dir, log_line):
+                    self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
+                    self.after(0, self._conformance_refresh_row_result_labels)
+                    continue
+
                 spec_ref = spec_map.get(fname, "")
                 host_log = self._conformance_host_run_log_path(fname)
                 self._conformance_active_host_log = host_log
@@ -890,11 +1651,35 @@ class ConformanceMixin:
                 self._conformance_detail_capture_key = fname
                 self._conformance_detail_run_started_wall[fname] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 self._conformance_detail_run_started_mono[fname] = time.monotonic()
+                boost_defer: str | None = None
+                if fname in _CONFORMANCE_3112X_SCRIPTS and self._conformance_oru_boost_enabled(fname):
+                    if fname == "conformance_31122.sh":
+                        boost_defer = "Wait for Trace-log generated"
+                    elif fname == "conformance_31121.sh":
+                        boost_defer = "Wait for Troubleshooting-log generated"
+                    else:
+                        if not self._conformance_start_oru_show_system_boost(
+                            client, sftp, remote_dir, fname, log_line
+                        ):
+                            self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
+                            self.after(0, self._conformance_refresh_row_result_labels)
+                            continue
                 try:
                     rc = self._conformance_exec_remote_script(
-                        client, sftp, fname, opts, remote_dir, cfg_remote, spec_ref, host_log, log_line
+                        client,
+                        sftp,
+                        fname,
+                        opts,
+                        remote_dir,
+                        cfg_remote,
+                        spec_ref,
+                        host_log,
+                        log_line,
+                        oru_boost_defer_trigger=boost_defer,
                     )
                 finally:
+                    if getattr(self, "_conformance_oru_boost_active", False):
+                        self._conformance_stop_oru_show_system_boost(client, remote_dir, log_line)
                     self._conformance_detail_capture_key = None
                     self._conformance_detail_run_ended_wall[fname] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     self._conformance_detail_run_ended_mono[fname] = time.monotonic()
@@ -932,6 +1717,11 @@ class ConformanceMixin:
             self.after(0, lambda e=str(exc): messagebox.showerror("Conformance", str(e)))
         finally:
             if client is not None:
+                rd_boost = getattr(self, "_conformance_oru_boost_remote_dir", None) or opts.remote_dir.rstrip("/")
+                try:
+                    self._conformance_stop_oru_show_system_boost(client, rd_boost, log_line)
+                except Exception:
+                    pass
                 try:
                     client.close()
                 except Exception:
@@ -1031,6 +1821,11 @@ class ConformanceMixin:
         out.append(f" 표 참조: {ref}")
         out.append("═" * 56)
         out.append("")
+        spec_desc = self._conformance_spec_description_ko(ref)
+        if spec_desc:
+            out.append("[시험 설명]")
+            out.append(f"  {spec_desc}")
+            out.append("")
         out.append("[진행 시각]")
         out.append(f"  시작(로컬 시각): {sw}")
         out.append(f"  종료(로컬 시각): {ew}")
@@ -1359,31 +2154,52 @@ class ConformanceMixin:
         schema = _CONFORMANCE_PER_TEST_SCHEMA.get(fname)
         if not schema:
             return ""
-        stored = self._conformance_per_test_settings.get(fname, {}).get(key)
-        if stored is not None:
-            return stored
+        keys_to_try: list[str] = []
+        sk = schema.get("settings_key")
+        if sk:
+            keys_to_try.append(str(sk))
+        keys_to_try.append(fname)
+        shared = schema.get("shared_with")
+        if shared:
+            keys_to_try.append(str(shared))
+        for store_key in keys_to_try:
+            stored = self._conformance_per_test_settings.get(store_key, {}).get(key)
+            if stored is not None:
+                return stored
         for f in schema["fields"]:
             if f["key"] == key:
                 return f["default"]
         return ""
 
     def _conformance_per_test_env_exports(self, fname: str) -> str:
+        pre = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_PRE_3180", "")
+        if pre and fname == pre:
+            fname = "conformance_3181.sh"
         schema = _CONFORMANCE_PER_TEST_SCHEMA.get(fname)
         if not schema:
             return ""
-        settings = self._conformance_per_test_settings.get(fname, {})
+        store_key = self._conformance_settings_store_key(fname)
+        settings = dict(self._conformance_per_test_settings.get(store_key, {}))
+        if not settings:
+            settings = dict(self._conformance_per_test_settings.get(fname, {}))
         parts: list[str] = []
         for field in schema["fields"]:
             env_var = field.get("env_var")
             if not env_var:
                 continue
-            val = (settings.get(field["key"]) or "").strip() or field["default"]
+            val = (settings.get(field["key"]) or "").strip() or str(field.get("default") or "")
             parts.append(f"export {env_var}={shlex.quote(val)}")
+        if self._conformance_is_318x_script(fname):
+            mode = (settings.get("conf_v11_mode") or "after").strip()
+            v11 = "1" if mode == "after" else "0"
+            parts.append(f"export CONFORMANCE_V11_ORANUSER_AT_DOMAIN={shlex.quote(v11)}")
         # For SWM tests: build SW_PKG_REMOTE_PATH from per-test settings
         if fname in ("conformance_3161.sh", "conformance_3162.sh"):
             swm_env = self._conformance_swm_env_export(fname)
             if swm_env:
                 parts.append(swm_env)
+        if fname in _CONFORMANCE_3112X_SCRIPTS and self._conformance_oru_boost_enabled(fname):
+            parts.append("export ORU_LOG_BOOST=1")
         return " ; ".join(parts) + (" ; " if parts else "")
 
     def _conformance_swm_env_export(self, fname: str) -> str:
@@ -1451,12 +2267,41 @@ class ConformanceMixin:
         )
 
         entries: dict[str, tk.StringVar] = {}
-        cur = self._conformance_per_test_settings.get(fname, {})
+        store_key = str(schema.get("settings_key") or fname)
+        cur = self._conformance_per_test_settings.get(store_key, {})
+        if not cur:
+            cur = self._conformance_per_test_settings.get(fname, {})
         for i, field in enumerate(schema["fields"], start=1):
             ttk.Label(fr, text=field["label"]).grid(row=i, column=0, sticky="w", padx=(0, 8), pady=2)
             sv = tk.StringVar(value=cur.get(field["key"]) or field["default"])
             w = 40 if field.get("wide") else 12
-            if field.get("file_picker"):
+            choices = field.get("choices")
+            if choices:
+                labels = [c[1] for c in choices]
+                values = [c[0] for c in choices]
+                cur_val = cur.get(field["key"]) or field["default"]
+                if cur_val not in values and values:
+                    cur_val = values[0]
+                sv.set(cur_val)
+                cb = ttk.Combobox(
+                    fr,
+                    values=labels,
+                    width=max(28, w),
+                    state="readonly",
+                )
+                cb.grid(row=i, column=1, sticky="we", pady=2)
+                try:
+                    cb.current(values.index(cur_val))
+                except ValueError:
+                    cb.current(0)
+
+                def _on_choice(_evt: Any = None, cbox=cb, lbls=labels, vals=values, s=sv) -> None:
+                    idx = cbox.current()
+                    if 0 <= idx < len(vals):
+                        s.set(vals[idx])
+
+                cb.bind("<<ComboboxSelected>>", _on_choice)
+            elif field.get("file_picker"):
                 entry_fr = ttk.Frame(fr)
                 entry_fr.grid(row=i, column=1, sticky="we", pady=2)
                 ent = ttk.Entry(entry_fr, textvariable=sv, width=w - 6)
@@ -1471,7 +2316,8 @@ class ConformanceMixin:
 
                 ttk.Button(entry_fr, text="선택…", command=_browse, width=6).pack(side="left", padx=(4, 0))
             else:
-                ent = ttk.Entry(fr, textvariable=sv, width=w)
+                show_pw = "*" if field.get("password") else ""
+                ent = ttk.Entry(fr, textvariable=sv, width=w, show=show_pw)
                 ent.grid(row=i, column=1, sticky="we", pady=2)
             entries[field["key"]] = sv
             if field.get("hint"):
@@ -1481,10 +2327,23 @@ class ConformanceMixin:
 
         def _apply() -> None:
             vals: dict[str, str] = {}
-            for key, sv in entries.items():
+            for field in schema["fields"]:
+                key = field["key"]
+                sv = entries.get(key)
+                if sv is None:
+                    continue
                 v = sv.get().strip()
+                choices = field.get("choices")
+                if choices:
+                    labels = [c[1] for c in choices]
+                    values = [c[0] for c in choices]
+                    if v in labels:
+                        v = values[labels.index(v)]
+                    elif v not in values and values:
+                        v = values[0]
                 if v:
                     vals[key] = v
+            self._conformance_per_test_settings[store_key] = vals
             self._conformance_per_test_settings[fname] = vals
             shared = schema.get("shared_with")
             if shared:
@@ -1703,6 +2562,19 @@ class ConformanceMixin:
         with self._conformance_run_transport_lock:
             ch = self._conformance_run_script_channel
             cli = self._conformance_run_ssh_client
+        rd_boost = getattr(self, "_conformance_oru_boost_remote_dir", None)
+        if cli is not None and rd_boost:
+
+            def _stop_boost() -> None:
+                def _log(msg: str) -> None:
+                    self._conformance_log_lines_to_gui("Conformance-run", msg)
+
+                try:
+                    self._conformance_stop_oru_show_system_boost(cli, rd_boost, _log)
+                except Exception:
+                    pass
+
+            threading.Thread(target=_stop_boost, daemon=True).start()
         if ch is not None:
             try:
                 ch.close()

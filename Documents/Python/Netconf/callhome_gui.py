@@ -199,6 +199,8 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self._conformance_detail_capture_key: str | None = None
         self._conformance_detail_lock = threading.Lock()
         self._conformance_per_test_settings: dict[str, dict[str, str]] = {}
+        self._conformance_oru_boost_active: bool = False
+        self._conformance_oru_boost_remote_dir: str | None = None
         self._conformance_detail_run_started_wall: dict[str, str] = {}
         self._conformance_detail_run_started_mono: dict[str, float] = {}
         self._conformance_detail_run_ended_wall: dict[str, str] = {}
@@ -1397,7 +1399,10 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         ):
             sec = ttk.LabelFrame(inner, text=title, padding=8)
             sec.pack(fill="both", expand=True, padx=4, pady=(0, 10))
-            hint = "표의 모든 값은 수정 가능하며, Apply 시 RPC XML에 반영됩니다."
+            hint = (
+                "값은 Control-Sheet 3/4/5 절 표 셀만 사용 (A열 XML 직접 편집은 무시). "
+                "Save → Apply/Conformance."
+            )
             ttk.Label(sec, text=hint, foreground="#475569").pack(anchor="w", padx=4, pady=(0, 6))
             grid_host = ttk.Frame(sec)
             grid_host.pack(fill="both", expand=True, padx=2, pady=(8, 2))
@@ -1417,7 +1422,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.mplane_apply_btn.pack(side="left")
         ttk.Label(
             btm,
-            text="Uses RAW RPC path; sends CUplane-interface → Processing-element → PDSCH → PUSCH → PRACH → ACTIVE.",
+            text="Apply: 디스크 xlsx → M-* 탭 생성. Conformance(31101/31102)도 동일 xlsx 사용.",
             foreground="#64748b",
         ).pack(side="left", padx=14)
 
@@ -1456,11 +1461,14 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
     def _resolve_mplane_template_path(self) -> tuple[Path | None, list[Path]]:
         """
         Pick a template .xlsx for Save.
-        Order: path box -> last Reload path -> <bundle>/mplane/mplane.xlsx -> <bundle>/mplane.xlsx.
+        Save should always start from the clean master template when available:
+        <bundle>/mplane/mplane.xlsx -> <bundle>/mplane.xlsx -> path box -> last Reload path.
         Relative paths resolve against the bundle root (folder containing .exe or the script).
         """
         root = _app_bundle_root()
         ordered: list[Path] = []
+
+        ordered.extend([root / "mplane" / "mplane.xlsx", root / "mplane.xlsx"])
 
         cfg = self.mplane_xlsx_path.get().strip()
         if cfg:
@@ -1470,8 +1478,6 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         if self._mplane_loaded_xlsx_path:
             p = Path(self._mplane_loaded_xlsx_path).expanduser()
             ordered.append((root / p).resolve() if not p.is_absolute() else p.resolve())
-
-        ordered.extend([root / "mplane" / "mplane.xlsx", root / "mplane.xlsx"])
 
         seen: set[str] = set()
         tried: list[Path] = []
@@ -1606,9 +1612,20 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         live = self._mplane_collect_live()
         for name in mp.SEND_ORDER:
             body = (rpc.get(name) or "").strip()
-            if body:
-                rpc[name] = mp.apply_global_baselines(body, baselines, live)
+            if not body:
+                continue
+            rpc[name] = mp.apply_global_baselines(body, baselines, live)
+            if name == "CUplane-interface":
+                rpc[name] = mp.ensure_cuplane_interface_fields(rpc[name], live)
+            elif name == "Processing-element":
+                rpc[name] = mp.ensure_processing_element_fields(rpc[name], live)
         warns = self._mplane_apply_full_tables_to_rpc(rpc)
+        pusch_xml = (rpc.get("PUSCH") or "").strip()
+        prach_xml = (rpc.get("PRACH") or "").strip()
+        if pusch_xml and prach_xml:
+            prach_xml, pr_warns = mp.omit_prach_rx_endpoints_present_in_pusch(prach_xml, pusch_xml)
+            rpc["PRACH"] = prach_xml
+            warns.extend(pr_warns)
         if warns:
             self.append_log(f"[GUI] M-Plane Save warnings: {' | '.join(warns)}\n")
         off_rows = [i + 1 for i, v in enumerate(self.mplane_cc_on_vars) if not v.get()]
@@ -1621,6 +1638,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         # But detail sections (3.PDSCH / 4.PUSCH / 5.PRACH) are replaced from GUI values.
         ws_c = wb["Control-Sheet"] if "Control-Sheet" in wb.sheetnames else None
         if ws_c is not None:
+            mp.write_control_sheet_simple_fields(ws_c, live)
             def _safe_set(row: int, col: int, value: Any) -> None:
                 try:
                     cell = ws_c.cell(row=row, column=col)
@@ -1796,8 +1814,14 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         try:
             out = Path(out_path)
             wb.save(str(out))
-            self.append_log(f"[GUI] M-Plane saved: {out}\n")
-            messagebox.showinfo("M-Plane Save", f"Saved:\n{out}")
+            self.mplane_xlsx_path.set(str(out.resolve()))
+            self._mplane_loaded_xlsx_path = str(out.resolve())
+            self._save_current_config()
+            self.append_log(f"[GUI] M-Plane saved: {out} (workbook path updated — Reload to refresh)\n")
+            messagebox.showinfo(
+                "M-Plane Save",
+                f"Saved:\n{out}\n\nWorkbook path updated. Click \"Reload from Excel\" to load MAC/VLAN from the saved file.",
+            )
         except Exception as exc:
             messagebox.showerror("M-Plane Save", f"Failed to save file:\n{exc}")
         finally:
@@ -1857,6 +1881,15 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         for key, var in self.mplane_fields.items():
             v = merged.get(key, "")
             var.set("" if v is None else str(v))
+        try:
+            import mplane_control as mp
+
+            live = {k: (self.mplane_fields[k].get() or "").strip() for k in ("cu_if_name", "cu_base_if", "cu_vlan") if k in self.mplane_fields}
+            ifname = mp.resolve_l2vlan_interface_name(live)
+            if ifname and "cu_if_name" in self.mplane_fields:
+                self.mplane_fields["cu_if_name"].set(ifname)
+        except Exception:
+            pass
         self._mplane_fill_cc_sheet(cc_rows)
         # Sync Control-Sheet ON/OFF into the active CC toggle line used for comment-out.
         for i, bv in enumerate(self.mplane_cc_on_vars):
@@ -1867,7 +1900,12 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self._mplane_render_full_tables()
         wtext = " | ".join(warnings) if warnings else ""
         self.mplane_warnings_var.set(wtext[:2000] if len(wtext) > 2000 else wtext)
-        self.append_log(f"[GUI] M-Plane workbook loaded: {path} ({len(cc_rows)} CC row(s))\n")
+        tbl_info = ", ".join(
+            f"{k}={len(v[1])}rows" for k, v in sorted(tables.items()) if v and v[1]
+        )
+        self.append_log(
+            f"[GUI] M-Plane workbook loaded: {path} ({len(cc_rows)} CC row(s); Control-Sheet tables: {tbl_info})\n"
+        )
         for w in warnings:
             self.append_log(f"[GUI] M-Plane: {w}\n")
         self._save_current_config()
@@ -2724,6 +2762,49 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         s = re.sub(r"[^a-z0-9\\-_/()]+", "", s)
         return s
 
+    def _load_mplane_workbook_from_disk(
+        self, path: str, mp: Any
+    ) -> tuple[
+        dict[str, str],
+        dict[str, str],
+        dict[str, Any],
+        list[dict[str, Any]],
+        dict[str, tuple[list[str], list[list[str]]]],
+        list[str],
+        Any,
+    ]:
+        rpc, baselines, merged, cc_rows, tables, warnings = mp.load_workbook_payloads(path)
+        return rpc, baselines, merged, cc_rows, tables, warnings, mp
+
+    @staticmethod
+    def _mplane_apply_tables_from_workbook(
+        rpc: dict[str, str],
+        tables: dict[str, tuple[list[str], list[list[str]]]],
+        mp: Any,
+    ) -> list[str]:
+        """Merge Control-Sheet tables from a workbook into RPC XML (no GUI table vars)."""
+        warns: list[str] = []
+        for sheet in ("PDSCH", "PUSCH", "PRACH"):
+            headers, rows = tables.get(sheet, ([], []))
+            xml = (rpc.get(sheet) or "").strip()
+            if not headers or not xml or not rows:
+                continue
+            if "low-level-tx-endpoints" in xml or "low-level-rx-endpoints" in xml:
+                new_xml, ws = mp.apply_acorn_control_details_to_rpc(xml, sheet, headers, rows)
+            else:
+                new_xml, ws = mp.apply_full_table_to_rpc(xml, sheet, headers, rows)
+            rpc[sheet] = new_xml
+            warns.extend(ws)
+        return warns
+
+    @staticmethod
+    def _mplane_cc_off_rows_from_workbook(cc_rows: list[dict[str, Any]]) -> list[int]:
+        return [
+            i + 1
+            for i, row in enumerate(cc_rows)
+            if not CallhomeGUI._mplane_enabled_from_cell(row.get("enabled"))
+        ]
+
     def _mplane_apply_full_tables_to_rpc(self, rpc: dict[str, str]) -> list[str]:
         """Apply edited full-table values into RPC xml strings by nth-occurrence replacement."""
         warns: list[str] = []
@@ -2738,11 +2819,22 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             var_rows: list[list[tk.StringVar]] = meta.get("vars") or []
             xml = (rpc.get(sheet) or "").strip()
             if not headers or not xml or not var_rows:
+                headers, rows_fb = self._mplane_tables.get(sheet, ([], []))
+                if headers and rows_fb and xml:
+                    if "low-level-tx-endpoints" in xml or "low-level-rx-endpoints" in xml:
+                        new_xml, ws = mp.apply_acorn_control_details_to_rpc(xml, sheet, headers, rows_fb)
+                    else:
+                        new_xml, ws = mp.apply_full_table_to_rpc(xml, sheet, headers, rows_fb)
+                    rpc[sheet] = new_xml
+                    warns.extend(ws)
                 continue
             rows: list[list[str]] = []
             for r in var_rows:
                 rows.append([(v.get() or "") for v in r])
-            new_xml, ws = mp.apply_full_table_to_rpc(xml, sheet, headers, rows)
+            if "low-level-tx-endpoints" in xml or "low-level-rx-endpoints" in xml:
+                new_xml, ws = mp.apply_acorn_control_details_to_rpc(xml, sheet, headers, rows)
+            else:
+                new_xml, ws = mp.apply_full_table_to_rpc(xml, sheet, headers, rows)
             rpc[sheet] = new_xml
             warns.extend(ws)
 
@@ -2752,11 +2844,14 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         return {k: (v.get() or "").strip() for k, v in self.mplane_fields.items()}
 
     def apply_mplane_workbook_once(self) -> None:
-        self._mplane_sync_visible_widget_values()
-        if not self._mplane_rpc_raw:
-            messagebox.showwarning("M-Plane", 'Use "Reload from Excel" first.')
+        path = self._normalize_mplane_workbook_path(self.mplane_xlsx_path.get())
+        if not path:
+            messagebox.showwarning("M-Plane", "Choose an .xlsx path first.")
             return
-        threading.Thread(target=self._prepare_mplane_payload_tabs_worker, daemon=True).start()
+        if not os.path.isfile(path):
+            messagebox.showwarning("M-Plane", f"Workbook not found:\n{path}")
+            return
+        threading.Thread(target=self._prepare_mplane_payload_tabs_worker, args=(path,), daemon=True).start()
 
     def _mplane_sync_visible_widget_values(self) -> None:
         """Force-sync current widget text into StringVars before Save/Apply."""
@@ -2775,7 +2870,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                     if cur != vars_rows[r_idx][c_idx].get():
                         vars_rows[r_idx][c_idx].set(cur)
 
-    def _prepare_mplane_payload_tabs_worker(self) -> None:
+    def _prepare_mplane_payload_tabs_worker(self, xlsx_path: str) -> None:
         try:
             import mplane_control as mp
             mp = importlib.reload(mp)
@@ -2787,28 +2882,68 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         if apply_btn:
             self.after(0, lambda b=apply_btn: b.config(state="disabled"))
         try:
-            rpc = dict(self._mplane_rpc_raw)
+            self.after(0, self.append_log, f"[GUI] Apply: xlsx only ({xlsx_path})\n")
+            rpc_raw, baselines, merged, cc_rows, tables, load_warns, mp = self._load_mplane_workbook_from_disk(
+                xlsx_path, mp
+            )
+            rpc = dict(rpc_raw)
+            for w in load_warns:
+                self.after(0, self.append_log, f"[GUI] M-Plane Apply: {w}\n")
             # Normalize endpoint comments first so ON rows never inherit stale OFF comments.
             for sheet in ("PDSCH", "PUSCH", "PRACH"):
                 rpc[sheet] = mp.uncomment_endpoint_rows((rpc.get(sheet) or ""), sheet)
             rpc["ACTIVE"] = mp.uncomment_active_rows((rpc.get("ACTIVE") or ""))
-            baselines = dict(self._mplane_baselines)
-            live = self._mplane_collect_live()
+            baselines = dict(baselines)
+            live = {
+                k: ("" if merged.get(k) is None else str(merged.get(k)).strip())
+                for k in (
+                    "cu_if_name",
+                    "cu_base_if",
+                    "cu_vlan",
+                    "cu_mac",
+                    "odu_mac",
+                    "ru_mac_pe",
+                    "pe_name",
+                )
+            }
             for name in mp.SEND_ORDER:
                 body = (rpc.get(name) or "").strip()
                 if not body:
                     self.after(0, self.append_log, f"[GUI] M-Plane skip (empty payload): {name}\n")
                     continue
                 rpc[name] = mp.apply_global_baselines(body, baselines, live)
-            table_warns = self._mplane_apply_full_tables_to_rpc(rpc)
+                if name == "CUplane-interface":
+                    rpc[name] = mp.ensure_cuplane_interface_fields(rpc[name], live)
+                elif name == "Processing-element":
+                    rpc[name] = mp.ensure_processing_element_fields(rpc[name], live)
+            table_warns = self._mplane_apply_tables_from_workbook(rpc, tables, mp)
             for w in table_warns:
                 self.after(0, self.append_log, f"[GUI] M-Plane table: {w}\n")
-            # Global CC ON/OFF: comment-out off rows across DL/UL/PRACH.
-            off_rows = [i + 1 for i, v in enumerate(self.mplane_cc_on_vars) if not v.get()]
+            pusch_xml = (rpc.get("PUSCH") or "").strip()
+            prach_xml = (rpc.get("PRACH") or "").strip()
+            if pusch_xml and prach_xml:
+                prach_xml, pr_warns = mp.omit_prach_rx_endpoints_present_in_pusch(prach_xml, pusch_xml)
+                rpc["PRACH"] = prach_xml
+                for w in pr_warns:
+                    self.after(0, self.append_log, f"[GUI] M-Plane PRACH: {w}\n")
+            # Global CC ON/OFF from Control-Sheet (xlsx), not GUI toggles.
+            off_rows = self._mplane_cc_off_rows_from_workbook(cc_rows)
+            if not off_rows:
+                flags = merged.get("_detail_cc_on_flags")
+                if isinstance(flags, list):
+                    off_rows = [i + 1 for i, on in enumerate(flags) if not on]
+            active_body, act_warns = mp.apply_active_from_control_tables(
+                rpc.get("ACTIVE", ""),
+                tables.get("PDSCH", ([], [])),
+                tables.get("PUSCH", ([], [])),
+                off_rows,
+            )
+            rpc["ACTIVE"] = active_body
+            for w in act_warns:
+                self.after(0, self.append_log, f"[GUI] M-Plane ACTIVE: {w}\n")
             if off_rows:
                 for sheet in ("PDSCH", "PUSCH", "PRACH"):
                     rpc[sheet] = mp.comment_out_endpoint_rows((rpc.get(sheet) or ""), sheet, off_rows)
-                rpc["ACTIVE"] = mp.comment_out_active_rows((rpc.get("ACTIVE") or ""), off_rows)
                 self.after(0, self.append_log, f"[GUI] M-Plane OFF rows commented: {off_rows}\n")
             self.after(0, self._enqueue_mplane_payload_tabs, rpc, mp.SEND_ORDER)
         finally:
@@ -5346,9 +5481,9 @@ if __name__ == "__main__":
 
 # EXE build (Windows):
 #   py -m pip install pyinstaller paramiko openpyxl
-#   py -m PyInstaller --noconfirm --onefile --windowed --collect-submodules openpyxl --name miniDU_CallHome_Supervisor callhome_gui.py
+#   py -m PyInstaller --noconfirm --onefile --windowed --collect-submodules openpyxl --name "O-RAN Netconf" callhome_gui.py
 # If `py` launcher is unavailable in PowerShell, use:
 #   python -m pip install pyinstaller paramiko openpyxl
-#   python -m PyInstaller --noconfirm --onefile --windowed --collect-submodules openpyxl --name miniDU_CallHome_Supervisor callhome_gui.py
+#   python -m PyInstaller --noconfirm --onefile --windowed --collect-submodules openpyxl --name "O-RAN Netconf" callhome_gui.py
 # Output:
-#   dist\miniDU_CallHome_Supervisor.exe
+#   dist\O-RAN Netconf.exe

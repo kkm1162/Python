@@ -60,7 +60,11 @@ send_cmd() {
 	local _wfd="${NP2[1]:-}"
 	set -u
 	[[ -n "${_wfd}" ]] || return 0
-	echo "$cmd" >&"${_wfd}" 2>/dev/null || true
+	if [[ -f "${CMD_LOCK_FILE:-/var/tmp/netconf_tmp/netconf_cmd.lock}" ]]; then
+		{ flock -x 200; echo "$cmd" >&"${_wfd}"; } 200>"${CMD_LOCK_FILE:-/var/tmp/netconf_tmp/netconf_cmd.lock}"
+	else
+		echo "$cmd" >&"${_wfd}" 2>/dev/null || true
+	fi
 }
 
 test_fail() {
@@ -90,6 +94,34 @@ cleanup() {
 	return 0
 }
 trap cleanup EXIT INT TERM HUP
+
+if [[ "${CONFORMANCE_GUI_NETCONF:-0}" == "1" ]]; then
+	if [[ -n "${CONFORMANCE_GUI_LOG_DIR:-}" && -d "${CONFORMANCE_GUI_LOG_DIR}" ]]; then
+		_GUI_LATEST=$(ls -t "${CONFORMANCE_GUI_LOG_DIR}"/*.log 2>/dev/null | head -1 || true)
+		if [[ -n "$_GUI_LATEST" && -f "$_GUI_LATEST" ]]; then
+			LOG="$_GUI_LATEST"
+		fi
+	fi
+	echo "[INFO] 3.1.10.2 — GUI Netconf Client 세션 (FIFO)"
+	_COMMON_SH="${CONFORMANCE_REMOTE_DIR:-/var/tmp/conformance}/conformance_mplane_xlsx_common.sh"
+	_MPLANE_XLSX_MODE=$(jq -r '.["mplane-rpc-mode"] // empty' "$CONFIG")
+	if [[ "$_MPLANE_XLSX_MODE" != "xlsx" || ! -f "$_COMMON_SH" ]]; then
+		test_fail "GUI 모드: mplane xlsx 필요"
+		exit 1
+	fi
+	# shellcheck source=/dev/null
+	source "$_COMMON_SH"
+	export CONFORMANCE_MPLANE_SKIP_INIT=1
+	if ! conformance_mplane_run_xlsx_sequence "$CONFIG"; then
+		exit 1
+	fi
+	if ! conformance_mplane_run_duplicate_eaxc_negative "$CONFIG"; then
+		exit 1
+	fi
+	echo "[PASS]"
+	trap - EXIT INT TERM HUP
+	exit 0
+fi
 
 sudo fuser -k "${LISTEN_PORT}/tcp" 2>/dev/null || true
 sudo iptables -D INPUT -p tcp --dport "$LISTEN_PORT" -j DROP 2>/dev/null || true
@@ -145,9 +177,22 @@ fi
 sleep 3
 
 send_cmd "subscribe --stream NETCONF"
-sleep 2
+_SUB_OK="NOK"
+for _w in $(seq 1 60); do
+	if grep -a "<ok/>" "$LOG" >/dev/null 2>&1; then
+		_SUB_OK="OK"
+		break
+	fi
+	sleep 0.2
+done
+if [[ "$_SUB_OK" != "OK" ]]; then
+	test_fail "subscribe --stream NETCONF"
+	exit 1
+fi
 
 mkdir -p "${NETCONF_TMP}/edit" "${NETCONF_TMP}/get"
+CMD_LOCK_FILE="${CMD_LOCK_FILE:-/var/tmp/netconf_tmp/netconf_cmd.lock}"
+: >"$CMD_LOCK_FILE" 2>/dev/null || true
 
 WATCHDOG_RPC="${NETCONF_TMP}/watchdog.xml"
 cat > "$WATCHDOG_RPC" <<'EORPC'
@@ -160,17 +205,64 @@ while true; do
 	_cur_count=$(grep -c -a -F 'supervision-notification xmlns="urn:o-ran:supervision:1.0"' "$LOG" 2>/dev/null) || true
 	if (( _cur_count > _last_wdog_count )); then
 		_last_wdog_count=$_cur_count
-		echo "user-rpc --content $WATCHDOG_RPC" >&3 2>/dev/null || true
-		echo "Client SENT : user-rpc --content $WATCHDOG_RPC" >>"$LOG" 2>&1
+		send_cmd "user-rpc --content $WATCHDOG_RPC"
 	fi
 	sleep 1
 done
 ) &
 WATCHDOG_PID=$!
 
+_COMMON_SH="${CONFORMANCE_REMOTE_DIR:-/var/tmp/conformance}/conformance_mplane_xlsx_common.sh"
+_MPLANE_XLSX_MODE=$(jq -r '.["mplane-rpc-mode"] // empty' "$CONFIG")
+echo "[INFO] mplane-rpc-mode=${_MPLANE_XLSX_MODE:-<empty>} common_sh=${_COMMON_SH} ($([[ -f "$_COMMON_SH" ]] && echo present || echo missing))"
+if [[ "$_MPLANE_XLSX_MODE" == "xlsx" ]]; then
+	if [[ ! -f "$_COMMON_SH" ]]; then
+		test_fail "conformance_mplane_xlsx_common.sh 없음 (Conformance «스크립트 동기화» 필요)"
+		exit 1
+	fi
+	# shellcheck source=/dev/null
+	source "$_COMMON_SH"
+	if [[ -n "${WATCHDOG_PID:-}" ]]; then
+		kill "$WATCHDOG_PID" 2>/dev/null || true
+		wait "$WATCHDOG_PID" 2>/dev/null || true
+		unset WATCHDOG_PID
+		echo "[INFO] M-Plane xlsx RPC 전 watchdog 일시 중지"
+	fi
+	export CONFORMANCE_MPLANE_SKIP_INIT=1
+	if ! conformance_mplane_run_xlsx_sequence "$CONFIG"; then
+		exit 1
+	fi
+	if ! conformance_mplane_run_duplicate_eaxc_negative "$CONFIG"; then
+		exit 1
+	fi
+	echo "[PASS]"
+	echo "[INFO] 3.1.10.2 O-RU configurability negative test completed. Detailed log: $LOG"
+	trap - EXIT INT TERM HUP
+	cleanup || true
+	if [[ -n "${NETOPEER_COPROC_PID:-}" ]]; then
+		wait "$NETOPEER_COPROC_PID" 2>/dev/null || true
+	fi
+	exit 0
+fi
+
 INIT_UPLANE_OUT="${NETCONF_TMP}/edit/edit-init-uplane-conf.xml"
 rm -f "$INIT_UPLANE_OUT"
-cp /mplane_automation/miniDU/edit/edit_init_uplane_conf.xml "${NETCONF_TMP}/edit/edit_init_uplane_conf.xml" 2>/dev/null || true
+_INIT_SRC=""
+for _cand in \
+	"${CONFORMANCE_REMOTE_DIR:-/var/tmp/conformance}/mplane_templates/edit/edit_init_uplane_conf.xml" \
+	"${NETCONF_TMP}/edit/edit_init_uplane_conf.xml" \
+	"/var/tmp/mplane_automation/miniDU/edit/edit_init_uplane_conf.xml" \
+	"/mplane_automation/miniDU/edit/edit_init_uplane_conf.xml"; do
+	if [[ -f "$_cand" ]]; then
+		_INIT_SRC="$_cand"
+		break
+	fi
+done
+if [[ -z "$_INIT_SRC" ]]; then
+	test_fail "Initialize uplane conf (edit_init_uplane_conf.xml 없음 — Conformance 동기화)"
+	exit 1
+fi
+cp -f "$_INIT_SRC" "${NETCONF_TMP}/edit/edit_init_uplane_conf.xml"
 send_cmd "user-rpc --content ${NETCONF_TMP}/edit/edit_init_uplane_conf.xml --out $INIT_UPLANE_OUT"
 RESULT0="NOK"
 for _w in $(seq 1 20); do

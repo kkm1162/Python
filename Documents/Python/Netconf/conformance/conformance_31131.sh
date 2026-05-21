@@ -237,6 +237,7 @@ MPVERSION=$(xmlstarlet sel -N x="urn:o-ran:operations:1.0" -t -v "//x:supported-
 MPVERSIONNUM=$((${MPVERSION//./}))
 
 declare -a ToDUpename ToDUodumac MAC Port
+PE_FIXED_NAME="ru-pe.0"
 
 if $(jq -r '.["interface-configurations"]["to-DU-interface"]["enable"] // empty' "$CONFIG") ; then
 
@@ -306,12 +307,39 @@ for ((i=0; i < $(jq -r '.["interface-configurations"]["to-DU-interface"].name | 
 		fi
 
 		if $(jq -r '.["processing-element-configurations"]["to-DU-processing-element"]["enable"] // empty' "$CONFIG") ; then
-			cp /mplane_automation/miniDU/edit/edit_processing_element_org.xml "${NETCONF_TMP}/edit/edit_processing_element_mod.xml" 2>/dev/null || true
-			sed -i "s/PENAME/${ToDUpename[$i]}/g" "${NETCONF_TMP}/edit/edit_processing_element_mod.xml"
-			sed -i "s/IFNAME/${ToDUifname[$i]}_${ToDUifvlan[$i]}/g" "${NETCONF_TMP}/edit/edit_processing_element_mod.xml"
-			sed -i "s/VLANID/${ToDUifvlan[$i]}/g" "${NETCONF_TMP}/edit/edit_processing_element_mod.xml"
-			sed -i "s/ORUMAC/${MAC[$i]}/g" "${NETCONF_TMP}/edit/edit_processing_element_mod.xml"
-			sed -i "s/ODUMAC/${ToDUodumac[$i]}/g" "${NETCONF_TMP}/edit/edit_processing_element_mod.xml"
+			if [[ -z "${MAC[$i]:-}" ]]; then
+				test_fail "RU MAC is empty from interface query (index $i)"
+				exit 1
+			fi
+			ODU_MAC="${ToDUodumac[$i]}"
+			if [[ -z "${ODU_MAC:-}" ]]; then
+				test_fail "ODUMAC is empty in processing-element settings (index $i)"
+				exit 1
+			fi
+			cat > "${NETCONF_TMP}/edit/edit_processing_element_mod.xml" <<EORPC
+<edit-config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <target>
+    <running/>
+  </target>
+  <default-operation>merge</default-operation>
+  <config>
+    <processing-elements xmlns="urn:o-ran:processing-element:1.0">
+      <transport-session-type>ETH-INTERFACE</transport-session-type>
+      <ru-elements>
+        <name>${PE_FIXED_NAME}</name>
+        <transport-flow>
+          <interface-name>${ToDUifname[$i]}_${ToDUifvlan[$i]}</interface-name>
+          <eth-flow>
+            <ru-mac-address>${MAC[$i]}</ru-mac-address>
+            <vlan-id>${ToDUifvlan[$i]}</vlan-id>
+            <o-du-mac-address>${ODU_MAC}</o-du-mac-address>
+          </eth-flow>
+        </transport-flow>
+      </ru-elements>
+    </processing-elements>
+  </config>
+</edit-config>
+EORPC
 
 			EDIT_PE_OUT="${NETCONF_TMP}/edit/edit-pe.xml"
 			rm -f "$EDIT_PE_OUT"
@@ -333,7 +361,7 @@ for ((i=0; i < $(jq -r '.["interface-configurations"]["to-DU-interface"].name | 
 		fi
 
 		RESULT4="NOK"
-		PAT_PE_NOTIF="ru-elements[o-ran-elements:name='${ToDUpename[$i]}']</target><operation>create</operation></edit></netconf-config-change>"
+		PAT_PE_NOTIF="ru-elements[o-ran-elements:name='${PE_FIXED_NAME}']</target><operation>create</operation></edit></netconf-config-change>"
 		for _w in $(seq 1 20); do
 			if grep -a -F "$PAT_PE_NOTIF" "$LOG" >/dev/null 2>&1; then
 				RESULT4="OK"
