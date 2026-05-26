@@ -140,19 +140,40 @@ if [[ "$RESULT2" != "OK" ]]; then
 	exit 1
 fi
 
-sleep 5
-
-send_cmd "subscribe --stream NETCONF"
-for _w in $(seq 1 300); do
-	if grep -a -F "OK" "$LOG" >/dev/null 2>&1; then break; fi
-	sleep 0.2
-done
-
 mkdir -p "${NETCONF_TMP}/edit"
 WD_RPC="${NETCONF_TMP}/edit/watchdog_reset.xml"
 cat > "$WD_RPC" <<'EORPC'
 <supervision-watchdog-reset xmlns="urn:o-ran:supervision:1.0"/>
 EORPC
+
+# YANG preload (get-schema) 동안 supervision 갱신 — subscribe 전에 1회 선행 reset
+echo "[INFO] supervision-watchdog-reset (pre-subscribe, during YANG preload)"
+send_cmd "user-rpc --content $WD_RPC"
+
+echo "[INFO] netopeer2-cli YANG preload (30~120s). ssh_channel_read_timeout 로그가 많아도 정상입니다."
+for _w in $(seq 1 600); do
+	if grep -a -F 'Reading module "solid-o-ran-operations' "$LOG" >/dev/null 2>&1; then
+		break
+	fi
+	sleep 0.2
+done
+sleep 2
+
+send_cmd "subscribe --stream NETCONF"
+RESULT_SUB="NOK"
+for _w in $(seq 1 300); do
+	if grep -a -E 'create-subscription|Subscription created|<rpc-reply[^>]+><ok/>' "$LOG" >/dev/null 2>&1; then
+		if grep -a -F "OK" "$LOG" >/dev/null 2>&1; then
+			RESULT_SUB="OK"
+			break
+		fi
+	fi
+	sleep 0.2
+done
+if [[ "$RESULT_SUB" != "OK" ]]; then
+	test_fail "subscribe"
+	exit 1
+fi
 
 (
 _wd_last=0

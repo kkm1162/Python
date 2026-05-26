@@ -120,12 +120,28 @@ _SWM_TEST_FIELDS: list[dict[str, Any]] = [
     },
 ]
 
+
+def _swm_test_fields(pkg_hint: str) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for f in _SWM_TEST_FIELDS:
+        nf = dict(f)
+        if nf.get("key") == "swm_pkg_path":
+            nf["hint"] = pkg_hint
+        out.append(nf)
+    return out
+
+
+_SWM_FIELDS_3161 = _swm_test_fields("3.1.6.1용 정상 SW 패키지 (valid PKG)")
+_SWM_FIELDS_3162 = _swm_test_fields(
+    "3.1.6.2용 부정 시험 PKG (손상·무결성 오류 유발, 3161과 다른 파일 권장)"
+)
+
 _IFACE_TEST_FIELDS: list[dict[str, Any]] = [
     {
         "key": "to_du_if_name",
-        "label": "To-DU interface (base)",
+        "label": "To-DU interface (O-RU NETCONF)",
         "default": "",
-        "hint": "예: sys — CUplane-interface base-interface",
+        "hint": "O-RU YANG interface 이름 (NETCONF GET). 보통 sys.",
         "env_var": None,
         "wide": False,
     },
@@ -133,11 +149,33 @@ _IFACE_TEST_FIELDS: list[dict[str, Any]] = [
         "key": "to_du_vlan",
         "label": "VLAN ID",
         "default": "1",
-        "hint": "L2 VLAN ID (CUplane-interface name)",
+        "hint": "O-RU vlan-id / ethping -v",
+        "env_var": None,
+        "wide": False,
+    },
+    {
+        "key": "odu_mac",
+        "label": "O-DU MAC",
+        "default": "",
+        "hint": "processing-element o-du-mac-address. 비우면 Settings M-Plane O-DU MAC",
         "env_var": None,
         "wide": False,
     },
 ]
+
+# 3.1.13.1 LBM only — 3.1.10.x (31101/31102)는 M-Plane Excel만 사용
+_LBM31131_FIELDS: list[dict[str, Any]] = [
+    {
+        "key": "server_nic",
+        "label": "Server NIC (miniDU, ethping -i)",
+        "default": "",
+        "hint": "miniDU fronthaul (예: dasan). 비우면 Settings → Server NIC. VLAN은 아래 VLAN ID.",
+        "env_var": None,
+        "wide": False,
+    },
+] + _IFACE_TEST_FIELDS
+
+_CONFORMANCE_LBM_SCRIPT = "conformance_31131.sh"
 
 _CONFORMANCE_INTERFACE_SHARED_KEY = "conformance_interface_shared"
 _CONFORMANCE_3110X_SHARED_KEY = "conformance_3110x_shared"
@@ -236,8 +274,6 @@ _LOG_3112X_FIELDS: list[dict[str, Any]] = [
 _CONFORMANCE_INTERFACE_SCRIPTS: frozenset[str] = frozenset(
     {
         "conformance_3184.sh",
-        "conformance_31101.sh",
-        "conformance_31102.sh",
         "conformance_31131.sh",
     }
 )
@@ -256,13 +292,13 @@ _MPLANE_3110X_FIELDS: list[dict[str, Any]] = [
         "key": "mplane_xlsx_path",
         "label": "M-Plane Excel (.xlsx)",
         "default": "",
-        "hint": "Control-Sheet + PDSCH/PUSCH/PRACH/ACTIVE. CUplane → PE → PDSCH → PUSCH → PRACH → ACTIVE.",
+        "hint": "Control-Sheet + PDSCH/PUSCH/PRACH/ACTIVE. To-DU interface·VLAN·O-DU MAC은 Excel에서 로드.",
         "env_var": None,
         "wide": True,
         "file_picker": True,
         "file_types": [("Excel workbook", "*.xlsx"), ("All files", "*.*")],
     },
-] + _IFACE_TEST_FIELDS
+]
 
 _CONFORMANCE_PER_TEST_SCHEMA: dict[str, dict[str, Any]] = {
     "conformance_3131.sh": {
@@ -308,13 +344,11 @@ _CONFORMANCE_PER_TEST_SCHEMA: dict[str, dict[str, Any]] = {
     },
     "conformance_3161.sh": {
         "title": "3.1.6.1 O-RU Software Update (positive)",
-        "shared_with": "conformance_3162.sh",
-        "fields": _SWM_TEST_FIELDS,
+        "fields": _SWM_FIELDS_3161,
     },
     "conformance_3162.sh": {
         "title": "3.1.6.2 O-RU Software Update (negative)",
-        "shared_with": "conformance_3161.sh",
-        "fields": _SWM_TEST_FIELDS,
+        "fields": _SWM_FIELDS_3162,
     },
     "conformance_3170.sh": {
         "title": "3.1.7.1 Software Activation (no reset)",
@@ -393,7 +427,7 @@ _CONFORMANCE_PER_TEST_SCHEMA: dict[str, dict[str, Any]] = {
     "conformance_31131.sh": {
         "title": "3.1.13.1 Connectivity (To-DU interface)",
         "settings_key": _CONFORMANCE_INTERFACE_SHARED_KEY,
-        "fields": _IFACE_TEST_FIELDS,
+        "fields": _LBM31131_FIELDS,
     },
 }
 
@@ -424,6 +458,59 @@ class ConformanceMixin:
     def _conformance_scripts_318x(self) -> frozenset[str]:
         return getattr(_conf_manifest, "CONFORMANCE_SCRIPTS_318X", frozenset())
 
+    def _conformance_ordered_318x_local(self) -> list[str]:
+        """표 순서의 3.1.8.1–3.1.8.6 (로컬에 있는 항목만)."""
+        three8 = self._conformance_scripts_318x()
+        out: list[str] = []
+        for r in getattr(_conf_manifest, "CONFORMANCE_SPEC_ROWS", ()) or ():
+            if len(r) >= 3 and r[2] in three8 and self._conformance_script_local_path(r[2]) is not None:
+                out.append(r[2])
+        return out
+
+    def _conformance_expand_run_list(self, fnames: list[str]) -> list[str]:
+        """3.1.8.x 중 하나라도 선택되면 3.1.8.1–3.1.8.6 전체를 실행 목록에 넣는다."""
+        suite = self._conformance_ordered_318x_local()
+        if not suite:
+            return fnames
+        suite_set = set(suite)
+        if not any(f in suite_set for f in fnames):
+            return fnames
+        out: list[str] = []
+        inserted = False
+        for f in fnames:
+            if f in suite_set:
+                if not inserted:
+                    out.extend(suite)
+                    inserted = True
+            elif f not in out:
+                out.append(f)
+        return out
+
+    def _conformance_set_318x_linked_check(self, value: bool) -> None:
+        """3.1.8.1–3.1.8.6 체크박스를 동일 상태로 맞춘다."""
+        if getattr(self, "_conformance_318x_link_busy", False):
+            return
+        self._conformance_318x_link_busy = True
+        try:
+            for sn in self._conformance_ordered_318x_local():
+                bv = self.conformance_check_vars.get(sn)
+                if bv is not None:
+                    bv.set(value)
+        finally:
+            self._conformance_318x_link_busy = False
+
+    def _conformance_gui_script_order(self) -> list[str]:
+        """Conformance 표에 보이는 순서(위→아래). 실행·일부 선택 모두 이 순서를 따른다."""
+        return [fname for fname, _ref, _en in self._conformance_test_rows()]
+
+    def _conformance_order_run_list(self, fnames: list[str]) -> list[str]:
+        """선택된 항목만 GUI 표 순서(위→아래)로 정렬."""
+        gui_order = self._conformance_gui_script_order()
+        fn_set = set(fnames)
+        ordered = [f for f in gui_order if f in fn_set]
+        tail = [f for f in fnames if f not in set(gui_order)]
+        return ordered + tail
+
     def _conformance_is_318x_script(self, fname: str) -> bool:
         pre = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_PRE_3180", "")
         return fname in self._conformance_scripts_318x() or fname == pre
@@ -433,6 +520,159 @@ class ConformanceMixin:
         if schema and schema.get("settings_key"):
             return str(schema["settings_key"])
         return fname
+
+    def _conformance_3180_script_path(self, *, post_cleanup: bool = False) -> str:
+        """3.1.8.0 NACM 스크립트. 사후 정리용 3180_1 이 없으면 3180_init_user 를 사용."""
+        if post_cleanup:
+            post1 = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_POST_3180_1", "")
+            if post1 and self._conformance_script_local_path(post1):
+                return post1
+        pre = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_PRE_3180", "")
+        return pre
+
+    def _conformance_run_3180_step(
+        self,
+        client: Any,
+        sftp: Any,
+        script_b: str,
+        opts: ConformanceRunOptions,
+        remote_dir: str,
+        cfg_remote: str,
+        spec_map: dict[str, str],
+        log_line: Any,
+        phase: str,
+        *,
+        abort_suite_on_fail: bool = False,
+        force_despite_cancel: bool = False,
+        anchor_fname: str = "",
+    ) -> tuple[int | None, bool]:
+        """3.1.8.0(conformance_3180_init_user.sh 등) 실행. (rc, abort_suite)."""
+        if not script_b:
+            return None, False
+        lp = self._conformance_script_local_path(script_b)
+        if not lp:
+            log_line(f"WARN: 3.1.8.0 스크립트 없음 ({script_b}), 단계를 건너뜁니다.")
+            return None, False
+
+        phase_labels = {
+            "pre_3181": "3.1.8.1 직전",
+            "pre_3181_fallback": "3.1.8.1 직전 (3180_1 대체)",
+            "post_3186": "3.1.8.6 종료 후",
+            "post_stop": "3.1.8.x 중지·미완료 후",
+        }
+        label = phase_labels.get(phase, phase)
+
+        restore_cancel = False
+        if force_despite_cancel and self._conformance_cancel_event.is_set():
+            self._conformance_cancel_event.clear()
+            restore_cancel = True
+
+        log_line(f"---- 3.1.8.0 → {script_b} ({label}) ----")
+        host = self._conformance_host_run_log_path(script_b)
+        self._conformance_active_host_log = host
+        self._conformance_last_host_log = host
+        self.after(0, self._refresh_log_target_hint_line)
+        self._conformance_detail_lines[script_b] = []
+        self._conformance_detail_capture_key = script_b
+        self._conformance_detail_run_started_wall[script_b] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self._conformance_detail_run_started_mono[script_b] = time.monotonic()
+        spec_ref = spec_map.get(script_b, "3.1.8.0-prep")
+        rc: int
+        try:
+            rc = self._conformance_exec_remote_script(
+                client,
+                sftp,
+                script_b,
+                opts,
+                remote_dir,
+                cfg_remote,
+                spec_ref,
+                host,
+                log_line,
+            )
+        finally:
+            self._conformance_detail_capture_key = None
+            self._conformance_detail_run_ended_wall[script_b] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            self._conformance_detail_run_ended_mono[script_b] = time.monotonic()
+            if restore_cancel:
+                self._conformance_cancel_event.set()
+
+        if abort_suite_on_fail:
+            if rc == -2:
+                if anchor_fname:
+                    self._conformance_progress[anchor_fname] = {"rc": -2, "status": "STOP"}
+                    self.after(0, self._conformance_refresh_row_result_labels)
+                return rc, True
+            if rc != 0:
+                log_line(f"사전 단계 실패 (exit {rc}). 3.1.8.x 실행을 중단합니다.")
+                if anchor_fname:
+                    self._conformance_progress[anchor_fname] = {"rc": rc, "status": "FAIL"}
+                    self.after(0, self._conformance_refresh_row_result_labels)
+                return rc, True
+        elif rc != 0:
+            log_line(f"3.1.8.0 ({label}) 종료 exit={rc} (3.1.8.x 일괄 실행은 계속)")
+
+        return rc, False
+
+    def _conformance_run_pre_3180_before_318x(
+        self,
+        client: Any,
+        sftp: Any,
+        pre_script: str,
+        opts: ConformanceRunOptions,
+        remote_dir: str,
+        cfg_remote: str,
+        spec_map: dict[str, str],
+        log_line: Any,
+        *,
+        anchor_fname: str,
+    ) -> tuple[int | None, bool]:
+        """3.1.8.0(oranuser) 실패 시 3.1.8.0_1(sudouser) 재시도. (rc, abort_suite)."""
+        rc, _ = self._conformance_run_3180_step(
+            client,
+            sftp,
+            pre_script,
+            opts,
+            remote_dir,
+            cfg_remote,
+            spec_map,
+            log_line,
+            "pre_3181",
+            anchor_fname=anchor_fname,
+        )
+        if rc == -2:
+            self._conformance_progress[anchor_fname] = {"rc": -2, "status": "STOP"}
+            self.after(0, self._conformance_refresh_row_result_labels)
+            return rc, True
+        if rc in (None, 0):
+            return rc, False
+        fallback = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_POST_3180_1", "")
+        if (
+            fallback
+            and fallback != pre_script
+            and self._conformance_script_local_path(fallback)
+        ):
+            log_line(
+                f"[3.1.8.0] 실패 (exit {rc}) → 3.1.8.0.1 ({fallback}, sudouser) 로 재시도합니다."
+            )
+            rc2, abort_suite = self._conformance_run_3180_step(
+                client,
+                sftp,
+                fallback,
+                opts,
+                remote_dir,
+                cfg_remote,
+                spec_map,
+                log_line,
+                "pre_3181_fallback",
+                abort_suite_on_fail=True,
+                anchor_fname=anchor_fname,
+            )
+            return rc2, abort_suite
+        log_line(f"사전 단계 실패 (exit {rc}). 3.1.8.x 실행을 중단합니다.")
+        self._conformance_progress[anchor_fname] = {"rc": rc, "status": "FAIL"}
+        self.after(0, self._conformance_refresh_row_result_labels)
+        return rc, True
 
     def _conformance_local_dir(self) -> Path:
         d = _conformance_bundle_root() / "conformance"
@@ -564,6 +804,13 @@ class ConformanceMixin:
         cfg_b2 = cfg_payload.encode("utf-8")
         sftp.putfo(io.BytesIO(cfg_b2), cfg_remote, len(cfg_b2))
         log_line(f"refreshed ORU config on host (실행 직전 Settings 반영, {len(cfg_payload)} bytes)")
+        if fname == _CONFORMANCE_LBM_SCRIPT:
+            try:
+                _mc = json.loads(cfg_payload).get("management-configurations") or {}
+                _nic = str(_mc.get("LOCAL-IF") or "").strip()
+                log_line(f"Server NIC (LOCAL-IF): {_nic or '(not set)'}")
+            except Exception:
+                pass
         envp = self._conformance_bash_env_exports(opts, fname)
         per_test_envp = self._conformance_per_test_env_exports(fname)
         rp_q = shlex.quote(f"{remote_dir}/{fname}")
@@ -709,6 +956,14 @@ class ConformanceMixin:
         was_active = bool(getattr(self, "_conformance_oru_boost_active", False))
         self._conformance_oru_boost_active = False
         self._conformance_oru_boost_remote_dir = None
+        if client is None:
+            return
+        try:
+            tr = client.get_transport()
+            if tr is None or not tr.is_active():
+                return
+        except Exception:
+            return
         rd = remote_dir.rstrip("/")
         pid_file = f"{rd}/.oru_boost.pid"
         pf = shlex.quote(pid_file)
@@ -857,28 +1112,6 @@ class ConformanceMixin:
                 "LOCAL-IF": gv("LOCAL_IF"),
             }
         }
-        # Include software-management settings from per-test config (3.1.6.x)
-        swm_settings = (
-            self._conformance_per_test_settings.get("conformance_3161.sh")
-            or self._conformance_per_test_settings.get("conformance_3162.sh")
-            or {}
-        )
-        swm_pw = (swm_settings.get("swm_server_pw") or "").strip()
-        swm_ip = (swm_settings.get("swm_server_ip") or "").strip()
-        swm_id = (swm_settings.get("swm_server_id") or "root").strip()
-        swm_pkg = (swm_settings.get("swm_pkg_path") or "").strip()
-        swm_obj: dict[str, Any] = {}
-        if swm_pkg and swm_ip:
-            pkg_filename = os.path.basename(swm_pkg)
-            swm_path = f"sftp://{swm_id}@{swm_ip}/tmp/netconf_PKG/{pkg_filename}"
-            swm_obj["path"] = swm_path
-            swm_obj["password"] = swm_pw
-        guard_settings = self._conformance_per_test_settings.get("conformance_3170.sh", {})
-        guard = (guard_settings.get("activate_get_guard_sec") or "").strip()
-        if guard:
-            swm_obj["activate-get-guard-sec"] = guard
-        if swm_obj:
-            obj["software-management"] = swm_obj
         return json.dumps(obj, ensure_ascii=True, indent=2)
 
     @staticmethod
@@ -909,14 +1142,50 @@ class ConformanceMixin:
         if isinstance(pe, dict) and pe.get("to-DU-processing-element") is None:
             pe["to-DU-processing-element"] = {"enable": False, "name": {}, "ODUMAC": {}}
 
+    def _conformance_swm_settings_script(self, for_script: str) -> str:
+        """software-management JSON에 쓸 3.1.6.x 설정 소스 스크립트."""
+        if for_script in ("conformance_3161.sh", "conformance_3162.sh"):
+            return for_script
+        if for_script == "conformance_3170.sh":
+            if (self._conformance_get_per_test_val("conformance_3161.sh", "swm_pkg_path") or "").strip():
+                return "conformance_3161.sh"
+            if (self._conformance_get_per_test_val("conformance_3162.sh", "swm_pkg_path") or "").strip():
+                return "conformance_3162.sh"
+        return ""
+
+    def _conformance_apply_swm_from_per_test(self, root: dict[str, Any], for_script: str | None) -> None:
+        if not isinstance(root, dict) or not for_script:
+            return
+        swm_src = self._conformance_swm_settings_script(for_script)
+        if not swm_src:
+            return
+        swm_pw = self._conformance_get_per_test_val(swm_src, "swm_server_pw").strip()
+        swm_ip = self._conformance_get_per_test_val(swm_src, "swm_server_ip").strip()
+        swm_id = self._conformance_get_per_test_val(swm_src, "swm_server_id").strip() or "root"
+        swm_pkg = self._conformance_get_per_test_val(swm_src, "swm_pkg_path").strip()
+        swm_obj: dict[str, Any] = {}
+        if swm_pkg and swm_ip:
+            pkg_filename = os.path.basename(swm_pkg)
+            swm_obj["path"] = f"sftp://{swm_id}@{swm_ip}/tmp/netconf_PKG/{pkg_filename}"
+            swm_obj["password"] = swm_pw
+        guard = self._conformance_get_per_test_val("conformance_3170.sh", "activate_get_guard_sec").strip()
+        if guard:
+            swm_obj["activate-get-guard-sec"] = guard
+        if swm_obj:
+            root["software-management"] = swm_obj
+        elif "software-management" in root:
+            del root["software-management"]
+
     def _conformance_effective_config_json_text(self, for_script: str | None = None) -> str:
         """ORU JSON for remote --config: Settings + per-test (M-Plane xlsx, interface, SWM)."""
         gui_txt = self._conformance_build_management_config_json()
         gui_obj = json.loads(gui_txt)
         if for_script:
+            self._conformance_apply_server_nic_to_management(gui_obj, for_script)
             self._conformance_apply_interface_from_per_test(gui_obj, for_script)
             self._conformance_apply_mplane_from_bundle(gui_obj, for_script)
             self._conformance_apply_log_fileserver_from_per_test(gui_obj, for_script)
+            self._conformance_apply_swm_from_per_test(gui_obj, for_script)
         self._conformance_apply_config_stubs(gui_obj)
         gui_obj = self._conformance_strip_json_nulls(gui_obj)
         return json.dumps(gui_obj, ensure_ascii=True, indent=2)
@@ -962,8 +1231,6 @@ class ConformanceMixin:
 
             bundle = mc.prepare_mplane_conformance_bundle(
                 xlsx,
-                to_du_if_name=self._conformance_get_per_test_val(fname, "to_du_if_name").strip(),
-                to_du_vlan=self._conformance_get_per_test_val(fname, "to_du_vlan").strip() or "1",
                 duplicate_eaxc=(fname == "conformance_31102.sh"),
             )
         except Exception as exc:
@@ -1125,6 +1392,54 @@ class ConformanceMixin:
             mc["local-log-prefix"] = log_prefix.rstrip("/")
         mc["remote-upload-dir"] = remote_dir.rstrip("/") or "/tmp"
 
+    def _conformance_odu_mac_for_interface_test(self, for_script: str) -> str:
+        """O-DU MAC for interface/PE scripts: Excel bundle → per-test → Settings M-Plane."""
+        if for_script in _CONFORMANCE_MPLANE_SCRIPTS:
+            bundle = self._conformance_mplane_bundle_cache().get(for_script)
+            if bundle is not None:
+                mac = str(bundle.merged.get("odu_mac") or "").strip()
+                if mac:
+                    return mac
+        mac = self._conformance_get_per_test_val(for_script, "odu_mac").strip()
+        if mac:
+            return mac
+        mf = getattr(self, "mplane_fields", None) or {}
+        rec = mf.get("odu_mac")
+        if rec is not None:
+            mac = str(rec.get()).strip()
+            if mac:
+                return mac
+        return ""
+
+    def _conformance_resolve_server_nic(self, for_script: str | None = None) -> str:
+        """miniDU ethping -i (31131 only): per-test server_nic → Settings LOCAL_IF."""
+        if for_script == _CONFORMANCE_LBM_SCRIPT:
+            nic = self._conformance_get_per_test_val(for_script, "server_nic").strip()
+            if nic:
+                return nic
+            store = self._conformance_per_test_settings.get(_CONFORMANCE_INTERFACE_SHARED_KEY, {})
+            nic = str(store.get("server_nic") or "").strip()
+            if nic:
+                return nic
+        var = self.fields.get("LOCAL_IF")
+        if var is not None:
+            return str(var.get()).strip()
+        return ""
+
+    def _conformance_apply_server_nic_to_management(
+        self, root: dict[str, Any], for_script: str | None
+    ) -> None:
+        if not isinstance(root, dict) or not for_script:
+            return
+        if for_script != _CONFORMANCE_LBM_SCRIPT:
+            return
+        nic = self._conformance_resolve_server_nic(for_script)
+        if not nic:
+            return
+        mc = root.setdefault("management-configurations", {})
+        if isinstance(mc, dict):
+            mc["LOCAL-IF"] = nic
+
     def _conformance_apply_interface_from_per_test(self, root: dict[str, Any], for_script: str | None) -> None:
         if not isinstance(root, dict) or not for_script:
             return
@@ -1140,10 +1455,9 @@ class ConformanceMixin:
             else None
         )
         pe_name = ifname
-        odu_mac = ""
         if bundle is not None:
             pe_name = str(bundle.merged.get("pe_name") or pe_name).strip() or pe_name
-            odu_mac = str(bundle.merged.get("odu_mac") or "").strip()
+        odu_mac = self._conformance_odu_mac_for_interface_test(for_script)
         iface_entry = {"0": ifname}
         vlan_entry = {"0": vlan}
         root["interface-configurations"] = {
@@ -1163,12 +1477,25 @@ class ConformanceMixin:
 
     def _conformance_bash_env_exports(self, opts: ConformanceRunOptions, fname: str | None = None) -> str:
         parts: list[str] = []
-        for key in ("USER", "PASSWORD", "ALLOWED_IP", "LOCAL_IP", "CALLHOME_PORT", "NETCONF_PORT", "PRODUCT", "LOG_PATH"):
+        for key in (
+            "USER",
+            "PASSWORD",
+            "ALLOWED_IP",
+            "LOCAL_IP",
+            "LOCAL_IF",
+            "CALLHOME_PORT",
+            "NETCONF_PORT",
+            "PRODUCT",
+            "LOG_PATH",
+        ):
             var = self.fields.get(key)
             if var is None:
                 continue
             val = var.get().strip()
             parts.append(f"export {key}={shlex.quote(val)}")
+        if fname == _CONFORMANCE_LBM_SCRIPT:
+            parts = [p for p in parts if not p.startswith("export LOCAL_IF=")]
+            parts.append(f"export LOCAL_IF={shlex.quote(self._conformance_resolve_server_nic(fname))}")
         parts.append(f"export NETCONF_RPC_TIMEOUT={shlex.quote(opts.netconf_rpc_timeout.strip() or '30')}")
         parts.append(f"export NETCONF_IDLE_TIMEOUT={shlex.quote(opts.netconf_idle_timeout.strip() or '120')}")
         parts.append(f"export SUPERVISION_INTERVAL={shlex.quote(opts.supervision_interval.strip() or '60')}")
@@ -1551,10 +1878,12 @@ class ConformanceMixin:
                 if fn not in to_upload:
                     to_upload.append(fn)
             pre_m = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_PRE_3180", "")
+            post_m = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_POST_3180_1", "")
             t8 = getattr(_conf_manifest, "CONFORMANCE_SCRIPTS_318X", frozenset())
-            if pre_m and any(f in t8 for f in fnames):
-                if self._conformance_script_local_path(pre_m) and pre_m not in to_upload:
-                    to_upload.insert(0, pre_m)
+            if any(f in t8 for f in fnames):
+                for extra in (pre_m, post_m):
+                    if extra and self._conformance_script_local_path(extra) and extra not in to_upload:
+                        to_upload.insert(0, extra)
 
             for fname in to_upload:
                 lp = self._conformance_script_local_path(fname)
@@ -1569,56 +1898,39 @@ class ConformanceMixin:
                 log_line(f"uploaded {fname}")
 
             spec_map = self._conformance_spec_ref_map()
-            pre_3180_done = False
+            fnames = self._conformance_expand_run_list(list(fnames))
+            ordered_fnames = self._conformance_order_run_list(fnames)
+            if ordered_fnames != fnames:
+                log_line("실행 순서: " + ", ".join(ordered_fnames))
             three8 = getattr(_conf_manifest, "CONFORMANCE_SCRIPTS_318X", frozenset())
-            pre_b = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_PRE_3180", "")
+            pre_b = self._conformance_3180_script_path(post_cleanup=False)
+            post_b = self._conformance_3180_script_path(post_cleanup=True)
+            ran_318x_pass = any(f in three8 for f in ordered_fnames)
+            post_3180_after_3186 = False
+            abort_all = False
 
-            for fname in fnames:
+            for fname in ordered_fnames:
                 if self._conformance_cancel_event.is_set():
                     log_line("사용자 중지로 중단")
                     self._conformance_progress[fname] = {"rc": -2, "status": "STOP"}
                     self.after(0, self._conformance_refresh_row_result_labels)
+                    abort_all = True
                     break
-                if fname in three8 and not pre_3180_done and pre_b:
-                    lp_pre = self._conformance_script_local_path(pre_b)
-                    if lp_pre:
-                        log_line(f"---- PRE 3.1.8.x → {pre_b} (3.1.8.0 사전 단계) ----")
-                        host_pre = self._conformance_host_run_log_path(pre_b)
-                        self._conformance_active_host_log = host_pre
-                        self._conformance_last_host_log = host_pre
-                        self.after(0, self._refresh_log_target_hint_line)
-                        self._conformance_detail_lines[pre_b] = []
-                        self._conformance_detail_capture_key = pre_b
-                        self._conformance_detail_run_started_wall[pre_b] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        self._conformance_detail_run_started_mono[pre_b] = time.monotonic()
-                        try:
-                            rc_pre = self._conformance_exec_remote_script(
-                                client,
-                                sftp,
-                                pre_b,
-                                opts,
-                                remote_dir,
-                                cfg_remote,
-                                spec_map.get(pre_b, "3.1.8.0-prep"),
-                                host_pre,
-                                log_line,
-                            )
-                        finally:
-                            self._conformance_detail_capture_key = None
-                            self._conformance_detail_run_ended_wall[pre_b] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                            self._conformance_detail_run_ended_mono[pre_b] = time.monotonic()
-                        if rc_pre == -2:
-                            self._conformance_progress[fname] = {"rc": -2, "status": "STOP"}
-                            self.after(0, self._conformance_refresh_row_result_labels)
-                            break
-                        if rc_pre != 0:
-                            log_line(f"사전 단계 실패 (exit {rc_pre}). 3.1.8.x 실행을 중단합니다.")
-                            self._conformance_progress[fname] = {"rc": rc_pre, "status": "FAIL"}
-                            self.after(0, self._conformance_refresh_row_result_labels)
-                            break
-                    else:
-                        log_line(f"WARN: 사전 스크립트 없음 ({pre_b}), 3.1.8.x 는 그대로 시도합니다.")
-                    pre_3180_done = True
+                if fname == "conformance_3181.sh" and pre_b and ran_318x_pass:
+                    _rc_pre, abort_suite = self._conformance_run_pre_3180_before_318x(
+                        client,
+                        sftp,
+                        pre_b,
+                        opts,
+                        remote_dir,
+                        cfg_remote,
+                        spec_map,
+                        log_line,
+                        anchor_fname=fname,
+                    )
+                    if abort_suite:
+                        abort_all = True
+                        break
 
                 self._conformance_progress[fname] = {"rc": None, "status": "RUN"}
                 self.after(0, self._conformance_refresh_row_result_labels)
@@ -1686,12 +1998,29 @@ class ConformanceMixin:
                 if rc == -2:
                     self._conformance_progress[fname] = {"rc": -2, "status": "STOP"}
                     self.after(0, self._conformance_refresh_row_result_labels)
+                    abort_all = True
                     break
                 st = "PASS" if rc == 0 else "FAIL"
                 self._conformance_progress[fname] = {"rc": rc, "status": st}
                 self.after(0, self._conformance_refresh_row_result_labels)
 
-                if fname == "conformance_3132.sh" and fnames.index(fname) < len(fnames) - 1:
+                if fname == "conformance_3186.sh" and post_b and ran_318x_pass:
+                    cleanup_script = post_b
+                    self._conformance_run_3180_step(
+                        client,
+                        sftp,
+                        cleanup_script,
+                        opts,
+                        remote_dir,
+                        cfg_remote,
+                        spec_map,
+                        log_line,
+                        "post_3186",
+                        force_despite_cancel=True,
+                    )
+                    post_3180_after_3186 = True
+
+                if fname == "conformance_3132.sh" and ordered_fnames.index(fname) < len(ordered_fnames) - 1:
                     wait_s = 360
                     try:
                         wait_s = int(self._conformance_get_per_test_val(fname, "post_reset_wait_sec") or "360")
@@ -1708,6 +2037,34 @@ class ConformanceMixin:
                             time.sleep(1)
                         else:
                             log_line(f"ORU 리셋 대기 {wait_s}초 완료, 다음 시험 진행")
+
+            if (
+                ran_318x_pass
+                and post_b
+                and not post_3180_after_3186
+                and (abort_all or self._conformance_cancel_event.is_set())
+            ):
+                try:
+                    tr = client.get_transport() if client is not None else None
+                    ssh_up = tr is not None and tr.is_active()
+                except Exception:
+                    ssh_up = False
+                if not ssh_up:
+                    log_line("3.1.8.0 (중지 후 정리) 건너뜀: SSH 세션이 이미 종료됨")
+                else:
+                    self._conformance_run_3180_step(
+                        client,
+                        sftp,
+                        post_b,
+                        opts,
+                        remote_dir,
+                        cfg_remote,
+                        spec_map,
+                        log_line,
+                        "post_stop",
+                        force_despite_cancel=True,
+                    )
+
             try:
                 sftp.close()
             except Exception:
@@ -2204,10 +2561,9 @@ class ConformanceMixin:
 
     def _conformance_swm_env_export(self, fname: str) -> str:
         """Build SW_PKG_REMOTE_PATH env var for 3.1.6.x tests."""
-        settings = self._conformance_per_test_settings.get(fname, {})
-        pkg_path = (settings.get("swm_pkg_path") or "").strip()
-        server_ip = (settings.get("swm_server_ip") or "").strip()
-        server_id = (settings.get("swm_server_id") or "root").strip()
+        pkg_path = self._conformance_get_per_test_val(fname, "swm_pkg_path").strip()
+        server_ip = self._conformance_get_per_test_val(fname, "swm_server_ip").strip()
+        server_id = self._conformance_get_per_test_val(fname, "swm_server_id").strip() or "root"
         if not pkg_path or not server_ip:
             return ""
         pkg_filename = os.path.basename(pkg_path)
@@ -2221,10 +2577,9 @@ class ConformanceMixin:
         """Upload local PKG to remote /tmp/netconf_PKG/ for 3.1.6.x tests."""
         if fname not in ("conformance_3161.sh", "conformance_3162.sh"):
             return True
-        settings = self._conformance_per_test_settings.get(fname, {})
-        pkg_path = (settings.get("swm_pkg_path") or "").strip()
+        pkg_path = self._conformance_get_per_test_val(fname, "swm_pkg_path").strip()
         if not pkg_path:
-            log_line("[WARN] SWM PKG 경로가 설정되지 않았습니다. 설정창에서 지정하세요.")
+            log_line(f"[WARN] {fname} PKG 경로가 설정되지 않았습니다. 해당 항목 설정(⚙)에서 지정하세요.")
             return True
         if not os.path.isfile(pkg_path):
             log_line(f"[ERROR] 로컬 PKG 파일 없음: {pkg_path}")
@@ -2375,6 +2730,7 @@ class ConformanceMixin:
     def _build_conformance_tab(self, parent: ttk.Frame) -> None:
         self.conformance_check_vars.clear()
         self._conformance_run_labels.clear()
+        self._conformance_318x_link_busy = False
         self.conformance_path_hint_var = tk.StringVar(value="")
         intro = ttk.LabelFrame(parent, text="Conformance — 원격 Linux (/var/tmp)", padding=8)
         intro.pack(fill="x", padx=8, pady=(8, 4))
@@ -2385,7 +2741,9 @@ class ConformanceMixin:
                 "Settings 탭의 ORU 값만 반영한 JSON을 --config 로 넘겨 실행합니다. "
                 "스크립트·장비 측 작업 파일은 /var/tmp/netconf_tmp/ 만 사용하세요. "
                 "목록은 O-RAN M-Plane 3.1 시험 표 순서이며, 로컬에 있는 스크립트만 표시됩니다. "
-                "3.1.8.x 실행 전에는 3.1.8.0 사전 단계 스크립트가 자동으로 한 번 실행됩니다. "
+                "3.1.8.x(3.1.8.1–3.1.8.6)는 하나만 선택해도 전체가 연동 선택·일괄 실행됩니다(표 순서 3181→3186). "
+                "실행 순서는 표에서 위→아래 순서이며, 일부만 체크해도 체크된 항목만 그 순서대로 진행합니다. "
+                "3.1.8.0 은 3.1.8.1 직전·3.1.8.6 종료 후에 실행되며, 중지해도 정리용으로 한 번 더 시도합니다. "
                 "실행 출력(stdout/stderr)은 메인 화면 하단 로그 창에 표시됩니다. "
                 "표에서 행을 더블클릭하면 해당 항목의 STEP·원인·타임아웃 요약 상세 창이 열립니다(약 2초마다 갱신)."
             ),
@@ -2470,7 +2828,11 @@ class ConformanceMixin:
             if col == "#1":
                 bv = self.conformance_check_vars.get(row)
                 if bv is not None:
-                    bv.set(not bv.get())
+                    new_val = not bv.get()
+                    if row in self._conformance_scripts_318x():
+                        self._conformance_set_318x_linked_check(new_val)
+                    else:
+                        bv.set(new_val)
             elif col == "#6":
                 if row in _CONFORMANCE_PER_TEST_SCHEMA:
                     self._conformance_open_per_test_settings(row)
@@ -2506,6 +2868,13 @@ class ConformanceMixin:
             tree.insert("", "end", iid=fname, values=(pick, fname, ref, summ, loc, cfg_mark, "—"), tags=("res_idle", row_tag))
 
             def _on_bv_write(*_a: Any, fn: str = fname) -> None:
+                if (
+                    fn in self._conformance_scripts_318x()
+                    and not getattr(self, "_conformance_318x_link_busy", False)
+                ):
+                    bv_local = self.conformance_check_vars.get(fn)
+                    if bv_local is not None:
+                        self._conformance_set_318x_linked_check(bool(bv_local.get()))
                 self._conformance_sync_tree_pick(fn)
                 try:
                     self._on_any_setting_changed()
@@ -2523,10 +2892,25 @@ class ConformanceMixin:
         cred = self._conformance_collect_ssh_settings()
         if cred is None:
             return
-        to_run = [fn for fn, bv in self.conformance_check_vars.items() if bv.get()]
+        to_run = [
+            fn
+            for fn in self._conformance_gui_script_order()
+            if self.conformance_check_vars.get(fn) is not None and self.conformance_check_vars[fn].get()
+        ]
         if not to_run:
             messagebox.showwarning("Conformance", "실행할 항목을 하나 이상 선택하세요.")
             return
+        if any(f in self._conformance_scripts_318x() for f in to_run):
+            suite = self._conformance_ordered_318x_local()
+            if suite:
+                self._conformance_set_318x_linked_check(True)
+                expanded = self._conformance_expand_run_list(to_run)
+                if expanded != to_run:
+                    self.append_log(
+                        f"[Conformance-run] 3.1.8.x 일괄 실행: {', '.join(suite)}\n"
+                    )
+                to_run = expanded
+        to_run = self._conformance_order_run_list(to_run)
         missing = [fn for fn in to_run if self._conformance_script_local_path(fn) is None]
         if missing:
             messagebox.showwarning(

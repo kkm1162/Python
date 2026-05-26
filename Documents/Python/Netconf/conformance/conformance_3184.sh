@@ -222,20 +222,29 @@ EORPC
 		-t -m "//i:interface[i:name='$ToDUifname']" \
 		-v "//x:port-number" "$GET_IF_OUT" 2>/dev/null) || Port=""
 
+	if [[ -z "$MAC" ]]; then
+		echo "[FAIL] interface '$ToDUifname' not found on O-RU (GET empty). Check Conformance To-DU interface name."
+		test_fail "interface GET empty for ${ToDUifname}"
+		exit 1
+	fi
+	EDIT_MAC="00:11:22:33:44:55"
+	if [[ "$MAC" == "$EDIT_MAC" ]]; then
+		EDIT_MAC="00:11:22:33:44:56"
+	fi
+	echo "[INFO] interface GET: name=${ToDUifname} vlan=${ToDUifvlan} mac=${MAC} port=${Port:-n/a}"
+	echo "[INFO] interface EDIT attempt (merge MAC on ${ToDUifname}): mac=${EDIT_MAC}"
+
 	EDIT_IF="${NETCONF_TMP}/edit/edit_interface_mod.xml"
 	EDIT_IF_OUT="${NETCONF_TMP}/get/edit_if_out.xml"
+	# Base if (e.g. sys): port-number is under port-reference, not a direct leaf — only merge MAC for NACM check.
 	cat > "$EDIT_IF" <<EORPC
 <edit-config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
   <target><running/></target>
   <config>
     <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
-      <interface>
-        <name>${ToDUifname}_${ToDUifvlan}</name>
-        <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:l2vlan</type>
-        <base-interface xmlns="urn:o-ran:interfaces:1.0">${ToDUifname}</base-interface>
-        <vlan-id xmlns="urn:o-ran:interfaces:1.0">${ToDUifvlan}</vlan-id>
-        <mac-address xmlns="urn:o-ran:interfaces:1.0">${MAC}</mac-address>
-        <port-number xmlns="urn:o-ran:interfaces:1.0">${Port}</port-number>
+      <interface xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0" nc:operation="merge">
+        <name>${ToDUifname}</name>
+        <mac-address xmlns="urn:o-ran:interfaces:1.0">${EDIT_MAC}</mac-address>
       </interface>
     </interfaces>
   </config>
@@ -246,8 +255,23 @@ EORPC
 	send_cmd "user-rpc --content $EDIT_IF --out $EDIT_IF_OUT"
 
 	RESULT3="NOK"
-	for _w in $(seq 1 50); do
-		if grep -a -F "<error-tag>access-denied</error-tag>" "$LOG" >/dev/null 2>&1; then
+	for _w in $(seq 1 80); do
+		if [[ -f "$EDIT_IF_OUT" ]] && grep -aq "</rpc-reply>" "$EDIT_IF_OUT" 2>/dev/null; then
+			echo "----- edit_if_out -----" >>"$LOG"
+			cat "$EDIT_IF_OUT" >>"$LOG" 2>/dev/null || true
+			break
+		fi
+		sleep 0.2
+	done
+	if [[ -f "$EDIT_IF_OUT" ]] && grep -aq "<ok/>" "$EDIT_IF_OUT" 2>/dev/null \
+		&& ! grep -aq "access-denied" "$EDIT_IF_OUT" 2>/dev/null; then
+		echo "[FAIL] edit-config returned ok — fmpmuser must not be allowed to change interfaces"
+		test_fail "fm-pm-group access denied check"
+		exit 1
+	fi
+	for _w in $(seq 1 40); do
+		if grep -aiq "access-denied" "$LOG" "$EDIT_IF_OUT" 2>/dev/null \
+			|| grep -aFq "<error-tag>access-denied</error-tag>" "$LOG" "$EDIT_IF_OUT" 2>/dev/null; then
 			RESULT3="OK"
 			break
 		fi
@@ -255,6 +279,14 @@ EORPC
 	done
 	echo "[$RESULT3] STEP 3. Check fm-pm-group permissions."
 	if [[ "$RESULT3" != "OK" ]]; then
+		if [[ -f "$EDIT_IF_OUT" ]]; then
+			_err_tag=$(sed -n 's/.*<error-tag>\([^<]*\)<\/error-tag>.*/\1/p' "$EDIT_IF_OUT" 2>/dev/null | head -1) || _err_tag=""
+			if [[ -n "$_err_tag" ]]; then
+				echo "[FAIL] edit-config rpc-error: <error-tag>${_err_tag}</error-tag> (expected access-denied)"
+			else
+				echo "[FAIL] edit-config response missing access-denied (see edit_if_out in log)"
+			fi
+		fi
 		test_fail "fm-pm-group access denied check"
 		exit 1
 	fi

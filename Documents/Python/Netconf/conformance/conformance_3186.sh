@@ -208,7 +208,9 @@ USER_LIST["admin"]="admin"
 USER_LIST["root"]="admin"
 USER_LIST["__nc"]="admin"
 USER_LIST["oranuser"]="sudo"
-USER_LIST["oranuser@o-ran.org"]="sudo"
+if [[ "${CONFORMANCE_V11_ORANUSER_AT_DOMAIN:-1}" == "1" ]]; then
+	USER_LIST["oranuser@o-ran.org"]="sudo"
+fi
 USER_LIST["nmsuser"]="nms"
 USER_LIST["fmpmuser"]="fm-pm"
 USER_LIST["swmuser"]="swm"
@@ -351,7 +353,9 @@ USER_LIST["admin"]="admin"
 USER_LIST["root"]="admin"
 USER_LIST["__nc"]="admin"
 USER_LIST["oranuser"]="sudo"
-USER_LIST["oranuser@o-ran.org"]="sudo"
+if [[ "${CONFORMANCE_V11_ORANUSER_AT_DOMAIN:-1}" == "1" ]]; then
+	USER_LIST["oranuser@o-ran.org"]="sudo"
+fi
 USER_LIST["nmsuser"]="nms"
 USER_LIST["fmpmuser"]="fm-pm"
 USER_LIST["swmuser"]="swm"

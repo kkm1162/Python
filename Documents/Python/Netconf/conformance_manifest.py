@@ -1,7 +1,8 @@
 """
 O-RAN M-Plane 3.1.x 시험 스크립트 매핑 (로컬 ./conformance/*.sh).
 GUI는 CONFORMANCE_SPEC_ROWS 순서로 표시하며, 로컬에 파일이 있는 항목만 보여 줍니다.
-3.1.8.0 / 3.1.8.0_1 은 목록에 없음 — 3180 은 3.1.8.1 직전, 3180_1 은 3.1.8.6 종료·시험 중지 후 자동 실행합니다.
+3.1.8.0 / 3.1.8.0_1 은 목록에 없음 — 3180 은 3.1.8.1 직전(실패 시 3180_1 재시도), 3180_1 은 3.1.8.6 종료·시험 중지 후 자동 실행합니다.
+3.1.8.x(3.1.8.1–3.1.8.6)는 GUI에서 하나만 선택해도 전체가 연동 선택·일괄 실행됩니다.
 """
 
 from __future__ import annotations
@@ -19,8 +20,8 @@ CONFORMANCE_SPEC_ROWS: tuple[tuple[tuple[int, int, int, int], str, str, str, str
     ((3, 1, 4, 2), "3.1.4.2", "conformance_3142.sh", "3.1.4 Retrieval of O-RU's information elements", "Retrieval with filter applied"),
     ((3, 1, 5, 1), "3.1.5.1", "conformance_3151.sh", "3.1.5 Fault Management", "O-RU Alarm Notification Generation"),
     ((3, 1, 5, 2), "3.1.5.2", "conformance_3152.sh", "3.1.5 Fault Management", "Retrieval of Active Alarm List"),
-    ((3, 1, 6, 1), "3.1.6.1", "conformance_3161.sh", "3.1.6 O-RU Software Update", "O-RU Software Update and Install (positive case)"),
     ((3, 1, 6, 2), "3.1.6.2", "conformance_3162.sh", "3.1.6 O-RU Software Update", "O-RU Software Update (negative case)"),
+    ((3, 1, 6, 1), "3.1.6.1", "conformance_3161.sh", "3.1.6 O-RU Software Update", "O-RU Software Update and Install (positive case)"),
     ((3, 1, 7, 1), "3.1.7.1", "conformance_3170.sh", "3.1.7 O-RU Software Activation", "Software Activation without Reset"),
     ((3, 1, 8, 1), "3.1.8.1", "conformance_3181.sh", "3.1.8 Access Control", "Sudo on Hybrid M-plane Architecture (positive case)"),
     ((3, 1, 8, 2), "3.1.8.2", "conformance_3182.sh", "3.1.8 Access Control", "Access Control Sudo (negative case)"),
@@ -94,23 +95,24 @@ CONFORMANCE_SPEC_DESCRIPTIONS_KO: dict[str, str] = {
     ),
     "3.1.6.1": (
         "3.1.6.1 (S/W 다운로드·설치): 원격 SFTP의 정상 패키지를 download·install하여 "
-        "non-running 슬롯 상태가 VALID로 보고되는지 확인하는 정(Positive) 시험입니다."
+        "non-running 슬롯 상태가 VALID로 보고되는지 확인합니다. "
+        "Conformance 설정(⚙)에서 3.1.6.1 전용 PKG를 지정합니다."
     ),
     "3.1.6.2": (
-        "3.1.6.2 (S/W 설치 부정): 손상·누락 패키지 설치 시 FILE_NOT_FOUND·INTEGRITY_ERROR 등 "
-        "오류로 설치가 거부되는지 확인하는 부정(Negative) 시험입니다."
+        "3.1.6.2 (S/W 설치 부정): download 후 install 시 INTEGRITY_ERROR 등으로 "
+        "설치가 거부되는지 확인합니다. 3.1.6.2 설정(⚙)에서 3.1.6.1과 다른 PKG(손상·부정용)를 지정합니다."
     ),
     "3.1.7.1": (
         "3.1.7.1 (S/W 활성화): install 완료 슬롯에 activate를 수행했을 때 "
         "재부팅 없이 active 슬롯으로 전환되는지 확인합니다."
     ),
     "3.1.8.0-prep": (
-        "3.1.8.0 (사전 NACM 정리): 3.1.8.1 직전에 Settings NETCONF 계정으로 로그인하여 "
-        "NACM 그룹 매핑을 기준 상태로 맞춥니다. (목록 비표시·자동 실행)"
+        "3.1.8.0 (NACM 초기화): oranuser(Call Home)·pre 모드로 NACM 정리. "
+        "실패 시 3.1.8.0_1(sudouser, 동일 로직)으로 재시도합니다."
     ),
     "3.1.8.0.1-prep": (
-        "3.1.8.0_1 (사후 정리): 3.1.8.6 종료 또는 시험 중지 후 sudouser로 NACM 잔여 매핑을 "
-        "제거하고 sudouser RU 계정을 삭제합니다. (목록 비표시·자동 실행)"
+        "3.1.8.0_1: 3.1.8.0 과 동일 스크립트·NACM 처리, Call Home만 sudouser. "
+        "pre=3.1.8.1 직전, post=3.1.8.6 종료·중지 후(GUI가 mode 지정)."
     ),
     "3.1.8.1": (
         "3.1.8.1 (계정·NACM 생성): sudo 권한으로 nmsuser·fmpmuser 등 역할별 계정을 "

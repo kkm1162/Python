@@ -610,3 +610,12 @@
 [2026-05-20 12:44:53.103] PRACH: headers=11 rows=8 first_row_len=11
 [2026-05-20 12:44:53.145] PRACH: rendered var_rows=8 inner_w=1
 [2026-05-20 12:44:53.163] render_done
+[2026-05-26 19:29:10.239] reload_result PDSCH:h=16,r=8, PRACH:h=11,r=8, PUSCH:h=18,r=8
+[2026-05-26 19:29:10.266] render_start
+[2026-05-26 19:29:10.268] PDSCH: headers=16 rows=8 first_row_len=16
+[2026-05-26 19:29:10.412] PDSCH: rendered var_rows=8 inner_w=1
+[2026-05-26 19:29:10.414] PUSCH: headers=18 rows=8 first_row_len=18
+[2026-05-26 19:29:10.510] PUSCH: rendered var_rows=8 inner_w=1
+[2026-05-26 19:29:10.513] PRACH: headers=11 rows=8 first_row_len=11
+[2026-05-26 19:29:10.585] PRACH: rendered var_rows=8 inner_w=1
+[2026-05-26 19:29:10.620] render_done

@@ -54,6 +54,16 @@ LOG="$LOG_DIR/CONF_${TESTID}_$(date +'%y%m%d_%H-%M-%S').log"
 : >"$LOG"
 chmod 0644 "$LOG" 2>/dev/null || true
 
+test_fail() {
+	echo "[FAIL] $*"
+}
+
+_lbm_log_has_lbr_reply() {
+	local lbm_file="$1" ru_mac="$2"
+	[[ -f "$lbm_file" && -n "$ru_mac" ]] || return 1
+	grep -aF "bytes from ${ru_mac}" "$lbm_file" 2>/dev/null | grep -aEv 'timeout|Sending CFM LBM' >/dev/null 2>&1
+}
+
 send_cmd() {
 	local cmd="$*"
 	echo "Client SENT : $cmd" >>"$LOG" 2>&1
@@ -62,10 +72,6 @@ send_cmd() {
 	set -u
 	[[ -n "${_wfd}" ]] || return 0
 	echo "$cmd" >&"${_wfd}" 2>/dev/null || true
-}
-
-test_fail() {
-	echo "[FAIL] $*"
 }
 
 COPROC_READY=0
@@ -261,8 +267,21 @@ for ((i=0; i < $(jq -r '.["interface-configurations"]["to-DU-interface"].name | 
 			sleep 0.5
 		done
 
-		MAC[$i]=$(xmlstarlet sel -N x="urn:o-ran:interfaces:1.0" -N i="urn:ietf:params:xml:ns:yang:ietf-interfaces" -t -m "//i:interface[i:name='${ToDUifname[$i]}']" -v "//x:mac-address" "$GET_IF_OUT" 2>/dev/null) || true
-		Port[$i]=$(xmlstarlet sel -N x="urn:o-ran:interfaces:1.0" -N i="urn:ietf:params:xml:ns:yang:ietf-interfaces" -t -m "//i:interface[i:name='${ToDUifname[$i]}']" -v "//x:port-number" "$GET_IF_OUT" 2>/dev/null) || true
+		MAC[$i]=$(xmlstarlet sel -N x="urn:o-ran:interfaces:1.0" -N i="urn:ietf:params:xml:ns:yang:ietf-interfaces" \
+			-t -m "//i:interface[i:name='${ToDUifname[$i]}']" -v "x:mac-address" "$GET_IF_OUT" 2>/dev/null) || true
+		Port[$i]=$(xmlstarlet sel -N x="urn:o-ran:interfaces:1.0" -N i="urn:ietf:params:xml:ns:yang:ietf-interfaces" \
+			-t -m "//i:interface[i:name='${ToDUifname[$i]}']" -v "x:port-reference/x:port-number" "$GET_IF_OUT" 2>/dev/null) || true
+		if [[ -z "${Port[$i]:-}" ]]; then
+			Port[$i]=$(xmlstarlet sel -N x="urn:o-ran:interfaces:1.0" -N i="urn:ietf:params:xml:ns:yang:ietf-interfaces" \
+				-t -m "//i:interface[i:name='${ToDUifname[$i]}']" -v "//x:port-number" "$GET_IF_OUT" 2>/dev/null) || true
+		fi
+		if [[ -z "${Port[$i]:-}" ]]; then
+			Port[$i]="0"
+		fi
+		if [[ -z "${MAC[$i]:-}" ]]; then
+			test_fail "RU MAC empty (check To-DU interface name, e.g. sys)"
+			exit 1
+		fi
 
 		cp /mplane_automation/miniDU/edit/edit_interface_org.xml "${NETCONF_TMP}/edit/edit_interface_mod.xml" 2>/dev/null || true
 		sed -i "s/IFNAME/${ToDUifname[$i]}_${ToDUifvlan[$i]}/g" "${NETCONF_TMP}/edit/edit_interface_mod.xml"
@@ -380,9 +399,26 @@ done
 fi
 
 MD_DATA_OUT="${NETCONF_TMP}/edit/edit_md_data_definitions.xml"
-rm -f "$MD_DATA_OUT"
+MD_DATA_MOD="${NETCONF_TMP}/edit/edit_md_data_definitions_mod.xml"
+rm -f "$MD_DATA_OUT" "$MD_DATA_MOD"
 cp /mplane_automation/miniDU/edit/edit_md_data_definitions.xml "${NETCONF_TMP}/edit/edit_md_data_definitions_src.xml" 2>/dev/null || true
-send_cmd "user-rpc --content ${NETCONF_TMP}/edit/edit_md_data_definitions_src.xml --out $MD_DATA_OUT"
+
+_lbm_base="${ToDUifname[0]:-sys}"
+_lbm_vlan="${ToDUifvlan[0]:-1}"
+_lbm_vlan_if="${_lbm_base}_${_lbm_vlan}"
+
+if [[ -f "${NETCONF_TMP}/edit/edit_md_data_definitions_src.xml" ]]; then
+	cp "${NETCONF_TMP}/edit/edit_md_data_definitions_src.xml" "$MD_DATA_MOD"
+	sed -i "s/IFNAME/${_lbm_vlan_if}/g" "$MD_DATA_MOD"
+	sed -i "s/VLANID/${_lbm_vlan}/g" "$MD_DATA_MOD"
+	sed -i "s/BASENAME/${_lbm_base}/g" "$MD_DATA_MOD"
+	sed -i "s/sys_1/${_lbm_vlan_if}/g" "$MD_DATA_MOD"
+	sed -i "s/sys\\.1/${_lbm_base}.${_lbm_vlan}/g" "$MD_DATA_MOD"
+else
+	cp /mplane_automation/miniDU/edit/edit_md_data_definitions.xml "$MD_DATA_MOD" 2>/dev/null || true
+fi
+
+send_cmd "user-rpc --content ${MD_DATA_MOD} --out $MD_DATA_OUT"
 
 RESULT5="NOK"
 for _w in $(seq 1 20); do
@@ -401,16 +437,40 @@ fi
 echo "[WAIT]	LBM Procedure."
 LBM_LOG="${NETCONF_TMP}/LBM.log"
 rm -f "$LBM_LOG"
-sudo /mplane_automation/dot1ag-utils/src/ethping -i "$LOCAL_IF" -v "${ToDUifvlan[0]}" -l 7 -c 30 "${MAC[0]}" > "$LBM_LOG" 2>&1 || true
+
+LBM_IDX=0
+LBM_VLAN="${ToDUifvlan[$LBM_IDX]:-}"
+LBM_RU_MAC="${MAC[$LBM_IDX]:-}"
+ETHPING_DIR="/mplane_automation/dot1ag-utils/src"
+ETHPING_BIN="${ETHPING_DIR}/ethping"
+
+if [[ -z "${LOCAL_IF:-}" ]]; then
+	test_fail "LOCAL-IF not configured (Settings or Conformance Server NIC)"
+	exit 1
+fi
+if [[ ! -x "$ETHPING_BIN" ]]; then
+	test_fail "ethping not found at $ETHPING_BIN"
+	exit 1
+fi
+if [[ -z "${LBM_RU_MAC:-}" ]]; then
+	test_fail "RU MAC empty before LBM"
+	exit 1
+fi
+
+(
+	cd "$ETHPING_DIR" || exit 127
+	exec sudo ./ethping -i "$LOCAL_IF" -v "$LBM_VLAN" -l 7 -c 30 "$LBM_RU_MAC"
+) >"$LBM_LOG" 2>&1 || true
 
 RESULT6="NOK"
 for _w in $(seq 1 250); do
-	if [[ -f "$LBM_LOG" ]] && grep -a -v "timeout for" "$LBM_LOG" 2>/dev/null | grep -a -F "${MAC[0]}" >/dev/null 2>&1; then
+	if [[ -f "$LBM_LOG" ]] && _lbm_log_has_lbr_reply "$LBM_LOG" "$LBM_RU_MAC"; then
 		RESULT6="OK"
 		break
 	fi
 	sleep 0.2
 done
+
 echo "[$RESULT6]	STEP 6.	CHECK if the O-RU transmitted LBR"
 if [[ "$RESULT6" != "OK" ]]; then
 	test_fail "LBR check"

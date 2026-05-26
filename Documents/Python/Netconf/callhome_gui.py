@@ -848,6 +848,9 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         form = ttk.LabelFrame(settings_tab, text="ORU Netconf configration", padding=8)
         form.pack(fill="x", padx=8, pady=10)
 
+        settings_labels = {
+            "LOCAL_IF": "Server NIC (ethping -i)",
+        }
         defaults = {
             "USER": "oranuser",
             "PASSWORD": "o-ran-password",
@@ -860,10 +863,12 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             # O-RU 쉘 자동화 시 sshpass 등으로 CLI-ID/CLI-PW 전달에 사용할 수 있음
             "CLI-ID": "",
             "CLI-PW": "",
+            "LOCAL_IF": "",
         }
 
         for i, (key, value) in enumerate(defaults.items()):
-            ttk.Label(form, text=key, width=24).grid(row=i // 2, column=(i % 2) * 2, padx=8, pady=6, sticky="w")
+            label = settings_labels.get(key, key)
+            ttk.Label(form, text=label, width=24).grid(row=i // 2, column=(i % 2) * 2, padx=8, pady=6, sticky="w")
             var = tk.StringVar(value=value)
             self.fields[key] = var
             show = "*" if key in ("PASSWORD", "CLI-PW") else ""
@@ -881,7 +886,9 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             form,
             text=(
                 "이 값들은 miniDU_callhome.sh 실행 시 환경변수로 전달됩니다 (예: LOG_PATH, NETCONF_PORT). "
-                "CLI-ID/CLI-PW·ALLOWED_IP 등은 장비·자동화 스크립트에서 참조할 수 있습니다."
+                "CLI-ID/CLI-PW·ALLOWED_IP 등은 장비·자동화 스크립트에서 참조할 수 있습니다. "
+                "Server NIC: miniDU fronthaul (ethping -i, 예: dasan). "
+                "Conformance 3.1.13.1 등에서는 항목 설정의 Server NIC에도 동일 값을 넣을 수 있습니다."
             ),
             foreground="#555555",
         ).grid(row=(len(defaults) + 1) // 2 + 1, column=0, columnspan=4, padx=8, pady=(0, 6), sticky="w")
