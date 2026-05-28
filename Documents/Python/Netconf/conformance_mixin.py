@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import copy
 import io
 import json
 import os
@@ -14,7 +15,7 @@ import threading
 import time
 import tkinter as tk
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path, PurePosixPath
 from tkinter import messagebox, ttk
 from typing import Any
@@ -136,7 +137,7 @@ _SWM_FIELDS_3162 = _swm_test_fields(
     "3.1.6.2용 부정 시험 PKG (손상·무결성 오류 유발, 3161과 다른 파일 권장)"
 )
 
-_IFACE_TEST_FIELDS: list[dict[str, Any]] = [
+_IFACE_TO_DU_FIELDS: list[dict[str, Any]] = [
     {
         "key": "to_du_if_name",
         "label": "To-DU interface (O-RU NETCONF)",
@@ -153,6 +154,9 @@ _IFACE_TEST_FIELDS: list[dict[str, Any]] = [
         "env_var": None,
         "wide": False,
     },
+]
+
+_IFACE_ODU_MAC_FIELD: list[dict[str, Any]] = [
     {
         "key": "odu_mac",
         "label": "O-DU MAC",
@@ -162,6 +166,8 @@ _IFACE_TEST_FIELDS: list[dict[str, Any]] = [
         "wide": False,
     },
 ]
+
+_IFACE_TEST_FIELDS: list[dict[str, Any]] = _IFACE_TO_DU_FIELDS + _IFACE_ODU_MAC_FIELD
 
 # 3.1.13.1 LBM only — 3.1.10.x (31101/31102)는 M-Plane Excel만 사용
 _LBM31131_FIELDS: list[dict[str, Any]] = [
@@ -194,7 +200,7 @@ _318X_TEST_FIELDS: list[dict[str, Any]] = [
             ("after", "v11.0 이후 — oranuser@o-ran.org 포함"),
         ],
     },
-] + _IFACE_TEST_FIELDS
+] + _IFACE_TO_DU_FIELDS
 
 _CONFORMANCE_ORU_BOOST_SCRIPT = "oru_show_system_boost.sh"
 _CONFORMANCE_3112X_SCRIPTS: frozenset[str] = frozenset(
@@ -1964,18 +1970,8 @@ class ConformanceMixin:
                 self._conformance_detail_run_started_wall[fname] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 self._conformance_detail_run_started_mono[fname] = time.monotonic()
                 boost_defer: str | None = None
-                if fname in _CONFORMANCE_3112X_SCRIPTS and self._conformance_oru_boost_enabled(fname):
-                    if fname == "conformance_31122.sh":
-                        boost_defer = "Wait for Trace-log generated"
-                    elif fname == "conformance_31121.sh":
-                        boost_defer = "Wait for Troubleshooting-log generated"
-                    else:
-                        if not self._conformance_start_oru_show_system_boost(
-                            client, sftp, remote_dir, fname, log_line
-                        ):
-                            self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
-                            self.after(0, self._conformance_refresh_row_result_labels)
-                            continue
+                if fname == "conformance_31122.sh" and self._conformance_oru_boost_enabled(fname):
+                    boost_defer = "Wait for Trace-log generated"
                 try:
                     rc = self._conformance_exec_remote_script(
                         client,
@@ -2152,6 +2148,159 @@ class ConformanceMixin:
                     results.append(trimmed)
         return results
 
+    @staticmethod
+    def _conformance_detail_extract_ts(line: str) -> datetime | None:
+        s = line.strip()
+        m_iso = re.search(r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})Z", s)
+        if m_iso:
+            try:
+                return datetime.strptime(m_iso.group(1), "%Y-%m-%dT%H:%M:%S")
+            except Exception:
+                return None
+        m_wall = re.search(r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", s)
+        if m_wall:
+            try:
+                return datetime.strptime(m_wall.group(1), "%Y-%m-%d %H:%M:%S")
+            except Exception:
+                return None
+        return None
+
+    def _conformance_detail_sync_history(self, fname: str, lines: list[str]) -> list[str]:
+        hist: list[str] = []
+        blob = "\n".join(lines)
+        run_started_wall = self._conformance_detail_run_started_wall.get(fname, "")
+        fallback_fixed: datetime | None = None
+        if run_started_wall:
+            try:
+                fallback_fixed = datetime.strptime(run_started_wall, "%Y-%m-%d %H:%M:%S")
+            except Exception:
+                fallback_fixed = None
+        # Only count actually emitted L2SW command lines, not config summary lines.
+        l2sw_cmd_re = re.compile(r"^\[L2SW\](?:\[[^\]]+\])?\s*>>>\s*(.+)$", re.I)
+        cmd_lines: list[str] = []
+        cmd_times: list[datetime] = []
+        holdover_t: datetime | None = None
+        freerun_t: datetime | None = None
+        alarm_t: datetime | None = None
+        last_event_t: datetime | None = None
+
+        for raw in lines:
+            s = self._conformance_detail_strip_run_tag(raw)
+            t = self._conformance_detail_extract_ts(s)
+            low = s.lower()
+            m_hold = re.search(r"\[TIME\]\s*HOLDOVER_EVENT_TIME\s*=\s*(\S+)", s, re.I)
+            if m_hold:
+                holdover_t = holdover_t or self._conformance_detail_extract_ts(m_hold.group(1))
+            m_free = re.search(r"\[TIME\]\s*FREERUN_EVENT_TIME\s*=\s*(\S+)", s, re.I)
+            if m_free:
+                freerun_t = freerun_t or self._conformance_detail_extract_ts(m_free.group(1))
+            m_alarm_occ = re.search(r"\[TIME\]\s*ALARM_OCCUR_EVENT_TIME\s*=\s*(\S+)", s, re.I)
+            if m_alarm_occ:
+                alarm_t = alarm_t or self._conformance_detail_extract_ts(m_alarm_occ.group(1))
+            m_alarm_clr = re.search(r"\[TIME\]\s*ALARM_CLEAR_EVENT_TIME\s*=\s*(\S+)", s, re.I)
+            if m_alarm_clr and alarm_t is None:
+                alarm_t = self._conformance_detail_extract_ts(m_alarm_clr.group(1))
+            m_cmd = l2sw_cmd_re.match(s)
+            if m_cmd:
+                cmd_lines.append(s)
+                if t is not None:
+                    cmd_times.append(t)
+            # NETCONF notification eventTime is often on a separate line.
+            if "<eventtime>" in low or "notification (" in low:
+                if t is not None:
+                    last_event_t = t
+            if holdover_t is None and "holdover" in low:
+                holdover_t = t or last_event_t
+            if freerun_t is None and "freerun" in low:
+                freerun_t = t or last_event_t
+            if alarm_t is None:
+                if "alarm-notif" in low or "<fault-id>" in low or "<is-cleared>false</is-cleared>" in low:
+                    alarm_t = t or last_event_t
+
+        # Strong fallback: parse full notification XML blocks and map eventTime -> payload.
+        for nm in re.finditer(
+            r"<notification\b[^>]*>[\s\S]*?<eventTime>([^<]+)</eventTime>([\s\S]*?)</notification>",
+            blob,
+            re.I,
+        ):
+            if holdover_t is not None and freerun_t is not None and alarm_t is not None:
+                break
+            evt = self._conformance_detail_extract_ts(nm.group(1))
+            payload_low = nm.group(2).lower()
+            if holdover_t is None and "holdover" in payload_low:
+                holdover_t = evt
+            if freerun_t is None and "freerun" in payload_low:
+                freerun_t = evt
+            if alarm_t is None and (
+                "alarm-notif" in payload_low
+                or "<fault-id>" in payload_low
+                or "<is-cleared>false</is-cleared>" in payload_low
+            ):
+                alarm_t = evt
+
+        # Fallback: infer event time from nearby "notification (...)" blocks.
+        if holdover_t is None:
+            m = re.search(r"notification\s*\(([^)]+)\)[\s\S]{0,500}?holdover", blob, re.I)
+            if m:
+                holdover_t = self._conformance_detail_extract_ts(m.group(1))
+        if freerun_t is None:
+            m = re.search(r"notification\s*\(([^)]+)\)[\s\S]{0,500}?freerun", blob, re.I)
+            if m:
+                freerun_t = self._conformance_detail_extract_ts(m.group(1))
+        if alarm_t is None:
+            m = re.search(
+                r"notification\s*\(([^)]+)\)[\s\S]{0,700}?(alarm-notif|<fault-id>|<is-cleared>false</is-cleared>)",
+                blob,
+                re.I,
+            )
+            if m:
+                alarm_t = self._conformance_detail_extract_ts(m.group(1))
+
+        def _fmt_server_time(dt: datetime | None) -> str:
+            # Use fixed run-start local time as stable fallback (no moving clock).
+            if dt:
+                return dt.strftime("%Y-%m-%d %H:%M:%S")
+            if fallback_fixed:
+                return fallback_fixed.strftime("%Y-%m-%d %H:%M:%S")
+            return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        hist.append("[Sync 상태 이력 (서버시간)]")
+        if cmd_lines:
+            hist.append("  1) L2SW 설정 명령 진행")
+            for cl in cmd_lines[:8]:
+                hist.append(f"     - {cl}")
+            if len(cmd_lines) > 8:
+                hist.append(f"     - ... ({len(cmd_lines) - 8}줄 생략)")
+            if cmd_times:
+                c0 = min(cmd_times)
+                c1h = c0 + timedelta(hours=1)
+                hist.append(
+                    f"     - 첫 명령 서버시간: {_fmt_server_time(c0)}  "
+                    f"(+1h 종료: {_fmt_server_time(c1h)})"
+                )
+            else:
+                hist.append(f"     - 첫 명령 서버시간: {_fmt_server_time(None)}")
+        else:
+            hist.append("  1) L2SW 설정 명령 진행: 미진행")
+
+        if holdover_t is not None:
+            hist.append(f"  2) HOLDOVER 변경 서버시간: {_fmt_server_time(holdover_t)}")
+        else:
+            hist.append("  2) HOLDOVER 변경: 미진행")
+        if freerun_t is not None:
+            hist.append(f"  3) FREERUN 변경 서버시간: {_fmt_server_time(freerun_t)}")
+        else:
+            note = ""
+            if holdover_t is not None:
+                note = " (FREERUN 시간 정보 없음)"
+            hist.append(f"  3) FREERUN 변경: 미진행{note}")
+        if alarm_t is not None:
+            hist.append(f"  4) Alarm noti 수신 서버시간: {_fmt_server_time(alarm_t)}")
+        else:
+            hist.append("  4) Alarm noti 수신: 미진행")
+        hist.append("")
+        return hist
+
     def _conformance_format_detail_report(self, fname: str, opts: ConformanceRunOptions) -> str:
         lk = getattr(self, "_conformance_detail_lock", None)
         lines: list[str] = []
@@ -2197,6 +2346,8 @@ class ConformanceMixin:
         out.append(f"  CONN_DELAY: {opts.conn_delay.strip() or '3'} s")
         out.append(f"  post_listen_wait: {(opts.post_listen_wait_sec or '').strip() or '0'} s")
         out.append("")
+        if fname in ("conformance_3151.sh", "conformance_3152.sh"):
+            out.extend(self._conformance_detail_sync_history(fname, lines))
         out.append("[STEP·PASS/FAIL 원인 분석]")
         step_blocks: list[str] = []
 
@@ -2314,6 +2465,34 @@ class ConformanceMixin:
                 for nl in noti_lines[:3]:
                     parts.append(f"      {nl}")
             step_blocks.append("\n".join(parts))
+
+        if fname == "conformance_3162.sh":
+            m_swm_bad = re.search(
+                r"<install-event\b[^>]*>[\s\S]*?<status>\s*(?:COMPLETED|VALID)\s*</status>",
+                blob,
+                re.I,
+            )
+            if m_swm_bad:
+                step_blocks.append(
+                    "  【3.1.6.2 install-event】 FAIL\n"
+                    "      부정 PKG인데 install이 성공(COMPLETED/VALID)한 것으로 보입니다."
+                )
+            m_swm_ok = re.search(
+                r"<install-event\b[^>]*>[\s\S]*?<status>\s*(?:INTEGRITY_ERROR|FILE_ERROR|FILE_NOT_FOUND|FAILED|APPLICATION_ERROR)\s*</status>",
+                blob,
+                re.I,
+            )
+            if m_swm_ok and not m_swm_bad:
+                sm = re.search(
+                    r"<install-event\b[^>]*>[\s\S]*?<status>\s*([^<]+)\s*</status>",
+                    blob,
+                    re.I,
+                )
+                st = (sm.group(1).strip() if sm else "?")
+                step_blocks.append(
+                    f"  【3.1.6.2 install-event】 PASS (expected rejection)\n"
+                    f"      status={st} — 비정상 PKG 설치 거부"
+                )
 
         if "[FAIL]" in blob:
             seen_fail: set[str] = set()
@@ -2507,6 +2686,65 @@ class ConformanceMixin:
 
     # ── per-test settings ──────────────────────────────────────────
 
+    def _conformance_reconcile_per_test_settings(self) -> None:
+        """Merge per-script / shared keys so dialogs and runs see the same values."""
+        for fname, schema in _CONFORMANCE_PER_TEST_SCHEMA.items():
+            sk = str(schema.get("settings_key") or fname)
+            keys: list[str] = [sk, fname]
+            shared = schema.get("shared_with")
+            if shared:
+                keys.append(str(shared))
+            merged: dict[str, str] = {}
+            for k in keys:
+                cur = self._conformance_per_test_settings.get(k)
+                if isinstance(cur, dict):
+                    merged.update({str(kk): str(vv) for kk, vv in cur.items()})
+            if not merged:
+                continue
+            for k in keys:
+                self._conformance_per_test_settings[k] = dict(merged)
+
+    def _conformance_field_value_from_entry(
+        self, field: dict[str, Any], sv: tk.StringVar
+    ) -> str:
+        v = sv.get().strip()
+        choices = field.get("choices")
+        if choices:
+            labels = [c[1] for c in choices]
+            values = [c[0] for c in choices]
+            if v in labels:
+                return values[labels.index(v)]
+            if v in values:
+                return v
+            if values:
+                return values[0]
+        if field.get("file_picker") and v:
+            try:
+                return str(Path(v).expanduser().resolve())
+            except OSError:
+                return v
+        return v
+
+    def _conformance_write_per_test_settings(
+        self, fname: str, schema: dict[str, Any], vals: dict[str, str]
+    ) -> None:
+        store_key = str(schema.get("settings_key") or fname)
+        clean = {str(k): str(v) for k, v in vals.items()}
+        self._conformance_per_test_settings[store_key] = dict(clean)
+        self._conformance_per_test_settings[fname] = dict(clean)
+        shared = schema.get("shared_with")
+        if shared:
+            self._conformance_per_test_settings[str(shared)] = dict(clean)
+
+    def _conformance_persist_per_test_settings_to_disk(self) -> None:
+        try:
+            self._save_current_config()
+        except Exception as exc:
+            try:
+                self.append_log(f"[GUI] Conformance 항목 설정 저장 실패: {exc}\n")
+            except Exception:
+                pass
+
     def _conformance_get_per_test_val(self, fname: str, key: str) -> str:
         schema = _CONFORMANCE_PER_TEST_SCHEMA.get(fname)
         if not schema:
@@ -2555,7 +2793,7 @@ class ConformanceMixin:
             swm_env = self._conformance_swm_env_export(fname)
             if swm_env:
                 parts.append(swm_env)
-        if fname in _CONFORMANCE_3112X_SCRIPTS and self._conformance_oru_boost_enabled(fname):
+        if fname == "conformance_31122.sh" and self._conformance_oru_boost_enabled(fname):
             parts.append("export ORU_LOG_BOOST=1")
         return " ; ".join(parts) + (" ; " if parts else "")
 
@@ -2663,10 +2901,30 @@ class ConformanceMixin:
                 ent.pack(side="left", fill="x", expand=True)
                 ftypes = field.get("file_types", [("All files", "*.*")])
 
-                def _browse(s=sv, ft=ftypes) -> None:
+                def _browse(
+                    s=sv,
+                    ft=ftypes,
+                    fkey=field["key"],
+                ) -> None:
                     from tkinter import filedialog
-                    p = filedialog.askopenfilename(filetypes=ft)
+
+                    initial = s.get().strip()
+                    init_dir = ""
+                    if initial:
+                        try:
+                            pp = Path(initial).expanduser()
+                            init_dir = str(pp.parent if pp.is_file() else pp)
+                        except OSError:
+                            init_dir = ""
+                    p = filedialog.askopenfilename(
+                        filetypes=ft,
+                        initialdir=init_dir or None,
+                    )
                     if p:
+                        try:
+                            p = str(Path(p).expanduser().resolve())
+                        except OSError:
+                            pass
                         s.set(p)
 
                 ttk.Button(entry_fr, text="선택…", command=_browse, width=6).pack(side="left", padx=(4, 0))
@@ -2681,30 +2939,23 @@ class ConformanceMixin:
                 )
 
         def _apply() -> None:
-            vals: dict[str, str] = {}
+            vals = dict(cur)
             for field in schema["fields"]:
                 key = field["key"]
                 sv = entries.get(key)
                 if sv is None:
                     continue
-                v = sv.get().strip()
-                choices = field.get("choices")
-                if choices:
-                    labels = [c[1] for c in choices]
-                    values = [c[0] for c in choices]
-                    if v in labels:
-                        v = values[labels.index(v)]
-                    elif v not in values and values:
-                        v = values[0]
+                v = self._conformance_field_value_from_entry(field, sv)
                 if v:
                     vals[key] = v
-            self._conformance_per_test_settings[store_key] = vals
-            self._conformance_per_test_settings[fname] = vals
-            shared = schema.get("shared_with")
-            if shared:
-                self._conformance_per_test_settings[shared] = dict(vals)
+                else:
+                    vals.pop(key, None)
+            self._conformance_write_per_test_settings(fname, schema, vals)
+            self._conformance_persist_per_test_settings_to_disk()
             try:
-                self._on_any_setting_changed()
+                self.append_log(
+                    f"[GUI] Conformance 항목 설정 저장: {fname} ({len(vals)}개 필드)\n"
+                )
             except Exception:
                 pass
             win.destroy()
@@ -2922,7 +3173,7 @@ class ConformanceMixin:
             messagebox.showwarning("Conformance", "이미 실행 중입니다.")
             return
         opts = self._conformance_default_run_options()
-        self._conformance_progress.clear()
+        # Keep previous per-item results visible while rerunning a subset.
         self._conformance_cancel_event.clear()
         self._conformance_run_busy = True
         self._conformance_run_active_targets = set(to_run)

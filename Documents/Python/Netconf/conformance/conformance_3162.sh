@@ -127,6 +127,65 @@ cat > "$GET_RUNNING_SLOT_RPC" <<'EORPC'
 </get>
 EORPC
 
+GET_SLOTS_RPC="${NETCONF_TMP}/get/get_software_slots.xml"
+cat > "$GET_SLOTS_RPC" <<'EORPC'
+<get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <filter type="subtree">
+    <software-inventory xmlns="urn:o-ran:software-management:1.0">
+      <software-slot/>
+    </software-inventory>
+  </filter>
+</get>
+EORPC
+
+_rpc_has_error() {
+	local f="$1"
+	[[ -f "$f" ]] || return 1
+	grep -aq "<rpc-error" "$f" 2>/dev/null
+}
+
+# Last <install-event> status/error-message from session log (not download COMPLETED).
+_swm_last_install_event_fields() {
+	local log="$1"
+	python3 - "$log" <<'PY'
+import re, sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
+events = re.findall(
+    r"<install-event\b[^>]*>([\s\S]*?)</install-event>", text, flags=re.IGNORECASE
+)
+if not events:
+    print("\t")
+    raise SystemExit(0)
+last = events[-1]
+sm = re.search(r"<status>([^<]*)</status>", last, flags=re.IGNORECASE)
+em = re.search(r"<error-message>([^<]*)</error-message>", last, flags=re.IGNORECASE)
+status = (sm.group(1).strip() if sm else "")
+err = (em.group(1).strip() if em else "")
+print(f"{status}\t{err}")
+PY
+}
+
+_swm_install_reply_status() {
+	local f="$1"
+	[[ -f "$f" ]] || return 0
+	python3 - "$f" <<'PY'
+import re, sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
+m = re.search(
+    r"<status\b[^>]*xmlns=[\"']urn:o-ran:software-management:1.0[\"'][^>]*>([^<]*)</status>",
+    text,
+    flags=re.IGNORECASE,
+)
+if not m:
+    m = re.search(r"<status>([^<]*)</status>", text, flags=re.IGNORECASE)
+print((m.group(1).strip() if m else ""))
+PY
+}
+
 coproc NP2 {
 	setsid stdbuf -oL sshpass -p "$PASSWORD" netopeer2-cli 2>&1
 } >>"$LOG" 2>&1
@@ -239,6 +298,35 @@ if [[ "$RESULT3" != "OK" ]]; then
 fi
 
 ########################################################################
+# STEP 3.1. Get Slot States (running/active flags)
+########################################################################
+GET_SLOTS_OUT="${NETCONF_TMP}/get/get_software_slots_out.xml"
+rm -f "$GET_SLOTS_OUT"
+send_cmd "user-rpc --content $GET_SLOTS_RPC --out $GET_SLOTS_OUT"
+RESULT3A="NOK"
+for _w in $(seq 1 60); do
+	if [[ -f "$GET_SLOTS_OUT" ]] && grep -aq "</data>" "$GET_SLOTS_OUT" 2>/dev/null; then
+		RESULT3A="OK"
+		break
+	fi
+	sleep 0.5
+done
+if [[ "$RESULT3A" != "OK" ]]; then
+	test_fail "get software slots"
+	exit 1
+fi
+
+_pick_install_slot() {
+	local xml="$1"
+	# Choose a slot with running=false AND active=false.
+	# ACORN RU also exposes read-only slots (e.g. "factory"). Installation must target first/second only.
+	xmlstarlet sel -N x="urn:o-ran:software-management:1.0" \
+		-t -m "//x:software-slot[(x:name='first' or x:name='second') and x:running='false' and x:active='false']" \
+		-v "x:name" -n \
+		"$xml" 2>/dev/null | head -n 1 | tr -d '\r\n '
+}
+
+########################################################################
 # STEP 4. Software Download — non-existent file (expect FILE_NOT_FOUND)
 ########################################################################
 # Build download URL with embedded credentials (user:password@host format)
@@ -283,16 +371,17 @@ if [[ "$RESULT4" != "OK" ]]; then
 fi
 
 ########################################################################
-# STEP 5. Software Install (expect INTEGRITY_ERROR)
+# STEP 5. Software Install (expect install rejection: INTEGRITY_ERROR, FILE_ERROR, …)
 ########################################################################
-# 추가된 부분: RUNNINGSLOT 변수에서 첫 번째 줄(실제 슬롯 이름)만 추출하여 공백과 줄바꿈을 제거합니다.
-ACTUAL_RUNNINGSLOT=$(echo "$RUNNINGSLOT" | head -n 1 | tr -d '\r\n ')
-
-# 조건문을 정제된 변수(ACTUAL_RUNNINGSLOT) 기준으로 변경합니다.
-if [[ "$ACTUAL_RUNNINGSLOT" == "first" ]]; then
-    NONRUNNINGSLOT="second"
-else
-    NONRUNNINGSLOT="first"
+NONRUNNINGSLOT="$(_pick_install_slot "$GET_SLOTS_OUT")"
+if [[ -z "${NONRUNNINGSLOT:-}" ]]; then
+	# Prevent indefinite wait: RU rejects install unless active=false and running=false.
+	test_fail "no installable slot among {first,second} (need running=false & active=false)"
+	exit 1
+fi
+if [[ "$NONRUNNINGSLOT" != "first" && "$NONRUNNINGSLOT" != "second" ]]; then
+	test_fail "invalid install slot chosen: $NONRUNNINGSLOT (must be first/second only)"
+	exit 1
 fi
 
 SW_INSTALL_RPC="${NETCONF_TMP}/edit/software_install.xml"
@@ -303,29 +392,72 @@ cat > "$SW_INSTALL_RPC" <<EORPC
 </software-install>
 EORPC
 
-send_cmd "user-rpc --content $SW_INSTALL_RPC"
+SW_INSTALL_OUT="${NETCONF_TMP}/edit/software_install_out.xml"
+rm -f "$SW_INSTALL_OUT"
+send_cmd "user-rpc --content $SW_INSTALL_RPC --out $SW_INSTALL_OUT"
 echo "      Software Installation Started   .slot = $NONRUNNINGSLOT"
+
+# If install RPC was rejected, fail fast (GUI should not keep waiting).
+for _w in $(seq 1 80); do
+	if [[ -f "$SW_INSTALL_OUT" ]] && (grep -aq "<ok/>" "$SW_INSTALL_OUT" 2>/dev/null || _rpc_has_error "$SW_INSTALL_OUT"); then
+		break
+	fi
+	sleep 0.2
+done
+if _rpc_has_error "$SW_INSTALL_OUT"; then
+	ERR_RPC=$(grep -aoP '(?<=<error-message[^>]*>).*?(?=</error-message>)' "$SW_INSTALL_OUT" 2>/dev/null | tail -1) || true
+	echo "[FAIL] software-install RPC rejected: ${ERR_RPC:-rpc-error}"
+	exit 1
+fi
+
+REPLY_STATUS="$(_swm_install_reply_status "$SW_INSTALL_OUT")"
+if [[ -n "${REPLY_STATUS:-}" && "$REPLY_STATUS" != "STARTED" ]]; then
+	echo "[FAIL] software-install RPC reply status=${REPLY_STATUS} (expected async install-event with install failure)"
+	test_fail "unexpected install RPC reply status: $REPLY_STATUS"
+	exit 1
+fi
 
 RESULT6="NOK"
 SWMSTATUS6=""
 ERR_MSG6=""
 for _w in $(seq 1 1000); do
 	if grep -a -F "</install-event></notification>" "$LOG" >/dev/null 2>&1; then
-		SWMSTATUS6=$(grep -oP '(?<=<status>).*?(?=</status>)' "$LOG" 2>/dev/null | tail -1) || true
-		ERR_MSG6=$(grep -oP '(?<=<error-message>).*?(?=</error-message>)' "$LOG" 2>/dev/null | tail -1) || true
+		IFS=$'\t' read -r SWMSTATUS6 ERR_MSG6 < <(_swm_last_install_event_fields "$LOG")
 		break
 	fi
 	sleep 0.2
 done
 
-if [[ "$SWMSTATUS6" == "INTEGRITY_ERROR" ]]; then
-	RESULT6="OK"
-elif [[ "$ERR_MSG6" == *"Can't extract download software package."* ]]; then
-	RESULT6="OK"
+if [[ -z "${SWMSTATUS6:-}" ]]; then
+	echo "[FAIL] STEP 6: no install-event notification (expected install failure event)"
+	test_fail "missing install-event"
+	exit 1
 fi
-echo "[$RESULT6] STEP 6. Installation Normally Failed.	.status = ${SWMSTATUS6:-unknown}, .error-message = ${ERR_MSG6:-none}"
+
+# Negative test PASS: O-RU rejects install (any failure status). FAIL only if install succeeds.
+case "$SWMSTATUS6" in
+	INTEGRITY_ERROR|FILE_ERROR|FILE_NOT_FOUND|FAILED|APPLICATION_ERROR)
+		RESULT6="OK"
+		;;
+	COMPLETED|VALID)
+		echo "[FAIL] STEP 6: install should have failed for negative PKG, got ${SWMSTATUS6}"
+		test_fail "install succeeded unexpectedly (negative PKG)"
+		exit 1
+		;;
+	*)
+		if [[ "$ERR_MSG6" == *"Can't extract download software package."* ]]; then
+			RESULT6="OK"
+		else
+			echo "[FAIL] STEP 6: unknown install status ${SWMSTATUS6:-?} (${ERR_MSG6:-no error-message})"
+			test_fail "negative install (expected rejection status or extraction error)"
+			exit 1
+		fi
+		;;
+esac
+
+echo "[$RESULT6] STEP 6. Installation Normally Failed.	.status = ${SWMSTATUS6}, .error-message = ${ERR_MSG6:-none}"
 if [[ "$RESULT6" != "OK" ]]; then
-	test_fail "negative install (INTEGRITY_ERROR or extraction error expected)"
+	test_fail "negative install (install rejection expected)"
 	exit 1
 fi
 

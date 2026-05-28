@@ -99,8 +99,8 @@ CONFORMANCE_SPEC_DESCRIPTIONS_KO: dict[str, str] = {
         "Conformance 설정(⚙)에서 3.1.6.1 전용 PKG를 지정합니다."
     ),
     "3.1.6.2": (
-        "3.1.6.2 (S/W 설치 부정): download 후 install 시 INTEGRITY_ERROR 등으로 "
-        "설치가 거부되는지 확인합니다. 3.1.6.2 설정(⚙)에서 3.1.6.1과 다른 PKG(손상·부정용)를 지정합니다."
+        "3.1.6.2 (S/W 설치 부정): download 후 install 시 O-RU가 설치를 거부하는지 확인합니다 "
+        "(INTEGRITY_ERROR, FILE_ERROR 등 실패 status). 3.1.6.2 설정(⚙)에서 3.1.6.1과 다른 PKG(손상·부정용)를 지정합니다."
     ),
     "3.1.7.1": (
         "3.1.7.1 (S/W 활성화): install 완료 슬롯에 activate를 수행했을 때 "

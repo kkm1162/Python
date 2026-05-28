@@ -1,3 +1,4 @@
+import copy
 import io
 import os
 import re
@@ -4040,7 +4041,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "conformance_run_supervision_negative_fail_cycle": self.conformance_run_supervision_negative_fail_cycle_var.get(),
             "conformance_run_conn_delay": self.conformance_run_conn_delay_var.get(),
             "conformance_post_listen_wait": self.conformance_post_listen_wait_var.get(),
-            "conformance_per_test_settings": self._conformance_per_test_settings,
+            "conformance_per_test_settings": copy.deepcopy(self._conformance_per_test_settings),
             "conformance_extra_uploads": [
                 {"local": a, "remote": b} for a, b in self._conformance_extra_uploads
             ],
@@ -4142,6 +4143,10 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                     self._conformance_per_test_settings[str(fname)] = {
                         str(k): str(v) for k, v in vals.items()
                     }
+            try:
+                self._conformance_reconcile_per_test_settings()
+            except Exception:
+                pass
         ex = data.get("conformance_extra_uploads")
         if isinstance(ex, list):
             self._conformance_extra_uploads = []

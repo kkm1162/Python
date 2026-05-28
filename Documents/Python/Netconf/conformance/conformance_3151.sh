@@ -90,13 +90,83 @@ send_cmd() {
 }
 
 l2sw_send() {
-	echo "[L2SW] >>> $*"
+	local _ts
+	_ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || true)"
+	echo "[L2SW][${_ts:-unknown}] >>> $*"
 	echo "$*" >&20 2>/dev/null || true
 	sleep 1
 }
 
 test_fail() {
 	echo "[FAIL] $*"
+}
+
+_print_sync_state_times() {
+	python3 - "$LOG" <<'PY'
+import re, sys
+from pathlib import Path
+
+log = Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
+
+def norm_state(s: str) -> str:
+    return re.sub(r"[\s_\-]+", "", (s or "").strip().upper())
+
+first = {"HOLDOVER": None, "FREERUN": None, "LOCKED": None}
+last_sync = None
+for m in re.finditer(
+    r"<notification\b[^>]*>[\s\S]*?<eventTime>([^<]+)</eventTime>([\s\S]*?)</notification>",
+    log,
+    re.I,
+):
+    ts = m.group(1).strip()
+    payload = m.group(2)
+    pl = payload.lower()
+    if "synchronization-state-change" in pl:
+        sm = re.search(r"<sync-state[^>]*>([^<]+)</sync-state>", payload, re.I)
+        if sm:
+            st = norm_state(sm.group(1))
+            last_sync = ts
+            if st in first and first[st] is None:
+                first[st] = ts
+    if first["FREERUN"] is None and "ptp-state-change" in pl:
+        pm = re.search(r"<ptp-state[^>]*>([^<]+)</ptp-state>", payload, re.I)
+        if pm and norm_state(pm.group(1)) == "FREERUN":
+            first["FREERUN"] = ts
+
+if last_sync:
+    print(f"[TIME] SYNC_EVENT_TIME={last_sync}")
+for k in ("HOLDOVER", "FREERUN", "LOCKED"):
+    if first[k]:
+        print(f"[TIME] {k}_EVENT_TIME={first[k]}")
+PY
+}
+
+_print_alarm_times() {
+	python3 - "$LOG" <<'PY'
+import re, sys
+from pathlib import Path
+
+log = Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
+first_occ = None
+first_clr = None
+for m in re.finditer(
+    r"<notification\b[^>]*>[\s\S]*?<eventTime>([^<]+)</eventTime>([\s\S]*?)</notification>",
+    log,
+    re.I,
+):
+    ts = m.group(1).strip()
+    payload = m.group(2)
+    if "fault-id" not in payload.lower():
+        continue
+    if first_occ is None and re.search(r"<is-cleared>\s*false\s*</is-cleared>", payload, re.I):
+        first_occ = ts
+    if first_clr is None and re.search(r"<is-cleared>\s*true\s*</is-cleared>", payload, re.I):
+        first_clr = ts
+if first_occ:
+    print(f"[TIME] ALARM_OCCUR_EVENT_TIME={first_occ}")
+if first_clr:
+    print(f"[TIME] ALARM_CLEAR_EVENT_TIME={first_clr}")
+PY
 }
 
 COPROC_READY=0
@@ -106,16 +176,6 @@ CLI_PID=""
 CLI_FIFO="${NETCONF_TMP}/to_ssh_l2sw"
 
 cleanup() {
-	if [[ -n "${ALARM_ON_CMDS:-}" ]]; then
-		IFS=',' read -ra _on_arr <<< "$ALARM_ON_CMDS"
-		for _c in "${_on_arr[@]}"; do
-			_c="$(echo "$_c" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
-			[[ -n "$_c" ]] && echo "$_c" >&20 2>/dev/null || true
-			sleep 1
-		done
-	fi
-	sleep 1
-
 	if [[ -n "${WATCHDOG_PID:-}" ]]; then
 		kill "$WATCHDOG_PID" 2>/dev/null || true
 		wait "$WATCHDOG_PID" 2>/dev/null || true
@@ -279,6 +339,7 @@ if [[ "$RESULT4" != "OK" ]]; then
 	test_fail "sync-state-change notification timeout"
 	exit 1
 fi
+_print_sync_state_times
 
 ########################################################################################
 # STEP 5. Alarm occur notification (is-cleared=false)
@@ -300,6 +361,7 @@ if [[ "$RESULT5" != "OK" ]]; then
 	test_fail "alarm-occur notification timeout"
 	exit 1
 fi
+_print_alarm_times
 
 ########################################################################################
 # STEP 6. L2SW ON commands
@@ -337,6 +399,10 @@ if [[ -n "${ALARM_ON_CMDS:-}" ]]; then
 else
 	echo "[OK]	STEP 6.	ON commands not configured (skip)"
 fi
+
+# Final scan: late FREERUN during recovery / full alarm times for GUI.
+_print_sync_state_times
+_print_alarm_times
 
 echo "[PASS]"
 echo "[INFO] 3.1.5.1 alarm notification test completed. Detailed log: $LOG"
