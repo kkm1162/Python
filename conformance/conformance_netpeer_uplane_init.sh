@@ -2,6 +2,8 @@
 # netopeer2-cli (user-rpc) scripts: U-Plane init (delete → replace, miniDU combined fallback).
 set -u
 
+CONFORMANCE_NETPEER_UPLANE_INIT_VER="20260608-rerun-idempotent"
+
 conformance_netpeer_resolve_uplane_init_template() {
 	local leaf="$1"
 	local cand
@@ -56,7 +58,13 @@ conformance_netpeer_rpc_has_error_tag() {
 	local out_file="$1"
 	local tag="$2"
 	[[ -f "$out_file" ]] && grep -aq "<error-tag>${tag}</error-tag>" "$out_file" 2>/dev/null && return 0
+	[[ -f "$out_file" ]] && grep -aq "${tag}" "$out_file" 2>/dev/null && return 0
 	conformance_netpeer_log_tail_has "<error-tag>${tag}</error-tag>"
+}
+
+conformance_netpeer_is_uplane_delete_label() {
+	local label="$1"
+	[[ "$label" == edit_init_uplane_conf.xml* ]]
 }
 
 # Idempotent delete: <ok/> or data-missing (already absent) both succeed.
@@ -145,12 +153,13 @@ conformance_netpeer_try_uplane_init_file() {
 	echo "[INFO] Initialize uplane conf: ${label} ← ${init_src}"
 	send_cmd "user-rpc --content ${try_xml} --out ${init_out}"
 	if conformance_netpeer_wait_rpc_ok "$init_out" 40; then
+		echo "[INFO] Initialize uplane conf: ${label} — OK"
 		return 0
 	fi
 	# Re-run: u-plane already cleared on prior PASS — delete on empty config is OK.
-	if [[ "$label" == *edit_init_uplane_conf.xml* && "$label" != *replace* ]]; then
+	if conformance_netpeer_is_uplane_delete_label "$label"; then
 		if conformance_netpeer_rpc_has_error_tag "$init_out" "data-missing"; then
-			echo "[INFO] Initialize uplane conf: ${label} — user-plane-configuration absent, OK"
+			echo "[INFO] Initialize uplane conf: ${label} — user-plane-configuration absent (data-missing), OK"
 			echo "OK" >"$init_out"
 			return 0
 		fi
@@ -163,6 +172,7 @@ conformance_netpeer_try_uplane_init_file() {
 conformance_netpeer_init_uplane() {
 	local leaf init_src minidu_src tpl _round
 
+	echo "[INFO] conformance_netpeer_uplane_init ${CONFORMANCE_NETPEER_UPLANE_INIT_VER}"
 	mkdir -p "${NETCONF_TMP:-/var/tmp/netconf_tmp}/edit" 2>/dev/null || true
 
 	for _round in 1 2; do

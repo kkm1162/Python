@@ -222,6 +222,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.conformance_run_supervision_negative_fail_cycle_var = tk.StringVar(value="3")
         self.conformance_run_conn_delay_var = tk.StringVar(value="3")
         self.conformance_post_listen_wait_var = tk.StringVar(value="0")
+        self.conformance_run_repeat_var = tk.StringVar(value="1")
         self.conformance_last_run_hint_var = tk.StringVar(value="")
         self._conformance_last_run_snapshot_cache: dict[str, Any] | None = None
         self._conformance_final_results: dict[str, dict[str, Any]] = {}
@@ -4045,6 +4046,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "conformance_run_supervision_negative_fail_cycle": self.conformance_run_supervision_negative_fail_cycle_var.get(),
             "conformance_run_conn_delay": self.conformance_run_conn_delay_var.get(),
             "conformance_post_listen_wait": self.conformance_post_listen_wait_var.get(),
+            "conformance_run_repeat": self.conformance_run_repeat_var.get(),
             "conformance_per_test_settings": copy.deepcopy(self._conformance_per_test_settings),
             "conformance_extra_uploads": [
                 {"local": a, "remote": b} for a, b in self._conformance_extra_uploads
@@ -4140,6 +4142,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             (self.conformance_run_supervision_negative_fail_cycle_var, "conformance_run_supervision_negative_fail_cycle"),
             (self.conformance_run_conn_delay_var, "conformance_run_conn_delay"),
             (self.conformance_post_listen_wait_var, "conformance_post_listen_wait"),
+            (self.conformance_run_repeat_var, "conformance_run_repeat"),
         ):
             v = data.get(cfg_key)
             if isinstance(v, str) and v.strip():

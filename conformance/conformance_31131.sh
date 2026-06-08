@@ -4,6 +4,7 @@ set -u
 set -o pipefail
 
 TESTID="31131"
+CONFORMANCE_31131_VER="20260608-rerun-cleanup"
 CONFIG=""
 while [ $# -gt 0 ]; do
 	case "$1" in
@@ -45,6 +46,7 @@ LISTEN_PORT="${CALLHOME_PORT:-4334}"
 NETCONF_TMP="${NETCONF_TMP:-/var/tmp/netconf_tmp}"
 
 echo "[INFO] USER=$USER, ALLOWED_IP=$ALLOWED_IP, LOCAL_IP=$LOCAL_IP, LISTEN_PORT=$LISTEN_PORT (Call Home), NETCONF_PORT=$NETCONF_PORT (JSON PORT), PRODUCT=$PRODUCT"
+echo "[INFO] conformance_31131 ${CONFORMANCE_31131_VER}"
 
 LOG_BASE="${LOG_PATH:-${CONFORMANCE_REMOTE_DIR:-/var/tmp/conformance}/logs}"
 LOG_BASE="${LOG_BASE%/}"
@@ -217,6 +219,48 @@ fi
 # shellcheck source=/dev/null
 source "$_NETPEER_UPLANE_INIT"
 
+_conformance_31131_log_oru_snapshot() {
+	local phase="$1"
+	local snap_out="${NETCONF_TMP}/get/_31131_oru_snapshot.xml"
+	local snap_xml="${NETCONF_TMP}/get/_31131_oru_snapshot_rpc.xml"
+	local _if_n _pe_n _uplane
+
+	cat >"$snap_xml" <<'EOGET'
+<get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <filter type="subtree">
+    <interfaces xmlns="urn:o-ran:interfaces:1.0"/>
+    <processing-elements xmlns="urn:o-ran:processing-element:1.0"/>
+    <user-plane-configuration xmlns="urn:o-ran:uplane-conf:1.0"/>
+  </filter>
+</get>
+EOGET
+	mkdir -p "${NETCONF_TMP}/get" 2>/dev/null || true
+	rm -f "$snap_out"
+	send_cmd "user-rpc --content ${snap_xml} --out ${snap_out}"
+	for _w in $(seq 1 20); do
+		if [[ -f "$snap_out" ]] && grep -aq "</data>" "$snap_out" 2>/dev/null; then
+			break
+		fi
+		sleep 0.5
+	done
+	_if_n=0
+	_pe_n=0
+	_uplane="absent"
+	if [[ -f "$snap_out" && -s "$snap_out" ]]; then
+		_if_n=$(grep -c -E '<[^:]*:interface[^>]*>|<interface[^>]*>' "$snap_out" 2>/dev/null) || _if_n=0
+		_pe_n=$(grep -c -E 'ru-elements|<[^:]*:ru-elements' "$snap_out" 2>/dev/null) || _pe_n=0
+		if grep -q 'user-plane-configuration' "$snap_out" 2>/dev/null; then
+			_uplane="present"
+		fi
+	fi
+	echo "[INFO] ORU snapshot (${phase}): interfaces=${_if_n}, ru-elements=${_pe_n}, user-plane=${_uplane}, get-bytes=$(
+		[[ -f "$snap_out" ]] && wc -c <"$snap_out" 2>/dev/null || echo 0
+	)"
+}
+
+echo "[INFO] re-run prep: snapshot before U-Plane init / cleanup"
+_conformance_31131_log_oru_snapshot "before-init"
+
 if ! conformance_netpeer_init_uplane; then
 	test_fail "Initialize uplane conf (delete/replace 모두 실패 — 이전 시험 잔여 설정 확인)"
 	exit 1
@@ -272,6 +316,9 @@ for ((i=0; i < $(jq -r '.["interface-configurations"]["to-DU-interface"].name | 
 		fi
 	fi
 done
+
+echo "[INFO] re-run prep: snapshot after PE/interface cleanup"
+_conformance_31131_log_oru_snapshot "after-cleanup"
 
 GET_MP_VER_RPC="${NETCONF_TMP}/get/get_mp_version.xml"
 cat > "$GET_MP_VER_RPC" <<'EORPC'
