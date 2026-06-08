@@ -52,6 +52,36 @@ conformance_netpeer_outfile_rpc_error() {
 	[[ -f "$out_file" ]] && grep -aq "<rpc-error" "$out_file" 2>/dev/null
 }
 
+conformance_netpeer_rpc_has_error_tag() {
+	local out_file="$1"
+	local tag="$2"
+	[[ -f "$out_file" ]] && grep -aq "<error-tag>${tag}</error-tag>" "$out_file" 2>/dev/null && return 0
+	conformance_netpeer_log_tail_has "<error-tag>${tag}</error-tag>"
+}
+
+# Idempotent delete: <ok/> or data-missing (already absent) both succeed.
+conformance_netpeer_user_rpc_ok_or_missing() {
+	local xml_path="$1"
+	local out_file="$2"
+	local label="$3"
+	local max_wait="${4:-40}"
+
+	rm -f "$out_file"
+	conformance_netpeer_log_mark
+	echo "[INFO] ${label}"
+	send_cmd "user-rpc --content ${xml_path} --out ${out_file}"
+	if conformance_netpeer_wait_rpc_ok "$out_file" "$max_wait"; then
+		return 0
+	fi
+	if conformance_netpeer_rpc_has_error_tag "$out_file" "data-missing"; then
+		echo "[INFO] ${label} — already absent (data-missing), OK"
+		echo "OK" >"$out_file"
+		return 0
+	fi
+	conformance_netpeer_log_uplane_init_failure "$out_file" "$label"
+	return 1
+}
+
 # --out file may stay 0 bytes when netopeer logs the reply only in the session LOG.
 conformance_netpeer_wait_rpc_ok() {
 	local out_file="$1"
@@ -116,6 +146,14 @@ conformance_netpeer_try_uplane_init_file() {
 	send_cmd "user-rpc --content ${try_xml} --out ${init_out}"
 	if conformance_netpeer_wait_rpc_ok "$init_out" 40; then
 		return 0
+	fi
+	# Re-run: u-plane already cleared on prior PASS — delete on empty config is OK.
+	if [[ "$label" == *edit_init_uplane_conf.xml* && "$label" != *replace* ]]; then
+		if conformance_netpeer_rpc_has_error_tag "$init_out" "data-missing"; then
+			echo "[INFO] Initialize uplane conf: ${label} — user-plane-configuration absent, OK"
+			echo "OK" >"$init_out"
+			return 0
+		fi
 	fi
 	conformance_netpeer_log_uplane_init_failure "$init_out" "$label"
 	return 1

@@ -224,6 +224,38 @@ fi
 
 declare -a ToDUifname ToDUifvlan
 
+_conformance_31131_delete_ru_pe() {
+	local pe_name="${PE_FIXED_NAME:-ru-pe.0}"
+	local pe_xml="${NETCONF_TMP}/edit/edit_delete_pe_mod.xml"
+	local pe_out="${NETCONF_TMP}/edit/edit-delete-pe.xml"
+
+	cat >"$pe_xml" <<EORPC
+<edit-config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <target>
+    <running/>
+  </target>
+  <config>
+    <processing-elements xmlns="urn:o-ran:processing-element:1.0">
+      <ru-elements xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0" nc:operation="delete">
+        <name>${pe_name}</name>
+      </ru-elements>
+    </processing-elements>
+  </config>
+</edit-config>
+EORPC
+	conformance_netpeer_user_rpc_ok_or_missing "$pe_xml" "$pe_out" "Delete existing processing-element (${pe_name})" || return 1
+	return 0
+}
+
+PE_FIXED_NAME="ru-pe.0"
+# Re-run after PASS: PE still references VLAN interface — remove PE before interface delete.
+if $(jq -r '.["processing-element-configurations"]["to-DU-processing-element"]["enable"] // empty' "$CONFIG") ; then
+	if ! _conformance_31131_delete_ru_pe; then
+		test_fail "Delete existing processing-element (re-run cleanup)"
+		exit 1
+	fi
+fi
+
 for ((i=0; i < $(jq -r '.["interface-configurations"]["to-DU-interface"].name | length // empty' "$CONFIG"); i++)); do
 	ToDUifname[$i]=$(jq -r '.["interface-configurations"]["to-DU-interface"].name['"$i"'] | to_entries[].value // empty' "$CONFIG")
 	ToDUifvlan[$i]=$(jq -r '.["interface-configurations"]["to-DU-interface"].vlan['"$i"'] | to_entries[].value // empty' "$CONFIG")
@@ -232,17 +264,9 @@ for ((i=0; i < $(jq -r '.["interface-configurations"]["to-DU-interface"].name | 
 		sed -i "s/IFNAME/${ToDUifname[$i]}_${ToDUifvlan[$i]}/g" "${NETCONF_TMP}/edit/edit_delete_if_mod.xml"
 
 		DEL_IF_OUT="${NETCONF_TMP}/edit/edit-delete-if.xml"
-		rm -f "$DEL_IF_OUT"
-		send_cmd "user-rpc --content ${NETCONF_TMP}/edit/edit_delete_if_mod.xml --out $DEL_IF_OUT"
-		RESULT0="NOK"
-		for _w in $(seq 1 20); do
-			if [[ -f "$DEL_IF_OUT" ]] && grep -aq "OK" "$DEL_IF_OUT" 2>/dev/null; then
-				RESULT0="OK"
-				break
-			fi
-			sleep 0.5
-		done
-		if [[ "$RESULT0" != "OK" ]]; then
+		if ! conformance_netpeer_user_rpc_ok_or_missing \
+			"${NETCONF_TMP}/edit/edit_delete_if_mod.xml" "$DEL_IF_OUT" \
+			"Delete existing interface ${ToDUifname[$i]}_${ToDUifvlan[$i]} ($i)"; then
 			test_fail "Delete existing interface $i"
 			exit 1
 		fi
@@ -273,7 +297,6 @@ MPVERSION=$(xmlstarlet sel -N x="urn:o-ran:operations:1.0" -t -v "//x:supported-
 MPVERSIONNUM=$((${MPVERSION//./}))
 
 declare -a ToDUpename ToDUodumac MAC Port
-PE_FIXED_NAME="ru-pe.0"
 
 if $(jq -r '.["interface-configurations"]["to-DU-interface"]["enable"] // empty' "$CONFIG") ; then
 
