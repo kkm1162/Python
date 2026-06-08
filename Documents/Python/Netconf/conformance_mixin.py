@@ -291,7 +291,18 @@ _CONFORMANCE_MPLANE_SCRIPTS: frozenset[str] = frozenset(
     }
 )
 
-_CONFORMANCE_HELPER_SCRIPTS: tuple[str, ...] = ("conformance_mplane_xlsx_common.sh",)
+_CONFORMANCE_HELPER_SCRIPTS: tuple[str, ...] = (
+    "conformance_mplane_xlsx_common.sh",
+    "conformance_315x_common.sh",
+    "conformance_netpeer_uplane_init.sh",
+)
+
+# netopeer2-cli scripts that source conformance_netpeer_uplane_init.sh + mplane_templates
+_CONFORMANCE_NETPEER_UPLANE_INIT_SCRIPTS: frozenset[str] = frozenset(
+    {
+        _CONFORMANCE_LBM_SCRIPT,
+    }
+)
 
 _MPLANE_3110X_FIELDS: list[dict[str, Any]] = [
     {
@@ -1604,6 +1615,7 @@ class ConformanceMixin:
         for fname, ent in self._conformance_progress.items():
             if isinstance(ent, dict) and ent.get("rc") is not None:
                 by_script[fname] = {"rc": ent.get("rc"), "status": ent.get("status")}
+                self._conformance_commit_final_result(fname, ent.get("rc"), ent.get("status"))
         if not by_script:
             self._conformance_last_run_snapshot_cache = None
             return
@@ -1612,6 +1624,239 @@ class ConformanceMixin:
             "by_script": by_script,
             "summary": self._conformance_summarize_pass_fail_counts(by_script),
         }
+
+    def _conformance_meta_for_script(self, fname: str) -> tuple[str, str]:
+        ref = self._conformance_spec_ref_map().get(fname, "—")
+        summ = ""
+        for fn, r, s in self._conformance_test_rows():
+            if fn == fname:
+                return r, s
+        return ref, summ
+
+    def _conformance_commit_final_result(self, fname: str, rc: Any, status: Any) -> None:
+        if rc is None:
+            return
+        try:
+            rc_i = int(rc)
+        except (TypeError, ValueError):
+            return
+        ref, summ = self._conformance_meta_for_script(fname)
+        st = str(status or "").upper()
+        store = getattr(self, "_conformance_final_results", None)
+        if not isinstance(store, dict):
+            self._conformance_final_results = {}
+            store = self._conformance_final_results
+        store[fname] = {
+            "rc": rc_i,
+            "status": st,
+            "updated_at": datetime.now().isoformat(timespec="seconds"),
+            "ref": ref,
+            "summary": summ,
+        }
+        self.after(0, self._conformance_refresh_results_summary_window)
+
+    def _conformance_apply_final_results_from_config(self, raw: Any) -> None:
+        if not isinstance(raw, dict) or not raw:
+            self._conformance_final_results = {}
+            self.after(0, self._conformance_refresh_results_summary_window)
+            return
+        try:
+            self._conformance_final_results = json.loads(json.dumps(raw))
+        except Exception:
+            self._conformance_final_results = {}
+        self.after(0, self._conformance_refresh_results_summary_window)
+
+    @staticmethod
+    def _conformance_result_label(rc: Any, status: str) -> tuple[str, str]:
+        st = str(status or "").upper()
+        if rc == -2 or st == "STOP":
+            return "STOP", "res_stop"
+        if rc == 0 or st == "PASS":
+            return "PASS", "res_pass"
+        if st == "FAIL" or (isinstance(rc, int) and rc not in (0, -2)):
+            return (f"FAIL ({rc})" if isinstance(rc, int) else "FAIL"), "res_fail"
+        return (st or "—", "res_mixed")
+
+    def _conformance_summarize_final_results(self) -> dict[str, int]:
+        out = {"PASS": 0, "FAIL": 0, "STOP": 0, "NONE": 0, "RUN": 0, "WAIT": 0}
+        active = getattr(self, "_conformance_run_active_targets", None)
+        busy = bool(getattr(self, "_conformance_run_busy", False))
+        for fname, _ref, _summ in self._conformance_test_rows():
+            pr = self._conformance_progress.get(fname)
+            if isinstance(pr, dict) and pr.get("status") == "RUN" and pr.get("rc") is None:
+                out["RUN"] += 1
+                continue
+            if isinstance(active, set) and fname in active and busy:
+                ent = self._conformance_final_results.get(fname)
+                if not (isinstance(ent, dict) and ent.get("rc") is not None):
+                    out["WAIT"] += 1
+                    continue
+            ent = self._conformance_final_results.get(fname)
+            if not isinstance(ent, dict) or ent.get("rc") is None:
+                out["NONE"] += 1
+                continue
+            rc, st = ent.get("rc"), str(ent.get("status") or "").upper()
+            if rc == -2 or st == "STOP":
+                out["STOP"] += 1
+            elif rc == 0 or st == "PASS":
+                out["PASS"] += 1
+            else:
+                out["FAIL"] += 1
+        return out
+
+    def _conformance_format_final_results_summary_line(self) -> str:
+        s = self._conformance_summarize_final_results()
+        parts = []
+        if s.get("PASS"):
+            parts.append(f"PASS {s['PASS']}")
+        if s.get("FAIL"):
+            parts.append(f"FAIL {s['FAIL']}")
+        if s.get("STOP"):
+            parts.append(f"STOP {s['STOP']}")
+        if s.get("RUN"):
+            parts.append(f"실행 중 {s['RUN']}")
+        if s.get("WAIT"):
+            parts.append(f"대기 {s['WAIT']}")
+        if s.get("NONE"):
+            parts.append(f"미실행 {s['NONE']}")
+        line = ", ".join(parts) if parts else "기록 없음"
+        latest = ""
+        for ent in self._conformance_final_results.values():
+            if isinstance(ent, dict):
+                ts = str(ent.get("updated_at") or "").strip()
+                if ts and (not latest or ts > latest):
+                    latest = ts
+        if latest:
+            line += f"  |  최종 기록: {latest}"
+        return line
+
+    def _conformance_refresh_results_summary_window(self) -> None:
+        tree = getattr(self, "conformance_results_summary_tree", None)
+        if tree is None:
+            return
+        try:
+            win = getattr(self, "_conformance_results_summary_win", None)
+            if win is None or not win.winfo_exists():
+                return
+        except tk.TclError:
+            return
+        summ_var = getattr(self, "conformance_results_summary_summary_var", None)
+        if summ_var is not None:
+            summ_var.set(self._conformance_format_final_results_summary_line())
+        for iid in tree.get_children(""):
+            tree.delete(iid)
+        active = getattr(self, "_conformance_run_active_targets", None)
+        busy = bool(getattr(self, "_conformance_run_busy", False))
+        row_idx = 0
+        for fname, ref, summ in self._conformance_test_rows():
+            pr = self._conformance_progress.get(fname)
+            if isinstance(pr, dict) and pr.get("status") == "RUN" and pr.get("rc") is None:
+                text, tag = "실행 중", "res_run"
+                ts = "—"
+            elif isinstance(active, set) and fname in active and busy:
+                ent = self._conformance_final_results.get(fname)
+                if isinstance(ent, dict) and ent.get("rc") is not None:
+                    text, tag = self._conformance_result_label(ent.get("rc"), ent.get("status"))
+                    ts = str(ent.get("updated_at") or "—")
+                else:
+                    text, tag = "대기", "res_wait"
+                    ts = "—"
+            else:
+                ent = self._conformance_final_results.get(fname)
+                if isinstance(ent, dict) and ent.get("rc") is not None:
+                    text, tag = self._conformance_result_label(ent.get("rc"), ent.get("status"))
+                    ts = str(ent.get("updated_at") or "—")
+                    ref = str(ent.get("ref") or ref)
+                    summ = str(ent.get("summary") or summ)
+                else:
+                    text, tag = "미실행", "res_idle"
+                    ts = "—"
+            row_tag = "row_even" if row_idx % 2 == 0 else "row_odd"
+            tree.insert(
+                "",
+                "end",
+                iid=fname,
+                values=(ref, fname, summ, text, ts),
+                tags=(tag, row_tag),
+            )
+            row_idx += 1
+
+    def _conformance_close_results_summary_window(self) -> None:
+        w = getattr(self, "_conformance_results_summary_win", None)
+        self._conformance_results_summary_win = None
+        self.conformance_results_summary_tree = None
+        if w is not None:
+            try:
+                w.destroy()
+            except tk.TclError:
+                pass
+
+    def _conformance_open_results_summary_window(self) -> None:
+        w = getattr(self, "_conformance_results_summary_win", None)
+        if w is not None:
+            try:
+                if w.winfo_exists():
+                    w.lift()
+                    self._conformance_refresh_results_summary_window()
+                    return
+            except tk.TclError:
+                pass
+        win = tk.Toplevel(self)
+        win.title("Conformance 전체 결과 (최종)")
+        win.geometry("980x620")
+        self._conformance_results_summary_win = win
+        self.conformance_results_summary_summary_var = tk.StringVar(value="")
+        top = ttk.Frame(win, padding=8)
+        top.pack(fill="x")
+        ttk.Label(
+            top,
+            text="항목별 최종 결과입니다. 시험이 끝나면 PASS/FAIL/STOP으로 갱신되며, 설정 JSON에도 저장됩니다.",
+            foreground="#475569",
+            wraplength=900,
+            justify="left",
+        ).pack(anchor="w")
+        ttk.Label(top, textvariable=self.conformance_results_summary_summary_var, foreground="#0f766e").pack(
+            anchor="w", pady=(6, 0)
+        )
+        body = ttk.Frame(win, padding=(8, 0, 8, 8))
+        body.pack(fill="both", expand=True)
+        cols = ("ref", "script", "summary", "result", "updated")
+        tree = ttk.Treeview(body, columns=cols, show="headings", selectmode="browse")
+        self.conformance_results_summary_tree = tree
+        tree.heading("ref", text="표 참조")
+        tree.column("ref", width=88, anchor="center", stretch=False)
+        tree.heading("script", text="스크립트")
+        tree.column("script", width=200, anchor="w", stretch=False)
+        tree.heading("summary", text="개요")
+        tree.column("summary", width=380, anchor="w", stretch=True)
+        tree.heading("result", text="최종 결과")
+        tree.column("result", width=110, anchor="center", stretch=False)
+        tree.heading("updated", text="기록 시각")
+        tree.column("updated", width=160, anchor="center", stretch=False)
+        for tag in ("res_idle", "res_wait", "res_run", "res_pass", "res_fail", "res_stop", "res_mixed"):
+            tree.tag_configure(tag, foreground={
+                "res_idle": "#94a3b8",
+                "res_wait": "#ca8a04",
+                "res_run": "#d97706",
+                "res_pass": "#15803d",
+                "res_fail": "#b91c1c",
+                "res_stop": "#64748b",
+                "res_mixed": "#334155",
+            }.get(tag, "#334155"))
+        tree.tag_configure("row_even", background="#ffffff")
+        tree.tag_configure("row_odd", background="#f0f4f8")
+        ys = ttk.Scrollbar(body, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=ys.set)
+        tree.grid(row=0, column=0, sticky="nsew")
+        ys.grid(row=0, column=1, sticky="ns")
+        body.rowconfigure(0, weight=1)
+        body.columnconfigure(0, weight=1)
+        bf = ttk.Frame(win, padding=8)
+        bf.pack(fill="x")
+        ttk.Button(bf, text="새로고침", command=self._conformance_refresh_results_summary_window).pack(side="left")
+        ttk.Button(bf, text="닫기", command=self._conformance_close_results_summary_window).pack(side="right")
+        win.protocol("WM_DELETE_WINDOW", self._conformance_close_results_summary_window)
+        self._conformance_refresh_results_summary_window()
 
     def _conformance_apply_last_run_from_config(self, raw: Any) -> None:
         if raw is None or (isinstance(raw, dict) and not raw.get("by_script")):
@@ -1706,22 +1951,35 @@ class ConformanceMixin:
                 elif isinstance(active, set) and fname in active and busy:
                     text, tag = "대기", "res_wait"
                 else:
-                    prev = bs.get(fname)
-                    if isinstance(prev, dict) and prev.get("rc") is not None:
-                        rc, st = prev.get("rc"), str(prev.get("status") or "").upper()
-                        if rc == -2 or st == "STOP":
-                            text, tag = "STOP", "res_stop"
-                        elif rc == 0 or st == "PASS":
-                            text, tag = "PASS", "res_pass"
-                        elif isinstance(rc, int) and rc != 0:
-                            text, tag = (f"FAIL ({rc})", "res_fail")
+                    fin = self._conformance_final_results.get(fname)
+                    if isinstance(fin, dict) and fin.get("rc") is not None:
+                        text, tag = self._conformance_result_label(fin.get("rc"), fin.get("status"))
+                    else:
+                        prev = bs.get(fname)
+                        if isinstance(prev, dict) and prev.get("rc") is not None:
+                            text, tag = self._conformance_result_label(prev.get("rc"), prev.get("status"))
                         else:
-                            text, tag = (st or "—", "res_mixed")
+                            text, tag = "—", "res_idle"
                 tree.set(fname, "result", text)
                 row_tag = self._conformance_row_parity.get(fname, "row_even")
                 tree.item(fname, tags=(tag, row_tag))
             except tk.TclError:
                 pass
+        self.after(0, self._conformance_refresh_results_summary_window)
+
+    def _conformance_parse_repeat_count(self) -> int:
+        """0 = 무한 반복, 1+ = 지정 횟수. 잘못된 값은 1."""
+        try:
+            raw = self.conformance_run_repeat_count_var.get()
+        except (tk.TclError, AttributeError):
+            return 1
+        try:
+            n = int(str(raw).strip())
+        except (TypeError, ValueError):
+            return 1
+        if n < 0:
+            return 1
+        return n
 
     def _conformance_default_run_options(self) -> ConformanceRunOptions:
         rd = (self.conformance_run_remote_dir_var.get().strip() or _conf_manifest.CONFORMANCE_REMOTE_DIR).rstrip("/")
@@ -1871,13 +2129,6 @@ class ConformanceMixin:
             self._conformance_remote_prepare_netconf_tmp(client, log_line)
 
             sftp = client.open_sftp()
-            cfg_bytes = cfg_payload.encode("utf-8")
-            sftp.putfo(io.BytesIO(cfg_bytes), cfg_remote, len(cfg_bytes))
-            try:
-                sftp.chmod(cfg_remote, 0o644)
-            except OSError:
-                pass
-            log_line(f"merged ORU config (현재 Settings 반영) -> {cfg_remote} ({len(cfg_payload)} bytes)")
 
             to_upload: list[str] = []
             for fn in fnames:
@@ -1903,6 +2154,11 @@ class ConformanceMixin:
                     pass
                 log_line(f"uploaded {fname}")
 
+            if any(f in _CONFORMANCE_NETPEER_UPLANE_INIT_SCRIPTS for f in fnames):
+                if not self._conformance_upload_mplane_helper_scripts(sftp, remote_dir, log_line):
+                    raise RuntimeError("U-Plane init helper 업로드 실패")
+                self._conformance_upload_mplane_templates(sftp, log_line)
+
             spec_map = self._conformance_spec_ref_map()
             fnames = self._conformance_expand_run_list(list(fnames))
             ordered_fnames = self._conformance_order_run_list(fnames)
@@ -1912,154 +2168,191 @@ class ConformanceMixin:
             pre_b = self._conformance_3180_script_path(post_cleanup=False)
             post_b = self._conformance_3180_script_path(post_cleanup=True)
             ran_318x_pass = any(f in three8 for f in ordered_fnames)
-            post_3180_after_3186 = False
-            abort_all = False
+            repeat_count = self._conformance_parse_repeat_count()
+            cycle_num = 0
 
-            for fname in ordered_fnames:
-                if self._conformance_cancel_event.is_set():
-                    log_line("사용자 중지로 중단")
-                    self._conformance_progress[fname] = {"rc": -2, "status": "STOP"}
-                    self.after(0, self._conformance_refresh_row_result_labels)
-                    abort_all = True
+            while True:
+                cycle_num += 1
+                if repeat_count > 0 and cycle_num > repeat_count:
                     break
-                if fname == "conformance_3181.sh" and pre_b and ran_318x_pass:
-                    _rc_pre, abort_suite = self._conformance_run_pre_3180_before_318x(
-                        client,
-                        sftp,
-                        pre_b,
-                        opts,
-                        remote_dir,
-                        cfg_remote,
-                        spec_map,
-                        log_line,
-                        anchor_fname=fname,
-                    )
-                    if abort_suite:
+                if repeat_count == 0:
+                    log_line(f"━━━ 반복 {cycle_num} (무한) ━━━")
+                elif repeat_count > 1:
+                    log_line(f"━━━ 반복 {cycle_num}/{repeat_count} ━━━")
+
+                try:
+                    cfg_payload = self._conformance_effective_config_json_text()
+                except Exception as exc:
+                    raise RuntimeError(f"설정 JSON 오류: {exc}") from exc
+                cfg_bytes = cfg_payload.encode("utf-8")
+                sftp.putfo(io.BytesIO(cfg_bytes), cfg_remote, len(cfg_bytes))
+                try:
+                    sftp.chmod(cfg_remote, 0o644)
+                except OSError:
+                    pass
+                log_line(
+                    f"merged ORU config (현재 Settings 반영) -> {cfg_remote} ({len(cfg_payload)} bytes)"
+                )
+
+                post_3180_after_3186 = False
+                abort_all = False
+
+                for fname in ordered_fnames:
+                    if self._conformance_cancel_event.is_set():
+                        log_line("사용자 중지로 중단")
+                        self._conformance_progress[fname] = {"rc": -2, "status": "STOP"}
+                        self._conformance_commit_final_result(fname, -2, "STOP")
+                        self.after(0, self._conformance_refresh_row_result_labels)
                         abort_all = True
                         break
+                    if fname == "conformance_3181.sh" and pre_b and ran_318x_pass:
+                        _rc_pre, abort_suite = self._conformance_run_pre_3180_before_318x(
+                            client,
+                            sftp,
+                            pre_b,
+                            opts,
+                            remote_dir,
+                            cfg_remote,
+                            spec_map,
+                            log_line,
+                            anchor_fname=fname,
+                        )
+                        if abort_suite:
+                            abort_all = True
+                            break
 
-                self._conformance_progress[fname] = {"rc": None, "status": "RUN"}
-                self.after(0, self._conformance_refresh_row_result_labels)
-
-                # SWM tests: upload PKG to remote /tmp/netconf_PKG/
-                if not self._conformance_swm_upload_pkg(sftp, fname, log_line):
-                    self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
+                    self._conformance_progress[fname] = {"rc": None, "status": "RUN"}
                     self.after(0, self._conformance_refresh_row_result_labels)
-                    continue
 
-                if not self._conformance_prepare_mplane_bundle(fname, log_line):
-                    self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
-                    self.after(0, self._conformance_refresh_row_result_labels)
-                    continue
-                if fname in _CONFORMANCE_MPLANE_SCRIPTS and getattr(self, "is_running", False) and getattr(
-                    self, "session_established", False
-                ):
-                    log_line("M-Plane: GUI Netconf 세션 사용 (Start 활성 → FIFO edit-config 경로)")
-                if not self._conformance_upload_mplane_assets(sftp, fname, remote_dir, log_line):
-                    self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
-                    self.after(0, self._conformance_refresh_row_result_labels)
-                    continue
+                    # SWM tests: upload PKG to remote /tmp/netconf_PKG/
+                    if not self._conformance_swm_upload_pkg(sftp, fname, log_line):
+                        self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
+                        self._conformance_commit_final_result(fname, 1, "FAIL")
+                        self.after(0, self._conformance_refresh_row_result_labels)
+                        continue
 
-                spec_ref = spec_map.get(fname, "")
-                host_log = self._conformance_host_run_log_path(fname)
-                self._conformance_active_host_log = host_log
-                self._conformance_last_host_log = host_log
-                self.after(0, self._refresh_log_target_hint_line)
-                self._conformance_detail_lines[fname] = []
-                self._conformance_detail_capture_key = fname
-                self._conformance_detail_run_started_wall[fname] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                self._conformance_detail_run_started_mono[fname] = time.monotonic()
-                boost_defer: str | None = None
-                if fname == "conformance_31122.sh" and self._conformance_oru_boost_enabled(fname):
-                    boost_defer = "Wait for Trace-log generated"
-                try:
-                    rc = self._conformance_exec_remote_script(
-                        client,
-                        sftp,
-                        fname,
-                        opts,
-                        remote_dir,
-                        cfg_remote,
-                        spec_ref,
-                        host_log,
-                        log_line,
-                        oru_boost_defer_trigger=boost_defer,
-                    )
-                finally:
-                    if getattr(self, "_conformance_oru_boost_active", False):
-                        self._conformance_stop_oru_show_system_boost(client, remote_dir, log_line)
-                    self._conformance_detail_capture_key = None
-                    self._conformance_detail_run_ended_wall[fname] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    self._conformance_detail_run_ended_mono[fname] = time.monotonic()
-                if rc == -2:
-                    self._conformance_progress[fname] = {"rc": -2, "status": "STOP"}
-                    self.after(0, self._conformance_refresh_row_result_labels)
-                    abort_all = True
-                    break
-                st = "PASS" if rc == 0 else "FAIL"
-                self._conformance_progress[fname] = {"rc": rc, "status": st}
-                self.after(0, self._conformance_refresh_row_result_labels)
+                    if not self._conformance_prepare_mplane_bundle(fname, log_line):
+                        self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
+                        self._conformance_commit_final_result(fname, 1, "FAIL")
+                        self.after(0, self._conformance_refresh_row_result_labels)
+                        continue
+                    if fname in _CONFORMANCE_MPLANE_SCRIPTS and getattr(self, "is_running", False) and getattr(
+                        self, "session_established", False
+                    ):
+                        log_line("M-Plane: GUI Netconf 세션 사용 (Start 활성 → FIFO edit-config 경로)")
+                    if not self._conformance_upload_mplane_assets(sftp, fname, remote_dir, log_line):
+                        self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
+                        self._conformance_commit_final_result(fname, 1, "FAIL")
+                        self.after(0, self._conformance_refresh_row_result_labels)
+                        continue
 
-                if fname == "conformance_3186.sh" and post_b and ran_318x_pass:
-                    cleanup_script = post_b
-                    self._conformance_run_3180_step(
-                        client,
-                        sftp,
-                        cleanup_script,
-                        opts,
-                        remote_dir,
-                        cfg_remote,
-                        spec_map,
-                        log_line,
-                        "post_3186",
-                        force_despite_cancel=True,
-                    )
-                    post_3180_after_3186 = True
-
-                if fname == "conformance_3132.sh" and ordered_fnames.index(fname) < len(ordered_fnames) - 1:
-                    wait_s = 360
+                    spec_ref = spec_map.get(fname, "")
+                    host_log = self._conformance_host_run_log_path(fname)
+                    self._conformance_active_host_log = host_log
+                    self._conformance_last_host_log = host_log
+                    self.after(0, self._refresh_log_target_hint_line)
+                    self._conformance_detail_lines[fname] = []
+                    self._conformance_detail_capture_key = fname
+                    self._conformance_detail_run_started_wall[fname] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    self._conformance_detail_run_started_mono[fname] = time.monotonic()
+                    boost_defer: str | None = None
+                    if fname == "conformance_31122.sh" and self._conformance_oru_boost_enabled(fname):
+                        boost_defer = "Wait for Trace-log generated"
                     try:
-                        wait_s = int(self._conformance_get_per_test_val(fname, "post_reset_wait_sec") or "360")
-                    except (ValueError, TypeError):
-                        wait_s = 360
-                    if wait_s > 0:
-                        log_line(f"3.1.3.2 완료 → ORU 리셋 대기 {wait_s}초 ({wait_s // 60}분 {wait_s % 60}초)")
-                        for elapsed in range(wait_s):
-                            if self._conformance_cancel_event.is_set():
-                                log_line("ORU 리셋 대기 중 사용자 중지")
-                                break
-                            if elapsed > 0 and elapsed % 30 == 0:
-                                log_line(f"ORU 리셋 대기 중… {elapsed}/{wait_s}초")
-                            time.sleep(1)
-                        else:
-                            log_line(f"ORU 리셋 대기 {wait_s}초 완료, 다음 시험 진행")
+                        rc = self._conformance_exec_remote_script(
+                            client,
+                            sftp,
+                            fname,
+                            opts,
+                            remote_dir,
+                            cfg_remote,
+                            spec_ref,
+                            host_log,
+                            log_line,
+                            oru_boost_defer_trigger=boost_defer,
+                        )
+                    finally:
+                        if getattr(self, "_conformance_oru_boost_active", False):
+                            self._conformance_stop_oru_show_system_boost(client, remote_dir, log_line)
+                        self._conformance_detail_capture_key = None
+                        self._conformance_detail_run_ended_wall[fname] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        self._conformance_detail_run_ended_mono[fname] = time.monotonic()
+                    if rc == -2:
+                        self._conformance_progress[fname] = {"rc": -2, "status": "STOP"}
+                        self._conformance_commit_final_result(fname, -2, "STOP")
+                        self.after(0, self._conformance_refresh_row_result_labels)
+                        abort_all = True
+                        break
+                    st = "PASS" if rc == 0 else "FAIL"
+                    self._conformance_progress[fname] = {"rc": rc, "status": st}
+                    self._conformance_commit_final_result(fname, rc, st)
+                    self.after(0, self._conformance_refresh_row_result_labels)
 
-            if (
-                ran_318x_pass
-                and post_b
-                and not post_3180_after_3186
-                and (abort_all or self._conformance_cancel_event.is_set())
-            ):
-                try:
-                    tr = client.get_transport() if client is not None else None
-                    ssh_up = tr is not None and tr.is_active()
-                except Exception:
-                    ssh_up = False
-                if not ssh_up:
-                    log_line("3.1.8.0 (중지 후 정리) 건너뜀: SSH 세션이 이미 종료됨")
-                else:
-                    self._conformance_run_3180_step(
-                        client,
-                        sftp,
-                        post_b,
-                        opts,
-                        remote_dir,
-                        cfg_remote,
-                        spec_map,
-                        log_line,
-                        "post_stop",
-                        force_despite_cancel=True,
-                    )
+                    if fname == "conformance_3186.sh" and post_b and ran_318x_pass:
+                        cleanup_script = post_b
+                        self._conformance_run_3180_step(
+                            client,
+                            sftp,
+                            cleanup_script,
+                            opts,
+                            remote_dir,
+                            cfg_remote,
+                            spec_map,
+                            log_line,
+                            "post_3186",
+                            force_despite_cancel=True,
+                        )
+                        post_3180_after_3186 = True
+
+                    if fname == "conformance_3132.sh" and ordered_fnames.index(fname) < len(ordered_fnames) - 1:
+                        wait_s = 360
+                        try:
+                            wait_s = int(self._conformance_get_per_test_val(fname, "post_reset_wait_sec") or "360")
+                        except (ValueError, TypeError):
+                            wait_s = 360
+                        if wait_s > 0:
+                            log_line(f"3.1.3.2 완료 → ORU 리셋 대기 {wait_s}초 ({wait_s // 60}분 {wait_s % 60}초)")
+                            for elapsed in range(wait_s):
+                                if self._conformance_cancel_event.is_set():
+                                    log_line("ORU 리셋 대기 중 사용자 중지")
+                                    break
+                                if elapsed > 0 and elapsed % 30 == 0:
+                                    log_line(f"ORU 리셋 대기 중… {elapsed}/{wait_s}초")
+                                time.sleep(1)
+                            else:
+                                log_line(f"ORU 리셋 대기 {wait_s}초 완료, 다음 시험 진행")
+
+                if (
+                    ran_318x_pass
+                    and post_b
+                    and not post_3180_after_3186
+                    and (abort_all or self._conformance_cancel_event.is_set())
+                ):
+                    try:
+                        tr = client.get_transport() if client is not None else None
+                        ssh_up = tr is not None and tr.is_active()
+                    except Exception:
+                        ssh_up = False
+                    if not ssh_up:
+                        log_line("3.1.8.0 (중지 후 정리) 건너뜀: SSH 세션이 이미 종료됨")
+                    else:
+                        self._conformance_run_3180_step(
+                            client,
+                            sftp,
+                            post_b,
+                            opts,
+                            remote_dir,
+                            cfg_remote,
+                            spec_map,
+                            log_line,
+                            "post_stop",
+                            force_despite_cancel=True,
+                        )
+
+                if abort_all or self._conformance_cancel_event.is_set():
+                    break
+                if repeat_count == 1:
+                    break
 
             try:
                 sftp.close()
@@ -2167,27 +2460,16 @@ class ConformanceMixin:
 
     def _conformance_detail_sync_history(self, fname: str, lines: list[str]) -> list[str]:
         hist: list[str] = []
-        blob = "\n".join(lines)
-        run_started_wall = self._conformance_detail_run_started_wall.get(fname, "")
-        fallback_fixed: datetime | None = None
-        if run_started_wall:
-            try:
-                fallback_fixed = datetime.strptime(run_started_wall, "%Y-%m-%d %H:%M:%S")
-            except Exception:
-                fallback_fixed = None
-        # Only count actually emitted L2SW command lines, not config summary lines.
         l2sw_cmd_re = re.compile(r"^\[L2SW\](?:\[[^\]]+\])?\s*>>>\s*(.+)$", re.I)
         cmd_lines: list[str] = []
         cmd_times: list[datetime] = []
         holdover_t: datetime | None = None
         freerun_t: datetime | None = None
         alarm_t: datetime | None = None
-        last_event_t: datetime | None = None
 
         for raw in lines:
             s = self._conformance_detail_strip_run_tag(raw)
             t = self._conformance_detail_extract_ts(s)
-            low = s.lower()
             m_hold = re.search(r"\[TIME\]\s*HOLDOVER_EVENT_TIME\s*=\s*(\S+)", s, re.I)
             if m_hold:
                 holdover_t = holdover_t or self._conformance_detail_extract_ts(m_hold.group(1))
@@ -2197,72 +2479,14 @@ class ConformanceMixin:
             m_alarm_occ = re.search(r"\[TIME\]\s*ALARM_OCCUR_EVENT_TIME\s*=\s*(\S+)", s, re.I)
             if m_alarm_occ:
                 alarm_t = alarm_t or self._conformance_detail_extract_ts(m_alarm_occ.group(1))
-            m_alarm_clr = re.search(r"\[TIME\]\s*ALARM_CLEAR_EVENT_TIME\s*=\s*(\S+)", s, re.I)
-            if m_alarm_clr and alarm_t is None:
-                alarm_t = self._conformance_detail_extract_ts(m_alarm_clr.group(1))
             m_cmd = l2sw_cmd_re.match(s)
             if m_cmd:
                 cmd_lines.append(s)
                 if t is not None:
                     cmd_times.append(t)
-            # NETCONF notification eventTime is often on a separate line.
-            if "<eventtime>" in low or "notification (" in low:
-                if t is not None:
-                    last_event_t = t
-            if holdover_t is None and "holdover" in low:
-                holdover_t = t or last_event_t
-            if freerun_t is None and "freerun" in low:
-                freerun_t = t or last_event_t
-            if alarm_t is None:
-                if "alarm-notif" in low or "<fault-id>" in low or "<is-cleared>false</is-cleared>" in low:
-                    alarm_t = t or last_event_t
-
-        # Strong fallback: parse full notification XML blocks and map eventTime -> payload.
-        for nm in re.finditer(
-            r"<notification\b[^>]*>[\s\S]*?<eventTime>([^<]+)</eventTime>([\s\S]*?)</notification>",
-            blob,
-            re.I,
-        ):
-            if holdover_t is not None and freerun_t is not None and alarm_t is not None:
-                break
-            evt = self._conformance_detail_extract_ts(nm.group(1))
-            payload_low = nm.group(2).lower()
-            if holdover_t is None and "holdover" in payload_low:
-                holdover_t = evt
-            if freerun_t is None and "freerun" in payload_low:
-                freerun_t = evt
-            if alarm_t is None and (
-                "alarm-notif" in payload_low
-                or "<fault-id>" in payload_low
-                or "<is-cleared>false</is-cleared>" in payload_low
-            ):
-                alarm_t = evt
-
-        # Fallback: infer event time from nearby "notification (...)" blocks.
-        if holdover_t is None:
-            m = re.search(r"notification\s*\(([^)]+)\)[\s\S]{0,500}?holdover", blob, re.I)
-            if m:
-                holdover_t = self._conformance_detail_extract_ts(m.group(1))
-        if freerun_t is None:
-            m = re.search(r"notification\s*\(([^)]+)\)[\s\S]{0,500}?freerun", blob, re.I)
-            if m:
-                freerun_t = self._conformance_detail_extract_ts(m.group(1))
-        if alarm_t is None:
-            m = re.search(
-                r"notification\s*\(([^)]+)\)[\s\S]{0,700}?(alarm-notif|<fault-id>|<is-cleared>false</is-cleared>)",
-                blob,
-                re.I,
-            )
-            if m:
-                alarm_t = self._conformance_detail_extract_ts(m.group(1))
 
         def _fmt_server_time(dt: datetime | None) -> str:
-            # Use fixed run-start local time as stable fallback (no moving clock).
-            if dt:
-                return dt.strftime("%Y-%m-%d %H:%M:%S")
-            if fallback_fixed:
-                return fallback_fixed.strftime("%Y-%m-%d %H:%M:%S")
-            return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            return dt.strftime("%Y-%m-%d %H:%M:%S") if dt else "—"
 
         hist.append("[Sync 상태 이력 (서버시간)]")
         if cmd_lines:
@@ -2278,8 +2502,6 @@ class ConformanceMixin:
                     f"     - 첫 명령 서버시간: {_fmt_server_time(c0)}  "
                     f"(+1h 종료: {_fmt_server_time(c1h)})"
                 )
-            else:
-                hist.append(f"     - 첫 명령 서버시간: {_fmt_server_time(None)}")
         else:
             hist.append("  1) L2SW 설정 명령 진행: 미진행")
 
@@ -2290,10 +2512,7 @@ class ConformanceMixin:
         if freerun_t is not None:
             hist.append(f"  3) FREERUN 변경 서버시간: {_fmt_server_time(freerun_t)}")
         else:
-            note = ""
-            if holdover_t is not None:
-                note = " (FREERUN 시간 정보 없음)"
-            hist.append(f"  3) FREERUN 변경: 미진행{note}")
+            hist.append("  3) FREERUN 변경: 미진행")
         if alarm_t is not None:
             hist.append(f"  4) Alarm noti 수신 서버시간: {_fmt_server_time(alarm_t)}")
         else:
@@ -2476,22 +2695,6 @@ class ConformanceMixin:
                 step_blocks.append(
                     "  【3.1.6.2 install-event】 FAIL\n"
                     "      부정 PKG인데 install이 성공(COMPLETED/VALID)한 것으로 보입니다."
-                )
-            m_swm_ok = re.search(
-                r"<install-event\b[^>]*>[\s\S]*?<status>\s*(?:INTEGRITY_ERROR|FILE_ERROR|FILE_NOT_FOUND|FAILED|APPLICATION_ERROR)\s*</status>",
-                blob,
-                re.I,
-            )
-            if m_swm_ok and not m_swm_bad:
-                sm = re.search(
-                    r"<install-event\b[^>]*>[\s\S]*?<status>\s*([^<]+)\s*</status>",
-                    blob,
-                    re.I,
-                )
-                st = (sm.group(1).strip() if sm else "?")
-                step_blocks.append(
-                    f"  【3.1.6.2 install-event】 PASS (expected rejection)\n"
-                    f"      status={st} — 비정상 PKG 설치 거부"
                 )
 
         if "[FAIL]" in blob:
@@ -2994,9 +3197,11 @@ class ConformanceMixin:
                 "목록은 O-RAN M-Plane 3.1 시험 표 순서이며, 로컬에 있는 스크립트만 표시됩니다. "
                 "3.1.8.x(3.1.8.1–3.1.8.6)는 하나만 선택해도 전체가 연동 선택·일괄 실행됩니다(표 순서 3181→3186). "
                 "실행 순서는 표에서 위→아래 순서이며, 일부만 체크해도 체크된 항목만 그 순서대로 진행합니다. "
+                "「반복」으로 체크된 항목 세트를 연속 실행할 수 있습니다(0=무한, 시험 중지로 종료). "
                 "3.1.8.0 은 3.1.8.1 직전·3.1.8.6 종료 후에 실행되며, 중지해도 정리용으로 한 번 더 시도합니다. "
                 "실행 출력(stdout/stderr)은 메인 화면 하단 로그 창에 표시됩니다. "
-                "표에서 행을 더블클릭하면 해당 항목의 STEP·원인·타임아웃 요약 상세 창이 열립니다(약 2초마다 갱신)."
+                "표에서 행을 더블클릭하면 해당 항목의 STEP·원인·타임아웃 요약 상세 창이 열립니다(약 2초마다 갱신). "
+                "「전체 결과」에서 항목별 최종 PASS/FAIL/STOP을 한 번에 볼 수 있습니다."
             ),
             foreground="#475569",
             justify="left",
@@ -3019,6 +3224,21 @@ class ConformanceMixin:
             command=self._conformance_run_checked,
             style="Big.TButton",
         ).pack(side="left", padx=(0, 8))
+        ttk.Label(bar, text="반복").pack(side="left", padx=(0, 2))
+        repeat_ent = ttk.Entry(bar, textvariable=self.conformance_run_repeat_count_var, width=4)
+        repeat_ent.pack(side="left", padx=(0, 2))
+
+        def _on_repeat_write(*_a: Any) -> None:
+            try:
+                self._on_any_setting_changed()
+            except Exception:
+                pass
+
+        try:
+            self.conformance_run_repeat_count_var.trace_add("write", _on_repeat_write)
+        except Exception:
+            pass
+        ttk.Label(bar, text="(0=무한)", foreground="#64748b").pack(side="left", padx=(0, 8))
         self.conformance_stop_btn = ttk.Button(bar, text="시험 중지", command=self._conformance_stop_run, state="disabled")
         self.conformance_stop_btn.pack(side="left", padx=(0, 8))
         self.conformance_sync_btn = ttk.Button(
@@ -3031,6 +3251,11 @@ class ConformanceMixin:
             side="left", padx=(8, 0)
         )
         ttk.Button(bar, text="로컬 폴더 열기", command=self._conformance_open_local_folder).pack(side="left", padx=(8, 0))
+        ttk.Button(
+            bar,
+            text="전체 결과",
+            command=self._conformance_open_results_summary_window,
+        ).pack(side="left", padx=(8, 0))
 
         mid = ttk.Frame(parent)
         mid.pack(fill="both", expand=True, padx=4, pady=(0, 2))
@@ -3172,14 +3397,25 @@ class ConformanceMixin:
         if self._conformance_run_busy:
             messagebox.showwarning("Conformance", "이미 실행 중입니다.")
             return
+        try:
+            raw_repeat = str(self.conformance_run_repeat_count_var.get()).strip() or "1"
+            repeat_count = int(raw_repeat)
+        except (TypeError, ValueError, tk.TclError):
+            messagebox.showwarning("Conformance", "반복 횟수는 0(무한) 이상의 정수여야 합니다.")
+            return
+        if repeat_count < 0:
+            messagebox.showwarning("Conformance", "반복 횟수는 0(무한) 이상의 정수여야 합니다.")
+            return
         opts = self._conformance_default_run_options()
         # Keep previous per-item results visible while rerunning a subset.
         self._conformance_cancel_event.clear()
         self._conformance_run_busy = True
         self._conformance_run_active_targets = set(to_run)
         self.after(0, self._refresh_log_target_hint_line)
+        repeat_hint = "무한" if repeat_count == 0 else str(repeat_count)
         self.append_log(
-            f"[Conformance-run] 선택 항목 실행 시작: {', '.join(to_run)} (출력은 이 로그 창에 표시, ORU 설정은 업로드 직전에 반영)\n"
+            f"[Conformance-run] 선택 항목 실행 시작: {', '.join(to_run)} "
+            f"(반복 {repeat_hint}회, 출력은 이 로그 창에 표시, ORU 설정은 업로드 직전에 반영)\n"
         )
         try:
             self.conformance_stop_btn.configure(state="normal")
@@ -3232,6 +3468,7 @@ class ConformanceMixin:
                 ent = self._conformance_progress.get(fname)
                 if not isinstance(ent, dict) or ent.get("rc") is None:
                     self._conformance_progress[fname] = {"rc": -2, "status": "STOP"}
+                    self._conformance_commit_final_result(fname, -2, "STOP")
         self._conformance_run_active_targets = None
         self._conformance_run_busy = False
         self._conformance_stop_idle_wait = False
@@ -3246,6 +3483,7 @@ class ConformanceMixin:
             pass
         self._conformance_refresh_row_result_labels()
         self._conformance_refresh_last_run_cache_from_progress()
+        self.after(0, self._conformance_refresh_results_summary_window)
         self.after(0, self._refresh_log_target_hint_line)
         self.after(100, self._save_current_config)
 

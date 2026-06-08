@@ -67,11 +67,17 @@ _lbm_log_has_lbr_reply() {
 send_cmd() {
 	local cmd="$*"
 	echo "Client SENT : $cmd" >>"$LOG" 2>&1
-	set +u
-	local _wfd="${NP2[1]:-}"
-	set -u
-	[[ -n "${_wfd}" ]] || return 0
-	echo "$cmd" >&"${_wfd}" 2>/dev/null || true
+	[[ "${COPROC_READY:-0}" == "1" ]] || return 0
+	# coproc write end is dup'd to fd 3 (exec 3>&"${NP2[1]}"). Do not use NP2[1] after dup.
+	set +o pipefail
+	if [[ -f "${CMD_LOCK_FILE:-}" ]] && command -v flock >/dev/null 2>&1; then
+		{ flock -x 200 2>/dev/null || true
+		  echo "$cmd" >&3
+		} 200>>"${CMD_LOCK_FILE}" 2>/dev/null || echo "$cmd" >&3 2>/dev/null || true
+	else
+		echo "$cmd" >&3 2>/dev/null || true
+	fi
+	set -o pipefail
 }
 
 COPROC_READY=0
@@ -152,72 +158,87 @@ fi
 sleep 3
 
 send_cmd "subscribe --stream NETCONF"
-sleep 2
+_SUB_OK="NOK"
+for _w in $(seq 1 60); do
+	if grep -a "<ok/>" "$LOG" >/dev/null 2>&1; then
+		_SUB_OK="OK"
+		break
+	fi
+	sleep 0.2
+done
+if [[ "$_SUB_OK" != "OK" ]]; then
+	test_fail "subscribe --stream NETCONF"
+	exit 1
+fi
 
 mkdir -p "${NETCONF_TMP}/edit" "${NETCONF_TMP}/get"
+CMD_LOCK_FILE="${CMD_LOCK_FILE:-/var/tmp/netconf_tmp/netconf_cmd.lock}"
+: >"$CMD_LOCK_FILE" 2>/dev/null || true
 
 WATCHDOG_RPC="${NETCONF_TMP}/watchdog.xml"
 cat > "$WATCHDOG_RPC" <<'EORPC'
 <supervision-watchdog-reset xmlns="urn:o-ran:supervision:1.0"/>
 EORPC
 
-(
-_last_wdog_count=0
-while true; do
-	_cur_count=$(grep -c -a -F 'supervision-notification xmlns="urn:o-ran:supervision:1.0"' "$LOG" 2>/dev/null) || true
-	if (( _cur_count > _last_wdog_count )); then
-		_last_wdog_count=$_cur_count
-		echo "user-rpc --content $WATCHDOG_RPC" >&3 2>/dev/null || true
-		echo "Client SENT : user-rpc --content $WATCHDOG_RPC" >>"$LOG" 2>&1
-	fi
-	sleep 1
-done
-) &
-WATCHDOG_PID=$!
+_conformance_31131_start_watchdog() {
+	[[ -n "${WATCHDOG_PID:-}" ]] && return 0
+	(
+		_last_wdog_count=0
+		while true; do
+			_cur_count=$(grep -c -a -F 'supervision-notification xmlns="urn:o-ran:supervision:1.0"' "$LOG" 2>/dev/null) || true
+			if (( _cur_count > _last_wdog_count )); then
+				_last_wdog_count=$_cur_count
+				send_cmd "user-rpc --content $WATCHDOG_RPC"
+			fi
+			sleep 1
+		done
+	) &
+	WATCHDOG_PID=$!
+}
 
-INIT_UPLANE_OUT="${NETCONF_TMP}/edit/edit-init-uplane-conf.xml"
-rm -f "$INIT_UPLANE_OUT"
-cp /mplane_automation/miniDU/edit/edit_init_uplane_conf.xml "${NETCONF_TMP}/edit/edit_init_uplane_conf.xml" 2>/dev/null || true
-send_cmd "user-rpc --content ${NETCONF_TMP}/edit/edit_init_uplane_conf.xml --out $INIT_UPLANE_OUT"
-RESULT0="NOK"
-for _w in $(seq 1 20); do
-	if [[ -f "$INIT_UPLANE_OUT" ]] && grep -aq "OK" "$INIT_UPLANE_OUT" 2>/dev/null; then
-		RESULT0="OK"
-		break
+_conformance_31131_stop_watchdog() {
+	if [[ -n "${WATCHDOG_PID:-}" ]]; then
+		kill "$WATCHDOG_PID" 2>/dev/null || true
+		wait "$WATCHDOG_PID" 2>/dev/null || true
+		WATCHDOG_PID=""
 	fi
-	sleep 0.5
-done
-if [[ "$RESULT0" != "OK" ]]; then
-	test_fail "Initialize uplane conf"
+}
+
+echo "[INFO] supervision-watchdog-reset (after subscribe, before U-Plane init)"
+send_cmd "user-rpc --content $WATCHDOG_RPC"
+sleep 1
+_conformance_31131_start_watchdog
+
+_NETPEER_UPLANE_INIT="$(dirname "$0")/conformance_netpeer_uplane_init.sh"
+if [[ ! -f "$_NETPEER_UPLANE_INIT" ]]; then
+	echo "[ERROR] missing helper: $_NETPEER_UPLANE_INIT (Conformance 스크립트 동기화 또는 3.1.13.1 재실행)"
+	exit 2
+fi
+# shellcheck source=/dev/null
+source "$_NETPEER_UPLANE_INIT"
+
+if ! conformance_netpeer_init_uplane; then
+	test_fail "Initialize uplane conf (delete/replace 모두 실패 — 이전 시험 잔여 설정 확인)"
 	exit 1
 fi
 
 declare -a ToDUifname ToDUifvlan
+PE_FIXED_NAME="ru-pe.0"
 
-for ((i=0; i < $(jq -r '.["interface-configurations"]["to-DU-interface"].name | length // empty' "$CONFIG"); i++)); do
-	ToDUifname[$i]=$(jq -r '.["interface-configurations"]["to-DU-interface"].name['"$i"'] | to_entries[].value // empty' "$CONFIG")
-	ToDUifvlan[$i]=$(jq -r '.["interface-configurations"]["to-DU-interface"].vlan['"$i"'] | to_entries[].value // empty' "$CONFIG")
-	if [[ -n "${ToDUifname[$i]:-}" ]]; then
-		cp /mplane_automation/miniDU/edit/edit_delete_if_org.xml "${NETCONF_TMP}/edit/edit_delete_if_mod.xml" 2>/dev/null || true
-		sed -i "s/IFNAME/${ToDUifname[$i]}_${ToDUifvlan[$i]}/g" "${NETCONF_TMP}/edit/edit_delete_if_mod.xml"
-
-		DEL_IF_OUT="${NETCONF_TMP}/edit/edit-delete-if.xml"
-		rm -f "$DEL_IF_OUT"
-		send_cmd "user-rpc --content ${NETCONF_TMP}/edit/edit_delete_if_mod.xml --out $DEL_IF_OUT"
-		RESULT0="NOK"
-		for _w in $(seq 1 20); do
-			if [[ -f "$DEL_IF_OUT" ]] && grep -aq "OK" "$DEL_IF_OUT" 2>/dev/null; then
-				RESULT0="OK"
-				break
+if conformance_netpeer_uplane_skip_per_interface_delete; then
+	echo "[INFO] U-Plane container reset (${CONFORMANCE_UPLANE_INIT_LEAF}) — per-interface delete 생략"
+else
+	for ((i=0; i < $(jq -r '.["interface-configurations"]["to-DU-interface"].name | length // empty' "$CONFIG"); i++)); do
+		ToDUifname[$i]=$(jq -r '.["interface-configurations"]["to-DU-interface"].name['"$i"'] | to_entries[].value // empty' "$CONFIG")
+		ToDUifvlan[$i]=$(jq -r '.["interface-configurations"]["to-DU-interface"].vlan['"$i"'] | to_entries[].value // empty' "$CONFIG")
+		if [[ -n "${ToDUifname[$i]:-}" ]]; then
+			if ! conformance_netpeer_try_delete_du_interface "${ToDUifname[$i]}_${ToDUifvlan[$i]}" "$i" "$PE_FIXED_NAME"; then
+				test_fail "Delete existing interface $i"
+				exit 1
 			fi
-			sleep 0.5
-		done
-		if [[ "$RESULT0" != "OK" ]]; then
-			test_fail "Delete existing interface $i"
-			exit 1
 		fi
-	fi
-done
+	done
+fi
 
 GET_MP_VER_RPC="${NETCONF_TMP}/get/get_mp_version.xml"
 cat > "$GET_MP_VER_RPC" <<'EORPC'
@@ -243,7 +264,6 @@ MPVERSION=$(xmlstarlet sel -N x="urn:o-ran:operations:1.0" -t -v "//x:supported-
 MPVERSIONNUM=$((${MPVERSION//./}))
 
 declare -a ToDUpename ToDUodumac MAC Port
-PE_FIXED_NAME="ru-pe.0"
 
 if $(jq -r '.["interface-configurations"]["to-DU-interface"]["enable"] // empty' "$CONFIG") ; then
 
@@ -292,6 +312,7 @@ for ((i=0; i < $(jq -r '.["interface-configurations"]["to-DU-interface"].name | 
 
 		EDIT_IF_OUT="${NETCONF_TMP}/edit/edit-if.xml"
 		rm -f "$EDIT_IF_OUT"
+		conformance_netpeer_log_mark
 		send_cmd "user-rpc --content ${NETCONF_TMP}/edit/edit_interface_mod.xml --out $EDIT_IF_OUT"
 
 		RESULT_IF="NOK"
@@ -310,17 +331,14 @@ for ((i=0; i < $(jq -r '.["interface-configurations"]["to-DU-interface"].name | 
 		fi
 
 		RESULT3="NOK"
-		PAT_IF_NOTIF="interface[if:name='${ToDUifname[$i]}_${ToDUifvlan[$i]}']</target><operation>create</operation></edit></netconf-config-change>"
-		for _w in $(seq 1 20); do
-			if grep -a -F "$PAT_IF_NOTIF" "$LOG" >/dev/null 2>&1; then
-				RESULT3="OK"
-				break
-			fi
-			sleep 0.5
-		done
+		if conformance_netpeer_step_config_change_or_verify interface \
+			"${ToDUifname[$i]}_${ToDUifvlan[$i]}" 40; then
+			RESULT3="OK"
+		fi
 
 		echo "[$RESULT3]	STEP 3.	Netconf config change notification is generated from O-RU ( create interface )"
 		if [[ "$RESULT3" != "OK" ]]; then
+			conformance_netpeer_log_config_change_hint "${ToDUifname[$i]}_${ToDUifvlan[$i]}"
 			test_fail "Interface notification"
 			exit 1
 		fi
@@ -362,6 +380,7 @@ EORPC
 
 			EDIT_PE_OUT="${NETCONF_TMP}/edit/edit-pe.xml"
 			rm -f "$EDIT_PE_OUT"
+			conformance_netpeer_log_mark
 			send_cmd "user-rpc --content ${NETCONF_TMP}/edit/edit_processing_element_mod.xml --out $EDIT_PE_OUT"
 			RESULT_PE="NOK"
 			for _w in $(seq 1 20); do
@@ -380,17 +399,13 @@ EORPC
 		fi
 
 		RESULT4="NOK"
-		PAT_PE_NOTIF="ru-elements[o-ran-elements:name='${PE_FIXED_NAME}']</target><operation>create</operation></edit></netconf-config-change>"
-		for _w in $(seq 1 20); do
-			if grep -a -F "$PAT_PE_NOTIF" "$LOG" >/dev/null 2>&1; then
-				RESULT4="OK"
-				break
-			fi
-			sleep 0.5
-		done
+		if conformance_netpeer_step_config_change_or_verify pe "$PE_FIXED_NAME" 40; then
+			RESULT4="OK"
+		fi
 
 		echo "[$RESULT4]	STEP 4.	Netconf config change notification is generated from O-RU ( create proecssing-element )"
 		if [[ "$RESULT4" != "OK" ]]; then
+			conformance_netpeer_log_config_change_hint "$PE_FIXED_NAME"
 			test_fail "PE notification"
 			exit 1
 		fi

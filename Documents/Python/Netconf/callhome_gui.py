@@ -221,9 +221,14 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.conformance_run_supervision_reset_cycles_var = tk.StringVar(value="30")
         self.conformance_run_supervision_negative_fail_cycle_var = tk.StringVar(value="3")
         self.conformance_run_conn_delay_var = tk.StringVar(value="3")
+        self.conformance_run_repeat_count_var = tk.StringVar(value="1")
         self.conformance_post_listen_wait_var = tk.StringVar(value="0")
         self.conformance_last_run_hint_var = tk.StringVar(value="")
         self._conformance_last_run_snapshot_cache: dict[str, Any] | None = None
+        self._conformance_final_results: dict[str, dict[str, Any]] = {}
+        self._conformance_results_summary_win: tk.Toplevel | None = None
+        self._conformance_results_summary_tree: ttk.Treeview | None = None
+        self._conformance_results_summary_summary_var: tk.StringVar | None = None
         self._conformance_omit_last_run_from_config_save: bool = False
         self._conformance_extra_uploads: list[tuple[str, str]] = []
         self._build_ui()
@@ -4040,6 +4045,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "conformance_run_supervision_reset_cycles": self.conformance_run_supervision_reset_cycles_var.get(),
             "conformance_run_supervision_negative_fail_cycle": self.conformance_run_supervision_negative_fail_cycle_var.get(),
             "conformance_run_conn_delay": self.conformance_run_conn_delay_var.get(),
+            "conformance_run_repeat_count": self.conformance_run_repeat_count_var.get(),
             "conformance_post_listen_wait": self.conformance_post_listen_wait_var.get(),
             "conformance_per_test_settings": copy.deepcopy(self._conformance_per_test_settings),
             "conformance_extra_uploads": [
@@ -4050,6 +4056,9 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         cl = self._conformance_last_run_snapshot_cache
         if not omit and isinstance(cl, dict) and cl.get("by_script"):
             payload["conformance_last_run"] = cl
+        fr = getattr(self, "_conformance_final_results", None)
+        if not omit and isinstance(fr, dict) and fr:
+            payload["conformance_final_results"] = copy.deepcopy(fr)
         return payload
 
     def _apply_config(self, data: dict[str, Any]) -> None:
@@ -4103,6 +4112,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 if bv is not None:
                     bv.set(bool(val))
         self._conformance_apply_last_run_from_config(data.get("conformance_last_run"))
+        self._conformance_apply_final_results_from_config(data.get("conformance_final_results"))
         crd = data.get("conformance_run_remote_dir")
         if isinstance(crd, str) and crd.strip():
             self.conformance_run_remote_dir_var.set(crd.strip())
@@ -4131,6 +4141,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             (self.conformance_run_supervision_reset_cycles_var, "conformance_run_supervision_reset_cycles"),
             (self.conformance_run_supervision_negative_fail_cycle_var, "conformance_run_supervision_negative_fail_cycle"),
             (self.conformance_run_conn_delay_var, "conformance_run_conn_delay"),
+            (self.conformance_run_repeat_count_var, "conformance_run_repeat_count"),
             (self.conformance_post_listen_wait_var, "conformance_post_listen_wait"),
         ):
             v = data.get(cfg_key)
