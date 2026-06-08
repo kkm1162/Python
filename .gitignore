@@ -1,0 +1,11 @@
+# PyInstaller
+build/
+dist/
+*.spec.bak
+
+# Runtime / debug logs
+mplane_ui_debug.log
+*.pyc
+__pycache__/
+myenv/
+callhome_gui_config.json
