@@ -51,6 +51,10 @@ mkdir -p "$LOG_DIR"
 LOG="$LOG_DIR/CONF_${TESTID}_$(date +'%y%m%d_%H-%M-%S').log"
 : >"$LOG"
 chmod 0644 "$LOG" 2>/dev/null || true
+# shellcheck source=/dev/null
+_CALLHOME_COMMON="${CONFORMANCE_REMOTE_DIR:-/var/tmp/conformance}/conformance_callhome_common.sh"
+[[ -f "$_CALLHOME_COMMON" ]] || _CALLHOME_COMMON="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/conformance_callhome_common.sh"
+source "$_CALLHOME_COMMON"
 
 send_cmd() {
 	local cmd="$*"
@@ -104,17 +108,10 @@ COPROC_READY=1
 
 send_cmd "verb 3"
 send_cmd "knownhosts --mode skip"
+conformance_callhome_set_listen_mark
 send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login $USER --timeout 300"
 
-RESULT1="NOK"
-PAT_ACCEPT="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
-for _w in $(seq 1 300); do
-	if grep -a -F "$PAT_ACCEPT" "$LOG" >/dev/null 2>&1; then
-		RESULT1="OK"
-		break
-	fi
-	sleep 0.2
-done
+RESULT1=$(conformance_callhome_wait_step1 300)
 
 echo "STEP 1. Criteria : The Netconf Client receive the CallHome from ORU"
 echo "STEP 1. CallHome : $RESULT1"
@@ -123,14 +120,7 @@ if [[ "$RESULT1" != "OK" ]]; then
 	exit 1
 fi
 
-RESULT2="NOK"
-for _w in $(seq 1 120); do
-	if grep -a -F "Authentication successful" "$LOG" >/dev/null 2>&1; then
-		RESULT2="OK"
-		break
-	fi
-	sleep 0.2
-done
+RESULT2=$(conformance_callhome_wait_auth 120)
 
 echo "[$RESULT2] STEP 2. Successfully login with the correct username and password ($USER / ***)"
 if [[ "$RESULT2" != "OK" ]]; then
@@ -167,7 +157,7 @@ for _w in $(seq 1 2400); do
 	if [[ "${_cnt:-0}" =~ ^[0-9]+$ ]] && (( _cnt > notif_seen )); then
 		send_cmd "user-rpc --content $WT_XML --out ${NETCONF_TMP}/watchdog_rpc_reply.xml"
 		notif_seen=$_cnt
-		echo "[INFO] supervision notification #${notif_seen} detected, watchdog sent"
+		echo "[INFO] supervision notification #${notif_seen} detected, watchdog sent" >&2
 		if (( notif_seen >= NEEDED )); then
 			RESULT4="OK"
 			break
@@ -183,12 +173,46 @@ if [[ "$RESULT4" != "OK" ]]; then
 	exit 1
 fi
 
-# watchdog 안 보내면 ORU가 세션 끊음 → EOF 발생. supervision interval + guard 여유 시간
+# watchdog 중단 후 supervision failure → 세션 EOF (STEP4 이전 SSH EOF는 제외)
+SUP_INTERVAL="${SUPERVISION_INTERVAL:-60}"
+SUP_GUARD="${SUPERVISION_GUARD:-10}"
+if ! [[ "$SUP_INTERVAL" =~ ^[0-9]+$ ]]; then
+	SUP_INTERVAL=60
+fi
+if ! [[ "$SUP_GUARD" =~ ^[0-9]+$ ]]; then
+	SUP_GUARD=10
+fi
+MIN_FAIL_WAIT=$((SUP_INTERVAL + SUP_GUARD + 5))
+notif_at_watchdog_stop=$notif_seen
+STEP4_DONE_MARK=$(wc -l <"$LOG" 2>/dev/null | tr -d ' ') || STEP4_DONE_MARK=0
+echo "[INFO] STEP4 완료 — watchdog 중단, supervision failure 대기 (interval=${SUP_INTERVAL}s, guard=${SUP_GUARD}s, 최소 ${MIN_FAIL_WAIT}s)" >&2
+echo "[INFO] supervision 알림 ${notif_at_watchdog_stop}회까지 watchdog 전송, 이후 알림은 무시" >&2
+
+_log_since_step4() {
+	tail -n +$((STEP4_DONE_MARK + 1)) "$LOG" 2>/dev/null
+}
+
+_supervision_notif_count() {
+	grep -acE '^\s*<supervision-notification' "$LOG" 2>/dev/null || echo 0
+}
+
 RESULT5="NOK"
 EOF_PAT="SSH channel unexpected EOF."
+_missed_notif_seen=0
 for _w in $(seq 1 2400); do
-	if grep -a -F "$EOF_PAT" "$LOG" >/dev/null 2>&1; then
+	_elapsed=$((_w / 4))
+	_cnt=$(_supervision_notif_count)
+	if [[ "${_cnt:-0}" =~ ^[0-9]+$ ]] && (( _cnt > notif_at_watchdog_stop )); then
+		_missed_notif_seen=1
+		echo "[INFO] watchdog 미응답 supervision 알림 감지 (#${_cnt}, STEP4 이후)" >&2
+	fi
+	if (( _missed_notif_seen == 0 || _elapsed < MIN_FAIL_WAIT )); then
+		sleep 0.25
+		continue
+	fi
+	if _log_since_step4 | grep -a -F "$EOF_PAT" >/dev/null 2>&1; then
 		RESULT5="OK"
+		echo "[INFO] supervision failure 후 EOF 확인 (${_elapsed}s 경과, 알림 ${_cnt}회)" >&2
 		break
 	fi
 	sleep 0.25
@@ -197,7 +221,10 @@ done
 echo "STEP 5. Criteria : Supervision Failure"
 echo "STEP 5. Supervision : $RESULT5"
 if [[ "$RESULT5" != "OK" ]]; then
-	test_fail "expected EOF after supervision failure"
+	if (( _missed_notif_seen == 0 )); then
+		echo "[INFO] watchdog 중단 후 추가 supervision-notification 없음 (failure 미발생)" >&2
+	fi
+	test_fail "expected EOF after supervision failure (missed_notif=${_missed_notif_seen}, wait=${MIN_FAIL_WAIT}s)"
 	exit 1
 fi
 

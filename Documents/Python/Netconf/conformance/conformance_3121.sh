@@ -40,8 +40,17 @@ PRODUCT=$(jq -r '.["management-configurations"]["PRODUCT-CODE"] // empty' "$CONF
 
 LISTEN_PORT="${CALLHOME_PORT:-4334}"
 NETCONF_TMP="${NETCONF_TMP:-/var/tmp/netconf_tmp}"
+CONN_DELAY="${CONN_DELAY:-3}"
+POST_LISTEN_WAIT="${CONFORMANCE_POST_LISTEN_WAIT:-15}"
+if ! [[ "$POST_LISTEN_WAIT" =~ ^[0-9]+$ ]]; then
+	POST_LISTEN_WAIT=15
+fi
+if [[ "$POST_LISTEN_WAIT" -gt 120 ]]; then
+	POST_LISTEN_WAIT=120
+fi
 
 echo "[INFO] USER=$USER, ALLOWED_IP=$ALLOWED_IP, LOCAL_IP=$LOCAL_IP, LISTEN_PORT=$LISTEN_PORT (Call Home), NETCONF_PORT=$NETCONF_PORT (JSON PORT), PRODUCT=$PRODUCT"
+echo "[INFO] CONN_DELAY=${CONN_DELAY}s, post_listen_wait=${POST_LISTEN_WAIT}s (GUI Conformance post_listen_wait)"
 
 LOG_BASE="${LOG_PATH:-${CONFORMANCE_REMOTE_DIR:-/var/tmp/conformance}/logs}"
 LOG_BASE="${LOG_BASE%/}"
@@ -50,6 +59,10 @@ mkdir -p "$LOG_DIR"
 LOG="$LOG_DIR/CONF_${TESTID}_$(date +'%y%m%d_%H-%M-%S').log"
 : >"$LOG"
 chmod 0644 "$LOG" 2>/dev/null || true
+# shellcheck source=/dev/null
+_CALLHOME_COMMON="${CONFORMANCE_REMOTE_DIR:-/var/tmp/conformance}/conformance_callhome_common.sh"
+[[ -f "$_CALLHOME_COMMON" ]] || _CALLHOME_COMMON="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/conformance_callhome_common.sh"
+source "$_CALLHOME_COMMON"
 
 mkdir -p "${NETCONF_TMP}/edit"
 SUB_RPC="${NETCONF_TMP}/edit/subscription_3121_rpc.xml"
@@ -105,7 +118,8 @@ sleep 1
 
 sudo iptables -A INPUT -p tcp --dport "$LISTEN_PORT" -j DROP
 sudo iptables -I INPUT -p tcp --dport "$LISTEN_PORT" -s "$ALLOWED_IP" -j ACCEPT
-sleep 3
+echo "[INFO] Waiting ${CONN_DELAY}s for network stabilization (iptables applied)..."
+sleep "$CONN_DELAY"
 
 coproc NP2 {
 	setsid stdbuf -oL sshpass -p "$PASSWORD" netopeer2-cli 2>&1
@@ -115,34 +129,28 @@ exec 3>&"${NP2[1]}"
 COPROC_READY=1
 
 send_cmd "verb 3"
+sleep 1
 send_cmd "knownhosts --mode skip"
+sleep 1
+conformance_callhome_set_listen_mark
 send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login $USER --timeout 300"
+sleep 3
+if [[ "$POST_LISTEN_WAIT" -gt 0 ]]; then
+	echo "[INFO] post_listen_wait ${POST_LISTEN_WAIT}s (ORU Call Home 재시도 대기)..."
+	sleep "$POST_LISTEN_WAIT"
+fi
 
-RESULT1="NOK"
-PAT_ACCEPT="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
-for _w in $(seq 1 300); do
-	if grep -a -F "$PAT_ACCEPT" "$LOG" >/dev/null 2>&1; then
-		RESULT1="OK"
-		break
-	fi
-	sleep 0.2
-done
+RESULT1=$(conformance_callhome_wait_step1 450)
 
 echo "STEP 1. Criteria : The Netconf Client receive the CallHome from ORU"
 echo "STEP 1. CallHome : $RESULT1"
 if [[ "$RESULT1" != "OK" ]]; then
+	conformance_callhome_print_hints
 	test_fail "Call Home"
 	exit 1
 fi
 
-RESULT2="NOK"
-for _w in $(seq 1 120); do
-	if grep -a -F "Authentication successful" "$LOG" >/dev/null 2>&1; then
-		RESULT2="OK"
-		break
-	fi
-	sleep 0.2
-done
+RESULT2=$(conformance_callhome_wait_auth 120)
 
 echo "[$RESULT2] STEP 2. Successfully login with the correct username and password ($USER / ***)"
 if [[ "$RESULT2" != "OK" ]]; then

@@ -1,6 +1,6 @@
 {
-  "window_geometry": "1231x1028+1262+61",
-  "log_window_geometry": "1080x1849+2423+62",
+  "window_geometry": "1709x1028+853+1022",
+  "log_window_geometry": "1062x1831+-1079+293",
   "rpc_event_window_geometry": "980x520+338+338",
   "remote_user": "root",
   "remote_host": "192.168.9.123",
@@ -15,7 +15,7 @@
   "runtime_fields": {
     "USER": "oranuser",
     "PASSWORD": "o-ran-password",
-    "ALLOWED_IP": "10.0.20.126",
+    "ALLOWED_IP": "10.0.20.110",
     "LOCAL_IP": "10.0.20.254",
     "CALLHOME_PORT": "4334",
     "NETCONF_PORT": "830",
@@ -25,7 +25,7 @@
     "CLI-PW": "",
     "LOCAL_IF": ""
   },
-  "mplane_xlsx_path": "C:\\Users\\thelastsun\\Documents\\Python\\Netconf\\mplane\\nDLPU_dc-c1-01-09-08-07.xlsx",
+  "mplane_xlsx_path": "C:\\Users\\thelastsun\\Documents\\Python\\Netconf\\mplane\\nDLPU_dc-c1-01-09-08-07_001.xlsx",
   "conformance_checked": {
     "conformance_3111.sh": false,
     "conformance_3112.sh": false,
@@ -38,7 +38,7 @@
     "conformance_3152.sh": false,
     "conformance_3162.sh": false,
     "conformance_3161.sh": false,
-    "conformance_3170.sh": false,
+    "conformance_3170.sh": true,
     "conformance_3181.sh": false,
     "conformance_3182.sh": false,
     "conformance_3183.sh": false,
@@ -49,7 +49,7 @@
     "conformance_31102.sh": false,
     "conformance_31121.sh": false,
     "conformance_31122.sh": false,
-    "conformance_31131.sh": true
+    "conformance_31131.sh": false
   },
   "conformance_run_remote_dir": "/var/tmp/conformance",
   "conformance_run_sw_pkg": "",
@@ -62,13 +62,14 @@
   "conformance_run_supervision_reset_cycles": "1",
   "conformance_run_supervision_negative_fail_cycle": "1",
   "conformance_run_conn_delay": "3",
+  "conformance_run_repeat_count": "1",
   "conformance_post_listen_wait": "15",
   "conformance_per_test_settings": {
     "conformance_3131.sh": {
-      "supervision_cycles": "10"
+      "supervision_cycles": "1"
     },
     "conformance_3132.sh": {
-      "supervision_cycles": "10",
+      "supervision_cycles": "1",
       "post_reset_wait_sec": "400"
     },
     "conformance_3151.sh": {
@@ -88,7 +89,7 @@
       "alarm_timeout_sec": "3600"
     },
     "conformance_3161.sh": {
-      "swm_pkg_path": "C:\\Users\\thelastsun\\Downloads\\ST-nDLPU-1DU-000004-00-00_20260312_151703.zip",
+      "swm_pkg_path": "C:\\Users\\thelastsun\\Downloads\\ST-nDLPU-1DU-010004-01-01_20260604_161244.zip",
       "swm_server_ip": "10.0.20.254",
       "swm_server_id": "root",
       "swm_server_pw": "solid123!"
@@ -113,7 +114,7 @@
       "file_server_pw": "solid123!",
       "local_log_prefix": "O-RAN/log/",
       "remote_upload_dir": "/tmp",
-      "trace_oru_end_timeout_sec": "600"
+      "trace_oru_end_timeout_sec": "700"
     },
     "conformance_31122.sh": {
       "oru_log_boost_enable": "1",
@@ -124,18 +125,18 @@
       "file_server_pw": "solid123!",
       "local_log_prefix": "O-RAN/log/",
       "remote_upload_dir": "/tmp",
-      "trace_oru_end_timeout_sec": "600"
+      "trace_oru_end_timeout_sec": "700"
     },
     "conformance_3110x_shared": {
-      "mplane_xlsx_path": "C:\\Users\\thelastsun\\Documents\\Python\\Netconf\\mplane\\nDLPU_dc-c1-01-09-08-07.xlsx",
+      "mplane_xlsx_path": "C:\\Users\\thelastsun\\Documents\\Python\\Netconf\\mplane\\nDLPU_dc-c1-01-09-08-07_001.xlsx",
       "to_du_vlan": "1"
     },
     "conformance_31102.sh": {
-      "mplane_xlsx_path": "C:\\Users\\thelastsun\\Documents\\Python\\Netconf\\mplane\\nDLPU_dc-c1-01-09-08-07.xlsx",
+      "mplane_xlsx_path": "C:\\Users\\thelastsun\\Documents\\Python\\Netconf\\mplane\\nDLPU_dc-c1-01-09-08-07_001.xlsx",
       "to_du_vlan": "1"
     },
     "conformance_31101.sh": {
-      "mplane_xlsx_path": "C:\\Users\\thelastsun\\Documents\\Python\\Netconf\\mplane\\nDLPU_dc-c1-01-09-08-07.xlsx",
+      "mplane_xlsx_path": "C:\\Users\\thelastsun\\Documents\\Python\\Netconf\\mplane\\nDLPU_dc-c1-01-09-08-07_001.xlsx",
       "to_du_vlan": "1"
     },
     "conformance_3184.sh": {
@@ -157,7 +158,7 @@
       "file_server_pw": "solid123!",
       "local_log_prefix": "O-RAN/log/",
       "remote_upload_dir": "/tmp",
-      "trace_oru_end_timeout_sec": "600"
+      "trace_oru_end_timeout_sec": "700"
     },
     "conformance_3170.sh": {
       "activate_get_guard_sec": "10"

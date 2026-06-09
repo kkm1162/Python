@@ -55,6 +55,10 @@ mkdir -p "$LOG_DIR"
 LOG="$LOG_DIR/CONF_${TESTID}_$(date +'%y%m%d_%H-%M-%S').log"
 : >"$LOG"
 chmod 0644 "$LOG" 2>/dev/null || true
+# shellcheck source=/dev/null
+_CALLHOME_COMMON="${CONFORMANCE_REMOTE_DIR:-/var/tmp/conformance}/conformance_callhome_common.sh"
+[[ -f "$_CALLHOME_COMMON" ]] || _CALLHOME_COMMON="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/conformance_callhome_common.sh"
+source "$_CALLHOME_COMMON"
 
 send_cmd() {
 	local cmd="$*"
@@ -111,31 +115,17 @@ COPROC_READY=1
 
 send_cmd "verb 3"
 send_cmd "knownhosts --mode skip"
+conformance_callhome_set_listen_mark
 send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login $USER --timeout 300"
 
-RESULT1="NOK"
-PAT_ACCEPT="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
-for _w in $(seq 1 1500); do
-	if grep -a -F "$PAT_ACCEPT" "$LOG" >/dev/null 2>&1; then
-		RESULT1="OK"
-		break
-	fi
-	sleep 0.2
-done
+RESULT1=$(conformance_callhome_wait_step1 1500)
 echo "[$RESULT1] STEP 1. The Netconf Client receive the CallHome from ORU"
 if [[ "$RESULT1" != "OK" ]]; then
 	test_fail "Call Home"
 	exit 1
 fi
 
-RESULT2="NOK"
-for _w in $(seq 1 150); do
-	if grep -a -F "Authentication successful" "$LOG" >/dev/null 2>&1; then
-		RESULT2="OK"
-		break
-	fi
-	sleep 0.2
-done
+RESULT2=$(conformance_callhome_wait_auth 150)
 echo "[$RESULT2] STEP 2. Successfully login with the correct username and password ($USER / ***)"
 if [[ "$RESULT2" != "OK" ]]; then
 	test_fail "login"
@@ -464,17 +454,7 @@ send_cmd "verb 3"
 send_cmd "knownhosts --mode skip"
 send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login oranuser2 --timeout 300"
 
-RESULT5="NOK"
-for _w in $(seq 1 1500); do
-	if grep -a -F "$PAT_ACCEPT" "$LOG" >/dev/null 2>&1; then
-		ACCEPT_COUNT=$(grep -c -a -F "$PAT_ACCEPT" "$LOG" 2>/dev/null) || ACCEPT_COUNT=0
-		if (( ACCEPT_COUNT >= 2 )); then
-			RESULT5="OK"
-			break
-		fi
-	fi
-	sleep 0.2
-done
+RESULT5=$(conformance_callhome_wait_accept_count 2 1500)
 echo "[$RESULT5] STEP 5. The Netconf Client receive the CallHome from ORU"
 if [[ "$RESULT5" != "OK" ]]; then
 	test_fail "Call Home (oranuser2)"
@@ -540,15 +520,7 @@ send_cmd "verb 3"
 send_cmd "knownhosts --mode skip"
 send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login oranuser3 --timeout 300"
 
-RESULT8="NOK"
-for _w in $(seq 1 1500); do
-	ACCEPT_COUNT=$(grep -c -a -F "$PAT_ACCEPT" "$LOG" 2>/dev/null) || ACCEPT_COUNT=0
-	if (( ACCEPT_COUNT >= 3 )); then
-		RESULT8="OK"
-		break
-	fi
-	sleep 0.2
-done
+RESULT8=$(conformance_callhome_wait_accept_count 3 1500)
 echo "[$RESULT8] STEP 8. The Netconf Client receive the CallHome from ORU"
 if [[ "$RESULT8" != "OK" ]]; then
 	test_fail "Call Home (oranuser3)"

@@ -236,6 +236,14 @@ _LOG_3112X_FIELDS: list[dict[str, Any]] = [
         "password": True,
     },
     {
+        "key": "oru_ssh_ip",
+        "label": "O-RU SSH IP",
+        "default": "",
+        "hint": "vtysh show system 대상 (비우면 Settings ALLOWED_IP). Call Home 소스 IP와 다를 수 있음",
+        "env_var": None,
+        "wide": False,
+    },
+    {
         "key": "file_server_ip",
         "label": "SFTP server IP",
         "default": "",
@@ -292,6 +300,7 @@ _CONFORMANCE_MPLANE_SCRIPTS: frozenset[str] = frozenset(
 )
 
 _CONFORMANCE_HELPER_SCRIPTS: tuple[str, ...] = (
+    "conformance_callhome_common.sh",
     "conformance_mplane_xlsx_common.sh",
     "conformance_315x_common.sh",
     "conformance_netpeer_uplane_init.sh",
@@ -926,15 +935,16 @@ class ConformanceMixin:
     def _conformance_oru_boost_enabled(self, fname: str) -> bool:
         if fname not in _CONFORMANCE_3112X_SCRIPTS:
             return False
-        mode = (self._conformance_get_per_test_val(fname, "oru_log_boost_enable") or "1").strip()
+        mode = (self._conformance_get_per_test_val(fname, "oru_log_boost_enable") or "0").strip()
         return mode != "0"
 
     def _conformance_oru_boost_credentials(self, fname: str) -> tuple[str, str, str] | None:
-        host = ""
-        try:
-            host = str(self.fields.get("ALLOWED_IP", tk.StringVar()).get()).strip()  # type: ignore[union-attr]
-        except Exception:
-            pass
+        host = self._conformance_get_per_test_val(fname, "oru_ssh_ip").strip()
+        if not host:
+            try:
+                host = str(self.fields.get("ALLOWED_IP", tk.StringVar()).get()).strip()  # type: ignore[union-attr]
+            except Exception:
+                host = ""
         if not host:
             return None
         oru_id = self._conformance_get_per_test_val(fname, "oru_cli_id").strip()
@@ -1058,6 +1068,26 @@ class ConformanceMixin:
                 f"[O-RU boost] started: vtysh show system every 1s → {oru_id}@{host}"
                 + (f" (pid {pid})" if pid else "")
             )
+            log_line(f"[O-RU boost] remote log: /var/tmp/oru_show_system_boost.log")
+            time.sleep(2.5)
+            try:
+                _tstdin, _tstdout, _tstderr = client.exec_command(
+                    "bash -lc " + shlex.quote(f"tail -n 5 {shlex.quote(log_path)} 2>/dev/null || true")
+                )
+                _tstdout.channel.recv_exit_status()
+                _tail = _tstdout.read().decode(errors="replace").strip()
+                if _tail:
+                    for _tl in _tail.splitlines():
+                        _tl = _tl.rstrip()
+                        if _tl:
+                            log_line(f"[O-RU boost] {_tl}")
+                else:
+                    log_line(
+                        "[O-RU boost] WARN: boost log empty after 2.5s — "
+                        f"SSH to {host} 실패 가능 (O-RU SSH IP 확인)"
+                    )
+            except Exception as _texc:
+                log_line(f"[O-RU boost] WARN: boost log check failed: {_texc}")
             return True
         except Exception as exc:
             log_line(f"[ERROR] O-RU boost start: {exc}")
@@ -2303,6 +2333,27 @@ class ConformanceMixin:
                             force_despite_cancel=True,
                         )
                         post_3180_after_3186 = True
+
+                    if fname == "conformance_3112.sh" and ordered_fnames.index(fname) < len(ordered_fnames) - 1:
+                        wait_s = 45
+                        try:
+                            wait_s = int((opts.post_listen_wait_sec or "").strip() or "15")
+                        except (ValueError, TypeError):
+                            wait_s = 45
+                        wait_s = max(30, min(wait_s * 2, 120))
+                        log_line(
+                            f"3.1.1.2 완료 → ORU Call Home 재시도 대기 {wait_s}초 "
+                            f"(negative 인증 후 다음 positive 시험 준비)"
+                        )
+                        for elapsed in range(wait_s):
+                            if self._conformance_cancel_event.is_set():
+                                log_line("ORU Call Home 대기 중 사용자 중지")
+                                break
+                            if elapsed > 0 and elapsed % 15 == 0:
+                                log_line(f"ORU Call Home 대기 중… {elapsed}/{wait_s}초")
+                            time.sleep(1)
+                        else:
+                            log_line(f"ORU Call Home 대기 {wait_s}초 완료, 다음 시험 진행")
 
                     if fname == "conformance_3132.sh" and ordered_fnames.index(fname) < len(ordered_fnames) - 1:
                         wait_s = 360
