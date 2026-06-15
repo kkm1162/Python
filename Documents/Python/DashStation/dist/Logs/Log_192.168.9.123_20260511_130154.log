@@ -1,64 +1,0 @@
-Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-37-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/pro
-
-Expanded Security Maintenance for Applications is not enabled.
-
-255 updates can be applied immediately.
-12 of these updates are standard security updates.
-To see these additional updates run: apt list --upgradable
-
-16 additional security updates can be applied with ESM Apps.
-Learn more about enabling ESM Apps service at https://ubuntu.com/esm
-
-*** System restart required ***
-Last login: Mon May 11 11:21:45 2026 from 192.168.80.136
-[?2004h]0;solid@OL4-RUC: ~solid@OL4-RUC:~$ ip neighbo | grep 10.0.20
-[?2004l[01;31m[K10.0.20[m[K.103 dev dasan FAILED 
-[01;31m[K10.0.20[m[K.126 dev dasan lladdr 00:0a:35:00:00:0a REACHABLE 
-[01;31m[K10.0.20[m[K.108 dev dasan FAILED 
-[01;31m[K10.0.20[m[K.133 dev dasan lladdr dc:c1:01:00:00:09 REACHABLE 
-[01;31m[K10.0.20[m[K.130 dev dasan INCOMPLETE 
-[01;31m[K10.0.20[m[K.100 dev dasan lladdr dc:c1:01:00:92:2d STALE 
-[01;31m[K10.0.20[m[K.50 dev dasan lladdr d0:96:fb:9d:82:8e REACHABLE 
-[01;31m[K10.0.20[m[K.254 dev dasan FAILED 
-[01;31m[K10.0.20[m[K.101 dev dasan lladdr dc:c1:01:02:03:04 STALE 
-[01;31m[K10.0.20[m[K.102 dev dasan lladdr 00:0a:35:00:00:02 STALE 
-[01;31m[K10.0.20[m[K.128 dev dasan FAILED 
-[?2004h]0;solid@OL4-RUC: ~solid@OL4-RUC:~$ cd /mi[Kplane_automation/miniDU/
-config/  edit/    get/     SS_TEST/ T_SH_SY/ 
-]0;solid@OL4-RUC: ~solid@OL4-RUC:~$ cd /mplane_automation/miniDU/
-[?2004l[?2004h]0;solid@OL4-RUC: /mplane_automation/miniDUsolid@OL4-RUC:/mplane_automation/miniDU$ scp [K[K[K[Kcp -r e[Kget/ /var/tmp/netconf_tmp/
-[?2004l[?2004h]0;solid@OL4-RUC: /mplane_automation/miniDUsolid@OL4-RUC:/mplane_automation/miniDU$ cp -r get/ /var/tmp/netconf_tmp/[C[1P[1P[1P[1@e[1@t[1P[3@dit
-[?2004l[?2004h]0;solid@OL4-RUC: /mplane_automation/miniDUsolid@OL4-RUC:/mplane_automation/miniDU$ cd /t[K
-bin/                etc/                lost+found/         root/               srv/                var/
-bin.usr-is-merged/  home/               media/              run/                sys/                
-boot/               lib/                mnt/                RUyang/             tailf_backup/       
-cdrom/              lib32/              mplane_automation/  sbin/               tmp/                
-dev/                lib64/              opt/                sbin.usr-is-merged/ tmp2/               
-dhcp-4.4.2/         lib.usr-is-merged/  proc/               snap/               usr/                
-]0;solid@OL4-RUC: /mplane_automation/miniDUsolid@OL4-RUC:/mplane_automation/miniDU$ cd /[K[K[K[Kls
-[?2004l[0m[01;34mconfig[0m                [01;32mconformance_3121.sh[0m   [01;32mconformance_3152.sh[0m            [01;32mconformance_3183.sh[0m  [01;32mminiDU_last.sh[0m  [01;32mminiDU_v6.sh[0m
-[01;32mconformance_31101.sh[0m  [01;32mconformance_31301.sh[0m  [01;32mconformance_3161.sh[0m            [01;32mconformance_3184.sh[0m  [01;32mminiDU.sh[0m       RDLTEST.EXT
-[01;32mconformance_31102.sh[0m  [01;32mconformance_3131.sh[0m   [01;32mconformance_3162.sh[0m            [01;32mconformance_3185.sh[0m  [01;32mminiDU_v1.sh[0m    [01;32mSS_reproduce.sh[0m
-[01;32mconformance_3111.sh[0m   [01;32mconformance_3132.sh[0m   [01;32mconformance_3170.sh[0m            [01;32mconformance_3186.sh[0m  [01;32mminiDU_v2.sh[0m    SS-RRB2-A-0-PKGu.EXT
-[01;32mconformance_3112.sh[0m   [01;32mconformance_3141.sh[0m   [01;32mconformance_3180_init_user.sh[0m  [01;34medit[0m                 [01;32mminiDU_v3.sh[0m    [01;34mSS_TEST[0m
-[01;32mconformance_31201.sh[0m  [01;32mconformance_3142.sh[0m   [01;32mconformance_3181.sh[0m            [01;34mget[0m                  [01;32mminiDU_v4.sh[0m    [34;42mT_SH_SY[0m
-[01;32mconformance_31202.sh[0m  [01;32mconformance_3151.sh[0m   [01;32mconformance_3182.sh[0m            [01;32mminiDU_callhome.sh[0m   [01;32mminiDU_v5.sh[0m
-[?2004h]0;solid@OL4-RUC: /mplane_automation/miniDUsolid@OL4-RUC:/mplane_automation/miniDU$ cd ..
-[?2004l[?2004h]0;solid@OL4-RUC: /mplane_automationsolid@OL4-RUC:/mplane_automation$ c[Kls
-[?2004l[0m[01;34mconformance_test[0m  [01;34mdocopt.cpp[0m    [01;34mlibnetconf2[0m  [01;34mLOCALYANG[0m  [01;34mncclient[0m   [01;34morg[0m    [01;34mq3[0m      reset.xml  rhu.xml  [01;34msysrepo[0m
-connect           [01;34mdot1ag-utils[0m  [01;34mlibyang[0m      [01;34mminiDU[0m     [01;34mnetopeer2[0m  [01;34mpcre2[0m  [01;34mreplxx[0m  [01;34mRF2216CO[0m   [01;34mSERVER[0m   [01;34mtrompeloeil[0m
-[?2004h]0;solid@OL4-RUC: /mplane_automationsolid@OL4-RUC:/mplane_automation$ cd conformance_test/
-[?2004l[?2004h]0;solid@OL4-RUC: /mplane_automation/conformance_testsolid@OL4-RUC:/mplane_automation/conformance_test$ ls
-[?2004l3111.xml   [0m[01;32mconf2.sh[0m      [01;32mCONF_3112.sh[0m  [01;32mCONF_3131.sh[0m  [01;32mconf3.sh[0m  [01;34mcriteria[0m       [01;34mlog[0m              supervision.log  watchdog.xml
-close.xml  [01;32mCONF_3111.sh[0m  [01;32mCONF_3121.sh[0m  [01;32mCONF_3132.sh[0m  [01;32mconf.sh[0m   jsontest.json  [01;32mreproduction.sh[0m  sync.xml         :wq
-[?2004h]0;solid@OL4-RUC: /mplane_automation/conformance_testsolid@OL4-RUC:/mplane_automation/conformance_test$ mv 3111.xml [K[K[K[K[K[K[K[K[K[K[K[Kcp 3111.xml /var/tmp/netconf_tmp/
-[?2004l[?2004h]0;solid@OL4-RUC: /mplane_automation/conformance_testsolid@OL4-RUC:/mplane_automation/conformance_test$ cp 3111.xml /var/tmp/netconf_tmp/[1P[1P[1P[1P[1@c[1@l[7@ose.xml
-[?2004lcp: cannot stat 'close.xml.xml': No such file or directory
-[?2004h]0;solid@OL4-RUC: /mplane_automation/conformance_testsolid@OL4-RUC:/mplane_automation/conformance_test$ cp close.xml.xml /var/tmp/netconf_tmp/[1P[1P[1P[1P
-[?2004l[?2004h]0;solid@OL4-RUC: /mplane_automation/conformance_testsolid@OL4-RUC:/mplane_automation/conformance_test$ cp close.xml /var/tmp/netconf_tmp/[1P[1P[1P[1P[1P[1@s[1@y[1@n[1@c[C[C[C[C.xml /var/tmp/netconf_tmp/[1P[1P[1P[1P
-[?2004l[?2004h]0;solid@OL4-RUC: /mplane_automation/conformance_testsolid@OL4-RUC:/mplane_automation/conformance_test$ cp sync.xml /var/tmp/netconf_tmp/[1P[1P[1P[1P[1@w[1@a[10@tchdog.xml[1P[1P[1P[1P
-[?2004l[?2004h]0;solid@OL4-RUC: /mplane_automation/conformance_testsolid@OL4-RUC:/mplane_automation/conformance_test$ 

@@ -1,2 +1,0 @@
-# Bash on Linux rejects CRLF; keep shell scripts LF in the working tree on Windows.
-*.sh text eol=lf

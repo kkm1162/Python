@@ -1,34 +1,0 @@
-+------------------------------ WARNING! ------------------------------+
- This computer system and network is PRIVATE and PROPRIETARY and may
- only be accessed by authorized users. Unauthorized use of this
- computer system or network is strictly prohibited and maybe subject to
- criminal prosecution, employee discipline up to and including
- discharge, or the termination of vendor/service contracts.
-
- The owner, or its agents, may monitor any activity or communication on
- the computer system or network. The owner, or its agents, may retrieve
- any information stored within the computer system or network. By
- accessing and using this computer system or network, you are
- consenting to such monitoring and information retrieval for law
- enforcement and other purposes.
-
- Users should have no expectation of privacy as to any communication on
- or information stored within the computer system or network, including
- information stored locally or remotely on a hard drive or other media
- in use with this computer system or network.
-+----------------------------------------------------------------------+
-
-Last login: Tue May 12 08:23:44 2026 from 10.0.20.254
-Security & OS hardening are being applied.
-
-========================================================================
- Developer mode enabled.
-========================================================================
-
-Hello, this is O-RAN.MP.DAEMON (version 0.17.1 (0.17.1-15-g844a6efc9)).
-Copyright 2019-2028 SOLiD Inc.
-
-nRU# nRU# nRU# nRU# nRU# nRU# nRU# nRU# nRU# nRU# nRU# nRU# nRU# 
-
-CLI connection is closed by idle-timeout (600 seconds).
-

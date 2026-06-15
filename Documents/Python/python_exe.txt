@@ -1,3 +1,0 @@
-python -m PyInstaller --noconsole --onefile --icon="DDOS.ico" oran_trex_master.py
-                             --noconfirm --clean --onefile --windowed --icon "DDOS.ico" --name "oran_trex_master" "oran_trex_master.py"
-옵션 의미:

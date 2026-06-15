@@ -1,8 +1,0 @@
-<edit-config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
-  <target>
-    <running/>
-  </target>
-  <config>
-    <user-plane-configuration xmlns="urn:o-ran:uplane-conf:1.0" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0" nc:operation="replace"/>
-  </config>
-</edit-config>

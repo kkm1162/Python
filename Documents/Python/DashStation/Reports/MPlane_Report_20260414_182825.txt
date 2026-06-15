@@ -1,4 +1,0 @@
-========== 원격 폴더 실시간 감시 시작: /mplane_automation/conformance_test/log/nDLPU ==========
-
-
-▶ 원격 신규 파일 감지: CONF_CHECK_260414_18-28-17.log

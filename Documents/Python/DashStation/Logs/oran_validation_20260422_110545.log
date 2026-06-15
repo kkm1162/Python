@@ -1,6 +1,0 @@
-2026-04-22 11:05:45,746 - ORanValidation - INFO - <module>:1817 - ================================================================================
-2026-04-22 11:05:45,746 - ORanValidation - INFO - <module>:1818 - O-RAN O-RU DDoS Validation System v6.1 (Enhanced) 시작
-2026-04-22 11:05:45,746 - ORanValidation - INFO - <module>:1819 - 로그 파일: logs\oran_validation_20260422_110545.log
-2026-04-22 11:05:45,747 - ORanValidation - INFO - <module>:1820 - ================================================================================
-2026-04-22 11:05:49,259 - ORanValidation - INFO - _load_config:1716 - 설정 파일 로드 완료
-2026-04-22 11:05:49,301 - ORanValidation - INFO - __init__:811 - GUI 초기화 완료

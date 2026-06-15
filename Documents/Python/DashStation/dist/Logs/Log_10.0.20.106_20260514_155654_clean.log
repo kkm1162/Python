@@ -1,83 +1,0 @@
-+------------------------------ WARNING! ------------------------------+
- This computer system and network is PRIVATE and PROPRIETARY and may
- only be accessed by authorized users. Unauthorized use of this
- computer system or network is strictly prohibited and maybe subject to
- criminal prosecution, employee discipline up to and including
- discharge, or the termination of vendor/service contracts.
-
- The owner, or its agents, may monitor any activity or communication on
- the computer system or network. The owner, or its agents, may retrieve
- any information stored within the computer system or network. By
- accessing and using this computer system or network, you are
- consenting to such monitoring and information retrieval for law
- enforcement and other purposes.
-
- Users should have no expectation of privacy as to any communication on
- or information stored within the computer system or network, including
- information stored locally or remotely on a hard drive or other media
- in use with this computer system or network.
-+----------------------------------------------------------------------+
-
-Last login: Thu May 14 06:26:38 2026 from 192.168.80.58
-Security & OS hardening are being applied.
-
-========================================================================
- Developer mode enabled.
-========================================================================
-
-Hello, this is O-RAN.MP.DAEMON (version 0.17.1 (0.17.1-15-g844a6efc9)).
-Copyright 2019-2028 SOLiD Inc.
-
-nRU# show software cd  detail 
-
-Software Information 
-----------------------------------------------------------------------------------------------------
- SLOT       VERSION                             BUILD-DATE                  STATUS
-----------------------------------------------------------------------------------------------------
- factory    01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
- first      01.00.00-00-00-r30-8b33edf2-secure  2026-01-23T04:56:30+00:00   VALID, RUNNING, ACTIVATED
- second     01.00.00-00-00-c395-1538a0dd-secure 2024-11-26T05:40:32+00:00   VALID
-----------------------------------------------------------------------------------------------------
- Download(sftp): killed by timeout
-
-nRU# start-shell 
-admin@nRU:~$ tail      cat /s var/losy  g/syslog| g    | grep swm
-May 14 06:25:50 daemon.notice rud[5919]: swm: Checking storage space for software package download. (/var/volatile)
-May 14 06:25:51 daemon.notice rud[5919]: swm: Storage space check for software package download completed. (1000 ms/ 1 s)
-May 14 06:26:22 daemon.notice rud[5919]: swm: Last failure reason updated: Download(sftp): killed by timeout
-May 14 06:28:19 daemon.notice rud[5919]: swm: Checking storage space for software package download. (/var/volatile)
-May 14 06:28:20 daemon.notice rud[5919]: swm: Storage space check for software package download completed. (1000 ms/ 1 s)
-May 14 06:28:52 daemon.notice rud[5919]: swm: Last failure reason updated: Download(sftp): killed by timeout
-admin@nRU:~$ ^C
-admin@nRU:~$ sftp://root:***@10.0.20.254/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT
-bash: sftp://root@10.0.20.254/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT: No such file or directory
-admin@nRU:~$ sftp://root@10.0.20.254/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT /tmp/
-bash: sftp://root@10.0.20.254/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT: No such file or directory
-admin@nRU:~$ sftp://root@10.0.20.254/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT /tmp/
-bash: sftp://root@10.0.20.254/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT: No such file or directory
-admin@nRU:~$ scp so  root@10.0.20.254:/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXTST-O-LRU-A-n78eM4-010000-09-000-r2-2736a921-nonsecure.EXT                           admin@nRU:~$ scp root@10.0.20.254:/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXTST-O-LRU-A-n78eM4-010000-09-0 admin@nRU:~$ scp root@10.0.20.254:/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXTST-O-LRU-A-n78eM4-010000-09-
-admin@nRU:~$ scp root@10.0.20.254:/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXTST-O-LRU-A-n78eM4-010000-09-                            
-usage: scp [-346ABCpqrTv] [-c cipher] [-F ssh_config] [-i identity_file]
-            [-J destination] [-l limit] [-o ssh_option] [-P port]
-            [-S program] source ... target
-admin@nRU:~$ scp root@10.0.20.254:/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT /tmp/
-The authenticity of host '10.0.20.254 (10.0.20.254)' can't be established.
-ED25519 key fingerprint is SHA256:XSGscpnOrABqCSXCyaS4NcrK1VaGElh8oe+I1hq8Hu4.
-This key is not known by any other names
-Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
-Warning: Permanently added '10.0.20.254' (ED25519) to the list of known hosts.
-root@10.0.20.254's password: 
-ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                                0%    0     0.0KB/s   --:-- ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               40%   59MB  58.6MB/s   00:01 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               80%  117MB  58.6MB/s   00:00 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                              100%  146MB  58.9MB/s   00:02    
-admin@nRU:~$ scp root@10.0.20.254:/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT /tmp/
-root@10.0.20.254's password: 
-admin@nRU:~$ sftp://root:solid123!@10.0.20.254/tmp/netconf_PKG/file.EXT        sftp://root:solid123!@10.0.20.254/tmp/netconf_PKG/file.EXT                                                          ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT /tm[ p/ . solid123!
-bash: !@10.0.20.254/tmp/netconf_PKG/ST: event not found
-admin@nRU:~$ scp root@10.0.20.254:/tmp/netconf_PKG/ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT /tmp/     solid123!
-root@10.0.20.254's password: 
-ST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                                0%    0     0.0KB/s   --:-- ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               25%   37MB  37.4MB/s   00:02 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               49%   72MB  37.1MB/s   00:01 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               50%   73MB  33.4MB/s   00:02 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               50%   73MB  30.1MB/s   00:02 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               50%   73MB  27.1MB/s   00:02 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               50%   74MB  24.4MB/s   00:02 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               50%   74MB  21.9MB/s   00:03 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               50%   74MB  19.7MB/s   00:03 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               50%   74MB  17.8MB/s   00:04 ETAST-O-LRU-A-n78eM4-010000-09-00-r2-2736a921-nonsecure.EXT                                               50%   74MB  16.0MB/s   00:04 ETA^Cadmin@nRU:~$ 
-admin@nRU:~$ 
-admin@nRU:~$ 
-admin@nRU:~$ vtysh
-
-
-^C
