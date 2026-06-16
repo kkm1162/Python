@@ -1,0 +1,505 @@
+2026-04-22 11:15:09,572 - ORanValidation - INFO - <module>:1693 - ================================================================================
+2026-04-22 11:15:09,572 - ORanValidation - INFO - <module>:1694 - O-RAN O-RU DDoS Validation System v6.1 (Enhanced) 시작
+2026-04-22 11:15:09,572 - ORanValidation - INFO - <module>:1695 - 로그 파일: logs\oran_validation_20260422_111509.log
+2026-04-22 11:15:09,573 - ORanValidation - INFO - <module>:1696 - ================================================================================
+2026-04-22 11:15:13,664 - ORanValidation - INFO - _load_config:1592 - 설정 파일 로드 완료
+2026-04-22 11:15:13,708 - ORanValidation - INFO - __init__:692 - GUI 초기화 완료
+2026-04-22 11:15:21,897 - ORanValidation - INFO - _connect_server_bg:1041 - 서버 연결 시작: slab@192.168.9.249
+2026-04-22 11:15:21,897 - ORanValidation - INFO - connect:236 - SSH 연결 시도: slab@192.168.9.249
+2026-04-22 11:15:21,920 - paramiko.transport - DEBUG - _log:1938 - starting thread (client mode): 0xcda8c050
+2026-04-22 11:15:21,921 - paramiko.transport - DEBUG - _log:1938 - Local version/idstring: SSH-2.0-paramiko_4.0.0
+2026-04-22 11:15:21,921 - paramiko.transport - DEBUG - _log:1938 - Remote version/idstring: SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.13
+2026-04-22 11:15:21,922 - paramiko.transport - INFO - _log:1938 - Connected (version 2.0, client OpenSSH_8.2p1)
+2026-04-22 11:15:21,926 - paramiko.transport - DEBUG - _log:1938 - === Key exchange possibilities ===
+2026-04-22 11:15:21,926 - paramiko.transport - DEBUG - _log:1938 - kex algos: curve25519-sha256, curve25519-sha256@libssh.org, ecdh-sha2-nistp256, ecdh-sha2-nistp384, ecdh-sha2-nistp521, diffie-hellman-group-exchange-sha256, diffie-hellman-group16-sha512, diffie-hellman-group18-sha512, diffie-hellman-group14-sha256, kex-strict-s-v00@openssh.com
+2026-04-22 11:15:21,926 - paramiko.transport - DEBUG - _log:1938 - server key: rsa-sha2-512, rsa-sha2-256, ssh-rsa, ecdsa-sha2-nistp256, ssh-ed25519
+2026-04-22 11:15:21,926 - paramiko.transport - DEBUG - _log:1938 - client encrypt: chacha20-poly1305@openssh.com, aes128-ctr, aes192-ctr, aes256-ctr, aes128-gcm@openssh.com, aes256-gcm@openssh.com
+2026-04-22 11:15:21,927 - paramiko.transport - DEBUG - _log:1938 - server encrypt: chacha20-poly1305@openssh.com, aes128-ctr, aes192-ctr, aes256-ctr, aes128-gcm@openssh.com, aes256-gcm@openssh.com
+2026-04-22 11:15:21,927 - paramiko.transport - DEBUG - _log:1938 - client mac: umac-64-etm@openssh.com, umac-128-etm@openssh.com, hmac-sha2-256-etm@openssh.com, hmac-sha2-512-etm@openssh.com, hmac-sha1-etm@openssh.com, umac-64@openssh.com, umac-128@openssh.com, hmac-sha2-256, hmac-sha2-512, hmac-sha1
+2026-04-22 11:15:21,927 - paramiko.transport - DEBUG - _log:1938 - server mac: umac-64-etm@openssh.com, umac-128-etm@openssh.com, hmac-sha2-256-etm@openssh.com, hmac-sha2-512-etm@openssh.com, hmac-sha1-etm@openssh.com, umac-64@openssh.com, umac-128@openssh.com, hmac-sha2-256, hmac-sha2-512, hmac-sha1
+2026-04-22 11:15:21,927 - paramiko.transport - DEBUG - _log:1938 - client compress: none, zlib@openssh.com
+2026-04-22 11:15:21,927 - paramiko.transport - DEBUG - _log:1938 - server compress: none, zlib@openssh.com
+2026-04-22 11:15:21,927 - paramiko.transport - DEBUG - _log:1938 - client lang: <none>
+2026-04-22 11:15:21,927 - paramiko.transport - DEBUG - _log:1938 - server lang: <none>
+2026-04-22 11:15:21,927 - paramiko.transport - DEBUG - _log:1938 - kex follows: False
+2026-04-22 11:15:21,927 - paramiko.transport - DEBUG - _log:1938 - === Key exchange agreements ===
+2026-04-22 11:15:21,928 - paramiko.transport - DEBUG - _log:1938 - Strict kex mode: True
+2026-04-22 11:15:21,928 - paramiko.transport - DEBUG - _log:1938 - Kex: curve25519-sha256@libssh.org
+2026-04-22 11:15:21,928 - paramiko.transport - DEBUG - _log:1938 - HostKey: ssh-ed25519
+2026-04-22 11:15:21,928 - paramiko.transport - DEBUG - _log:1938 - Cipher: aes128-ctr
+2026-04-22 11:15:21,928 - paramiko.transport - DEBUG - _log:1938 - MAC: hmac-sha2-256
+2026-04-22 11:15:21,928 - paramiko.transport - DEBUG - _log:1938 - Compression: none
+2026-04-22 11:15:21,928 - paramiko.transport - DEBUG - _log:1938 - === End of kex handshake ===
+2026-04-22 11:15:21,982 - paramiko.transport - DEBUG - _log:1938 - Resetting outbound seqno after NEWKEYS due to strict mode
+2026-04-22 11:15:21,983 - paramiko.transport - DEBUG - _log:1938 - kex engine KexCurve25519 specified hash_algo <built-in function openssl_sha256>
+2026-04-22 11:15:21,984 - paramiko.transport - DEBUG - _log:1938 - Switch to new keys ...
+2026-04-22 11:15:21,985 - paramiko.transport - DEBUG - _log:1938 - Resetting inbound seqno after NEWKEYS due to strict mode
+2026-04-22 11:15:21,985 - paramiko.transport - DEBUG - _log:1938 - Adding ssh-ed25519 host key for 192.168.9.249: b'e712cb68bf422e16ed3e5a1c9ea3bc1d'
+2026-04-22 11:15:21,986 - paramiko.transport - DEBUG - _log:1938 - Got EXT_INFO: {'server-sig-algs': b'ssh-ed25519,sk-ssh-ed25519@openssh.com,ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-dss,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,sk-ecdsa-sha2-nistp256@openssh.com'}
+2026-04-22 11:15:22,030 - paramiko.transport - DEBUG - _log:1938 - userauth is OK
+2026-04-22 11:15:22,063 - paramiko.transport - INFO - _log:1938 - Authentication (password) successful!
+2026-04-22 11:15:22,064 - ORanValidation - INFO - connect:246 - SSH 연결 성공: slab@192.168.9.249
+2026-04-22 11:15:22,065 - ORanValidation - INFO - startup_engine:492 - TRex 엔진 구동 시작: /home/slab/trex/v3.08
+2026-04-22 11:15:22,066 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: sudo -S pkill -f 't-rex-64'
+2026-04-22 11:15:22,067 - paramiko.transport - DEBUG - _log:1210 - [chan 0] Max packet in: 32768 bytes
+2026-04-22 11:15:22,198 - paramiko.transport - DEBUG - _log:1938 - Received global request "hostkeys-00@openssh.com"
+2026-04-22 11:15:22,198 - paramiko.transport - DEBUG - _log:1938 - Rejecting "hostkeys-00@openssh.com" global request from server.
+2026-04-22 11:15:22,241 - paramiko.transport - DEBUG - _log:1210 - [chan 0] Max packet out: 32768 bytes
+2026-04-22 11:15:22,241 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 0 opened.
+2026-04-22 11:15:22,244 - paramiko.transport - DEBUG - _log:1210 - [chan 0] Sesch channel 0 request ok
+2026-04-22 11:15:22,253 - paramiko.transport - DEBUG - _log:1210 - [chan 0] Sesch channel 0 request ok
+2026-04-22 11:15:22,261 - paramiko.transport - DEBUG - _log:1210 - [chan 0] EOF received (0)
+2026-04-22 11:15:22,261 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:15:22,262 - paramiko.transport - DEBUG - _log:1210 - [chan 0] EOF sent (0)
+2026-04-22 11:15:24,263 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: cd /home/slab/trex/v3.08 && sudo -S sh -c 'nohup ./t-rex-64 -i -c 6 > /tmp/trex_engine.log 2>&1 &'
+2026-04-22 11:15:24,263 - paramiko.transport - DEBUG - _log:1210 - [chan 1] Max packet in: 32768 bytes
+2026-04-22 11:15:24,267 - paramiko.transport - DEBUG - _log:1210 - [chan 1] Max packet out: 32768 bytes
+2026-04-22 11:15:24,267 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 1 opened.
+2026-04-22 11:15:24,272 - paramiko.transport - DEBUG - _log:1210 - [chan 1] Sesch channel 1 request ok
+2026-04-22 11:15:24,278 - paramiko.transport - DEBUG - _log:1210 - [chan 1] Sesch channel 1 request ok
+2026-04-22 11:15:24,285 - paramiko.transport - DEBUG - _log:1210 - [chan 1] EOF received (1)
+2026-04-22 11:15:24,285 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:15:24,286 - paramiko.transport - DEBUG - _log:1210 - [chan 1] EOF sent (1)
+2026-04-22 11:15:25,286 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:25,287 - paramiko.transport - DEBUG - _log:1210 - [chan 2] Max packet in: 32768 bytes
+2026-04-22 11:15:25,293 - paramiko.transport - DEBUG - _log:1210 - [chan 2] Max packet out: 32768 bytes
+2026-04-22 11:15:25,293 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 2 opened.
+2026-04-22 11:15:25,298 - paramiko.transport - DEBUG - _log:1210 - [chan 2] Sesch channel 2 request ok
+2026-04-22 11:15:25,303 - paramiko.transport - DEBUG - _log:1210 - [chan 2] Sesch channel 2 request ok
+2026-04-22 11:15:25,321 - paramiko.transport - DEBUG - _log:1210 - [chan 2] EOF received (2)
+2026-04-22 11:15:25,321 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:25,322 - paramiko.transport - DEBUG - _log:1210 - [chan 2] EOF sent (2)
+2026-04-22 11:15:26,323 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:26,324 - paramiko.transport - DEBUG - _log:1210 - [chan 3] Max packet in: 32768 bytes
+2026-04-22 11:15:26,328 - paramiko.transport - DEBUG - _log:1210 - [chan 3] Max packet out: 32768 bytes
+2026-04-22 11:15:26,328 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 3 opened.
+2026-04-22 11:15:26,335 - paramiko.transport - DEBUG - _log:1210 - [chan 3] Sesch channel 3 request ok
+2026-04-22 11:15:26,343 - paramiko.transport - DEBUG - _log:1210 - [chan 3] Sesch channel 3 request ok
+2026-04-22 11:15:26,361 - paramiko.transport - DEBUG - _log:1210 - [chan 3] EOF received (3)
+2026-04-22 11:15:26,362 - paramiko.transport - DEBUG - _log:1210 - [chan 3] EOF sent (3)
+2026-04-22 11:15:26,362 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:27,363 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:27,363 - paramiko.transport - DEBUG - _log:1210 - [chan 4] Max packet in: 32768 bytes
+2026-04-22 11:15:27,368 - paramiko.transport - DEBUG - _log:1210 - [chan 4] Max packet out: 32768 bytes
+2026-04-22 11:15:27,368 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 4 opened.
+2026-04-22 11:15:27,373 - paramiko.transport - DEBUG - _log:1210 - [chan 4] Sesch channel 4 request ok
+2026-04-22 11:15:27,379 - paramiko.transport - DEBUG - _log:1210 - [chan 4] Sesch channel 4 request ok
+2026-04-22 11:15:27,395 - paramiko.transport - DEBUG - _log:1210 - [chan 4] EOF received (4)
+2026-04-22 11:15:27,395 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:27,396 - paramiko.transport - DEBUG - _log:1210 - [chan 4] EOF sent (4)
+2026-04-22 11:15:28,397 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:28,397 - paramiko.transport - DEBUG - _log:1210 - [chan 5] Max packet in: 32768 bytes
+2026-04-22 11:15:28,403 - paramiko.transport - DEBUG - _log:1210 - [chan 5] Max packet out: 32768 bytes
+2026-04-22 11:15:28,403 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 5 opened.
+2026-04-22 11:15:28,410 - paramiko.transport - DEBUG - _log:1210 - [chan 5] Sesch channel 5 request ok
+2026-04-22 11:15:28,415 - paramiko.transport - DEBUG - _log:1210 - [chan 5] Sesch channel 5 request ok
+2026-04-22 11:15:28,433 - paramiko.transport - DEBUG - _log:1210 - [chan 5] EOF received (5)
+2026-04-22 11:15:28,433 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:28,433 - paramiko.transport - DEBUG - _log:1210 - [chan 5] EOF sent (5)
+2026-04-22 11:15:29,434 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:29,434 - paramiko.transport - DEBUG - _log:1210 - [chan 6] Max packet in: 32768 bytes
+2026-04-22 11:15:29,439 - paramiko.transport - DEBUG - _log:1210 - [chan 6] Max packet out: 32768 bytes
+2026-04-22 11:15:29,439 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 6 opened.
+2026-04-22 11:15:29,444 - paramiko.transport - DEBUG - _log:1210 - [chan 6] Sesch channel 6 request ok
+2026-04-22 11:15:29,450 - paramiko.transport - DEBUG - _log:1210 - [chan 6] Sesch channel 6 request ok
+2026-04-22 11:15:29,469 - paramiko.transport - DEBUG - _log:1210 - [chan 6] EOF received (6)
+2026-04-22 11:15:29,469 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:29,469 - paramiko.transport - DEBUG - _log:1210 - [chan 6] EOF sent (6)
+2026-04-22 11:15:30,470 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:30,471 - paramiko.transport - DEBUG - _log:1210 - [chan 7] Max packet in: 32768 bytes
+2026-04-22 11:15:30,546 - paramiko.transport - DEBUG - _log:1210 - [chan 7] Max packet out: 32768 bytes
+2026-04-22 11:15:30,546 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 7 opened.
+2026-04-22 11:15:30,559 - paramiko.transport - DEBUG - _log:1210 - [chan 7] Sesch channel 7 request ok
+2026-04-22 11:15:30,568 - paramiko.transport - DEBUG - _log:1210 - [chan 7] Sesch channel 7 request ok
+2026-04-22 11:15:30,587 - paramiko.transport - DEBUG - _log:1210 - [chan 7] EOF received (7)
+2026-04-22 11:15:30,588 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:30,588 - paramiko.transport - DEBUG - _log:1210 - [chan 7] EOF sent (7)
+2026-04-22 11:15:31,589 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:31,589 - paramiko.transport - DEBUG - _log:1210 - [chan 8] Max packet in: 32768 bytes
+2026-04-22 11:15:31,600 - paramiko.transport - DEBUG - _log:1210 - [chan 8] Max packet out: 32768 bytes
+2026-04-22 11:15:31,600 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 8 opened.
+2026-04-22 11:15:31,611 - paramiko.transport - DEBUG - _log:1210 - [chan 8] Sesch channel 8 request ok
+2026-04-22 11:15:31,616 - paramiko.transport - DEBUG - _log:1210 - [chan 8] Sesch channel 8 request ok
+2026-04-22 11:15:31,635 - paramiko.transport - DEBUG - _log:1210 - [chan 8] EOF received (8)
+2026-04-22 11:15:31,635 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:31,635 - paramiko.transport - DEBUG - _log:1210 - [chan 8] EOF sent (8)
+2026-04-22 11:15:32,636 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:32,637 - paramiko.transport - DEBUG - _log:1210 - [chan 9] Max packet in: 32768 bytes
+2026-04-22 11:15:32,640 - paramiko.transport - DEBUG - _log:1210 - [chan 9] Max packet out: 32768 bytes
+2026-04-22 11:15:32,640 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 9 opened.
+2026-04-22 11:15:32,644 - paramiko.transport - DEBUG - _log:1210 - [chan 9] Sesch channel 9 request ok
+2026-04-22 11:15:32,649 - paramiko.transport - DEBUG - _log:1210 - [chan 9] Sesch channel 9 request ok
+2026-04-22 11:15:32,662 - paramiko.transport - DEBUG - _log:1210 - [chan 9] EOF received (9)
+2026-04-22 11:15:32,663 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:32,663 - paramiko.transport - DEBUG - _log:1210 - [chan 9] EOF sent (9)
+2026-04-22 11:15:33,664 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:33,665 - paramiko.transport - DEBUG - _log:1210 - [chan 10] Max packet in: 32768 bytes
+2026-04-22 11:15:33,669 - paramiko.transport - DEBUG - _log:1210 - [chan 10] Max packet out: 32768 bytes
+2026-04-22 11:15:33,669 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 10 opened.
+2026-04-22 11:15:33,676 - paramiko.transport - DEBUG - _log:1210 - [chan 10] Sesch channel 10 request ok
+2026-04-22 11:15:33,684 - paramiko.transport - DEBUG - _log:1210 - [chan 10] Sesch channel 10 request ok
+2026-04-22 11:15:33,728 - paramiko.transport - DEBUG - _log:1210 - [chan 10] EOF received (10)
+2026-04-22 11:15:33,728 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:33,729 - paramiko.transport - DEBUG - _log:1210 - [chan 10] EOF sent (10)
+2026-04-22 11:15:34,730 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:34,730 - paramiko.transport - DEBUG - _log:1210 - [chan 11] Max packet in: 32768 bytes
+2026-04-22 11:15:34,734 - paramiko.transport - DEBUG - _log:1210 - [chan 11] Max packet out: 32768 bytes
+2026-04-22 11:15:34,735 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 11 opened.
+2026-04-22 11:15:34,740 - paramiko.transport - DEBUG - _log:1210 - [chan 11] Sesch channel 11 request ok
+2026-04-22 11:15:34,746 - paramiko.transport - DEBUG - _log:1210 - [chan 11] Sesch channel 11 request ok
+2026-04-22 11:15:34,760 - paramiko.transport - DEBUG - _log:1210 - [chan 11] EOF received (11)
+2026-04-22 11:15:34,761 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:34,761 - paramiko.transport - DEBUG - _log:1210 - [chan 11] EOF sent (11)
+2026-04-22 11:15:35,761 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:35,762 - paramiko.transport - DEBUG - _log:1210 - [chan 12] Max packet in: 32768 bytes
+2026-04-22 11:15:35,768 - paramiko.transport - DEBUG - _log:1210 - [chan 12] Max packet out: 32768 bytes
+2026-04-22 11:15:35,769 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 12 opened.
+2026-04-22 11:15:35,775 - paramiko.transport - DEBUG - _log:1210 - [chan 12] Sesch channel 12 request ok
+2026-04-22 11:15:35,784 - paramiko.transport - DEBUG - _log:1210 - [chan 12] Sesch channel 12 request ok
+2026-04-22 11:15:35,797 - paramiko.transport - DEBUG - _log:1210 - [chan 12] EOF received (12)
+2026-04-22 11:15:35,797 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:35,798 - paramiko.transport - DEBUG - _log:1210 - [chan 12] EOF sent (12)
+2026-04-22 11:15:36,798 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:36,799 - paramiko.transport - DEBUG - _log:1210 - [chan 13] Max packet in: 32768 bytes
+2026-04-22 11:15:36,801 - paramiko.transport - DEBUG - _log:1210 - [chan 13] Max packet out: 32768 bytes
+2026-04-22 11:15:36,802 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 13 opened.
+2026-04-22 11:15:36,809 - paramiko.transport - DEBUG - _log:1210 - [chan 13] Sesch channel 13 request ok
+2026-04-22 11:15:36,815 - paramiko.transport - DEBUG - _log:1210 - [chan 13] Sesch channel 13 request ok
+2026-04-22 11:15:36,833 - paramiko.transport - DEBUG - _log:1210 - [chan 13] EOF received (13)
+2026-04-22 11:15:36,833 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:36,834 - paramiko.transport - DEBUG - _log:1210 - [chan 13] EOF sent (13)
+2026-04-22 11:15:37,834 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:37,840 - paramiko.transport - DEBUG - _log:1210 - [chan 14] Max packet in: 32768 bytes
+2026-04-22 11:15:37,843 - paramiko.transport - DEBUG - _log:1210 - [chan 14] Max packet out: 32768 bytes
+2026-04-22 11:15:37,843 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 14 opened.
+2026-04-22 11:15:37,846 - paramiko.transport - DEBUG - _log:1210 - [chan 14] Sesch channel 14 request ok
+2026-04-22 11:15:37,850 - paramiko.transport - DEBUG - _log:1210 - [chan 14] Sesch channel 14 request ok
+2026-04-22 11:15:37,869 - paramiko.transport - DEBUG - _log:1210 - [chan 14] EOF received (14)
+2026-04-22 11:15:37,869 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:37,869 - paramiko.transport - DEBUG - _log:1210 - [chan 14] EOF sent (14)
+2026-04-22 11:15:38,870 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:38,871 - paramiko.transport - DEBUG - _log:1210 - [chan 15] Max packet in: 32768 bytes
+2026-04-22 11:15:38,875 - paramiko.transport - DEBUG - _log:1210 - [chan 15] Max packet out: 32768 bytes
+2026-04-22 11:15:38,876 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 15 opened.
+2026-04-22 11:15:38,881 - paramiko.transport - DEBUG - _log:1210 - [chan 15] Sesch channel 15 request ok
+2026-04-22 11:15:38,886 - paramiko.transport - DEBUG - _log:1210 - [chan 15] Sesch channel 15 request ok
+2026-04-22 11:15:38,905 - paramiko.transport - DEBUG - _log:1210 - [chan 15] EOF received (15)
+2026-04-22 11:15:38,905 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:38,906 - paramiko.transport - DEBUG - _log:1210 - [chan 15] EOF sent (15)
+2026-04-22 11:15:39,907 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:39,908 - paramiko.transport - DEBUG - _log:1210 - [chan 16] Max packet in: 32768 bytes
+2026-04-22 11:15:39,911 - paramiko.transport - DEBUG - _log:1210 - [chan 16] Max packet out: 32768 bytes
+2026-04-22 11:15:39,912 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 16 opened.
+2026-04-22 11:15:39,924 - paramiko.transport - DEBUG - _log:1210 - [chan 16] Sesch channel 16 request ok
+2026-04-22 11:15:39,931 - paramiko.transport - DEBUG - _log:1210 - [chan 16] Sesch channel 16 request ok
+2026-04-22 11:15:39,949 - paramiko.transport - DEBUG - _log:1210 - [chan 16] EOF received (16)
+2026-04-22 11:15:39,949 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:39,950 - paramiko.transport - DEBUG - _log:1210 - [chan 16] EOF sent (16)
+2026-04-22 11:15:56,358 - ORanValidation - INFO - _connect_server_bg:1041 - 서버 연결 시작: slab@192.168.9.249
+2026-04-22 11:15:56,358 - ORanValidation - INFO - connect:230 - 이미 SSH 연결되어 있습니다
+2026-04-22 11:15:56,359 - ORanValidation - INFO - startup_engine:492 - TRex 엔진 구동 시작: /home/slab/trex/v3.08
+2026-04-22 11:15:56,360 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: sudo -S pkill -f 't-rex-64'
+2026-04-22 11:15:56,360 - paramiko.transport - DEBUG - _log:1210 - [chan 17] Max packet in: 32768 bytes
+2026-04-22 11:15:56,366 - paramiko.transport - DEBUG - _log:1210 - [chan 17] Max packet out: 32768 bytes
+2026-04-22 11:15:56,366 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 17 opened.
+2026-04-22 11:15:56,373 - paramiko.transport - DEBUG - _log:1210 - [chan 17] Sesch channel 17 request ok
+2026-04-22 11:15:56,378 - paramiko.transport - DEBUG - _log:1210 - [chan 17] Sesch channel 17 request ok
+2026-04-22 11:15:56,389 - paramiko.transport - DEBUG - _log:1210 - [chan 17] EOF received (17)
+2026-04-22 11:15:56,389 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:15:56,390 - paramiko.transport - DEBUG - _log:1210 - [chan 17] EOF sent (17)
+2026-04-22 11:15:58,390 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: cd /home/slab/trex/v3.08 && sudo -S sh -c 'nohup ./t-rex-64 -i -c 6 > /tmp/trex_engine.log 2>&1 &'
+2026-04-22 11:15:58,390 - paramiko.transport - DEBUG - _log:1210 - [chan 18] Max packet in: 32768 bytes
+2026-04-22 11:15:58,421 - paramiko.transport - DEBUG - _log:1210 - [chan 18] Max packet out: 32768 bytes
+2026-04-22 11:15:58,421 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 18 opened.
+2026-04-22 11:15:58,424 - paramiko.transport - DEBUG - _log:1210 - [chan 18] Sesch channel 18 request ok
+2026-04-22 11:15:58,429 - paramiko.transport - DEBUG - _log:1210 - [chan 18] Sesch channel 18 request ok
+2026-04-22 11:15:58,437 - paramiko.transport - DEBUG - _log:1210 - [chan 18] EOF received (18)
+2026-04-22 11:15:58,437 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:15:58,438 - paramiko.transport - DEBUG - _log:1210 - [chan 18] EOF sent (18)
+2026-04-22 11:15:59,438 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:15:59,439 - paramiko.transport - DEBUG - _log:1210 - [chan 19] Max packet in: 32768 bytes
+2026-04-22 11:15:59,447 - paramiko.transport - DEBUG - _log:1210 - [chan 19] Max packet out: 32768 bytes
+2026-04-22 11:15:59,448 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 19 opened.
+2026-04-22 11:15:59,453 - paramiko.transport - DEBUG - _log:1210 - [chan 19] Sesch channel 19 request ok
+2026-04-22 11:15:59,458 - paramiko.transport - DEBUG - _log:1210 - [chan 19] Sesch channel 19 request ok
+2026-04-22 11:15:59,476 - paramiko.transport - DEBUG - _log:1210 - [chan 19] EOF received (19)
+2026-04-22 11:15:59,476 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:15:59,477 - paramiko.transport - DEBUG - _log:1210 - [chan 19] EOF sent (19)
+2026-04-22 11:16:00,477 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:00,478 - paramiko.transport - DEBUG - _log:1210 - [chan 20] Max packet in: 32768 bytes
+2026-04-22 11:16:00,482 - paramiko.transport - DEBUG - _log:1210 - [chan 20] Max packet out: 32768 bytes
+2026-04-22 11:16:00,482 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 20 opened.
+2026-04-22 11:16:00,487 - paramiko.transport - DEBUG - _log:1210 - [chan 20] Sesch channel 20 request ok
+2026-04-22 11:16:00,491 - paramiko.transport - DEBUG - _log:1210 - [chan 20] Sesch channel 20 request ok
+2026-04-22 11:16:00,512 - paramiko.transport - DEBUG - _log:1210 - [chan 20] EOF received (20)
+2026-04-22 11:16:00,512 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:00,512 - paramiko.transport - DEBUG - _log:1210 - [chan 20] EOF sent (20)
+2026-04-22 11:16:01,513 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:01,514 - paramiko.transport - DEBUG - _log:1210 - [chan 21] Max packet in: 32768 bytes
+2026-04-22 11:16:01,516 - paramiko.transport - DEBUG - _log:1210 - [chan 21] Max packet out: 32768 bytes
+2026-04-22 11:16:01,517 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 21 opened.
+2026-04-22 11:16:01,522 - paramiko.transport - DEBUG - _log:1210 - [chan 21] Sesch channel 21 request ok
+2026-04-22 11:16:01,527 - paramiko.transport - DEBUG - _log:1210 - [chan 21] Sesch channel 21 request ok
+2026-04-22 11:16:01,546 - paramiko.transport - DEBUG - _log:1210 - [chan 21] EOF received (21)
+2026-04-22 11:16:01,546 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:01,547 - paramiko.transport - DEBUG - _log:1210 - [chan 21] EOF sent (21)
+2026-04-22 11:16:02,548 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:02,548 - paramiko.transport - DEBUG - _log:1210 - [chan 22] Max packet in: 32768 bytes
+2026-04-22 11:16:02,555 - paramiko.transport - DEBUG - _log:1210 - [chan 22] Max packet out: 32768 bytes
+2026-04-22 11:16:02,555 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 22 opened.
+2026-04-22 11:16:02,560 - paramiko.transport - DEBUG - _log:1210 - [chan 22] Sesch channel 22 request ok
+2026-04-22 11:16:02,565 - paramiko.transport - DEBUG - _log:1210 - [chan 22] Sesch channel 22 request ok
+2026-04-22 11:16:02,583 - paramiko.transport - DEBUG - _log:1210 - [chan 22] EOF received (22)
+2026-04-22 11:16:02,583 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:02,584 - paramiko.transport - DEBUG - _log:1210 - [chan 22] EOF sent (22)
+2026-04-22 11:16:03,585 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:03,586 - paramiko.transport - DEBUG - _log:1210 - [chan 23] Max packet in: 32768 bytes
+2026-04-22 11:16:03,590 - paramiko.transport - DEBUG - _log:1210 - [chan 23] Max packet out: 32768 bytes
+2026-04-22 11:16:03,591 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 23 opened.
+2026-04-22 11:16:03,596 - paramiko.transport - DEBUG - _log:1210 - [chan 23] Sesch channel 23 request ok
+2026-04-22 11:16:03,602 - paramiko.transport - DEBUG - _log:1210 - [chan 23] Sesch channel 23 request ok
+2026-04-22 11:16:03,620 - paramiko.transport - DEBUG - _log:1210 - [chan 23] EOF received (23)
+2026-04-22 11:16:03,620 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:03,621 - paramiko.transport - DEBUG - _log:1210 - [chan 23] EOF sent (23)
+2026-04-22 11:16:04,621 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:04,622 - paramiko.transport - DEBUG - _log:1210 - [chan 24] Max packet in: 32768 bytes
+2026-04-22 11:16:04,627 - paramiko.transport - DEBUG - _log:1210 - [chan 24] Max packet out: 32768 bytes
+2026-04-22 11:16:04,627 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 24 opened.
+2026-04-22 11:16:04,633 - paramiko.transport - DEBUG - _log:1210 - [chan 24] Sesch channel 24 request ok
+2026-04-22 11:16:04,643 - paramiko.transport - DEBUG - _log:1210 - [chan 24] Sesch channel 24 request ok
+2026-04-22 11:16:04,657 - paramiko.transport - DEBUG - _log:1210 - [chan 24] EOF received (24)
+2026-04-22 11:16:04,657 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:04,658 - paramiko.transport - DEBUG - _log:1210 - [chan 24] EOF sent (24)
+2026-04-22 11:16:05,658 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:05,659 - paramiko.transport - DEBUG - _log:1210 - [chan 25] Max packet in: 32768 bytes
+2026-04-22 11:16:05,665 - paramiko.transport - DEBUG - _log:1210 - [chan 25] Max packet out: 32768 bytes
+2026-04-22 11:16:05,665 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 25 opened.
+2026-04-22 11:16:05,670 - paramiko.transport - DEBUG - _log:1210 - [chan 25] Sesch channel 25 request ok
+2026-04-22 11:16:05,675 - paramiko.transport - DEBUG - _log:1210 - [chan 25] Sesch channel 25 request ok
+2026-04-22 11:16:05,693 - paramiko.transport - DEBUG - _log:1210 - [chan 25] EOF received (25)
+2026-04-22 11:16:05,693 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:05,693 - paramiko.transport - DEBUG - _log:1210 - [chan 25] EOF sent (25)
+2026-04-22 11:16:06,694 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:06,695 - paramiko.transport - DEBUG - _log:1210 - [chan 26] Max packet in: 32768 bytes
+2026-04-22 11:16:06,700 - paramiko.transport - DEBUG - _log:1210 - [chan 26] Max packet out: 32768 bytes
+2026-04-22 11:16:06,700 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 26 opened.
+2026-04-22 11:16:06,705 - paramiko.transport - DEBUG - _log:1210 - [chan 26] Sesch channel 26 request ok
+2026-04-22 11:16:06,710 - paramiko.transport - DEBUG - _log:1210 - [chan 26] Sesch channel 26 request ok
+2026-04-22 11:16:06,728 - paramiko.transport - DEBUG - _log:1210 - [chan 26] EOF received (26)
+2026-04-22 11:16:06,728 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:06,729 - paramiko.transport - DEBUG - _log:1210 - [chan 26] EOF sent (26)
+2026-04-22 11:16:07,729 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:07,730 - paramiko.transport - DEBUG - _log:1210 - [chan 27] Max packet in: 32768 bytes
+2026-04-22 11:16:07,735 - paramiko.transport - DEBUG - _log:1210 - [chan 27] Max packet out: 32768 bytes
+2026-04-22 11:16:07,736 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 27 opened.
+2026-04-22 11:16:07,741 - paramiko.transport - DEBUG - _log:1210 - [chan 27] Sesch channel 27 request ok
+2026-04-22 11:16:07,748 - paramiko.transport - DEBUG - _log:1210 - [chan 27] Sesch channel 27 request ok
+2026-04-22 11:16:07,764 - paramiko.transport - DEBUG - _log:1210 - [chan 27] EOF received (27)
+2026-04-22 11:16:07,764 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:07,764 - paramiko.transport - DEBUG - _log:1210 - [chan 27] EOF sent (27)
+2026-04-22 11:16:08,765 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:08,766 - paramiko.transport - DEBUG - _log:1210 - [chan 28] Max packet in: 32768 bytes
+2026-04-22 11:16:08,769 - paramiko.transport - DEBUG - _log:1210 - [chan 28] Max packet out: 32768 bytes
+2026-04-22 11:16:08,769 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 28 opened.
+2026-04-22 11:16:08,778 - paramiko.transport - DEBUG - _log:1210 - [chan 28] Sesch channel 28 request ok
+2026-04-22 11:16:08,783 - paramiko.transport - DEBUG - _log:1210 - [chan 28] Sesch channel 28 request ok
+2026-04-22 11:16:08,802 - paramiko.transport - DEBUG - _log:1210 - [chan 28] EOF received (28)
+2026-04-22 11:16:08,802 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:08,802 - paramiko.transport - DEBUG - _log:1210 - [chan 28] EOF sent (28)
+2026-04-22 11:16:09,803 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:09,804 - paramiko.transport - DEBUG - _log:1210 - [chan 29] Max packet in: 32768 bytes
+2026-04-22 11:16:09,806 - paramiko.transport - DEBUG - _log:1210 - [chan 29] Max packet out: 32768 bytes
+2026-04-22 11:16:09,807 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 29 opened.
+2026-04-22 11:16:09,812 - paramiko.transport - DEBUG - _log:1210 - [chan 29] Sesch channel 29 request ok
+2026-04-22 11:16:09,817 - paramiko.transport - DEBUG - _log:1210 - [chan 29] Sesch channel 29 request ok
+2026-04-22 11:16:09,838 - paramiko.transport - DEBUG - _log:1210 - [chan 29] EOF received (29)
+2026-04-22 11:16:09,838 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:09,838 - paramiko.transport - DEBUG - _log:1210 - [chan 29] EOF sent (29)
+2026-04-22 11:16:10,839 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:10,840 - paramiko.transport - DEBUG - _log:1210 - [chan 30] Max packet in: 32768 bytes
+2026-04-22 11:16:10,845 - paramiko.transport - DEBUG - _log:1210 - [chan 30] Max packet out: 32768 bytes
+2026-04-22 11:16:10,845 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 30 opened.
+2026-04-22 11:16:10,852 - paramiko.transport - DEBUG - _log:1210 - [chan 30] Sesch channel 30 request ok
+2026-04-22 11:16:10,858 - paramiko.transport - DEBUG - _log:1210 - [chan 30] Sesch channel 30 request ok
+2026-04-22 11:16:10,875 - paramiko.transport - DEBUG - _log:1210 - [chan 30] EOF received (30)
+2026-04-22 11:16:10,875 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:10,876 - paramiko.transport - DEBUG - _log:1210 - [chan 30] EOF sent (30)
+2026-04-22 11:16:11,876 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:11,877 - paramiko.transport - DEBUG - _log:1210 - [chan 31] Max packet in: 32768 bytes
+2026-04-22 11:16:11,883 - paramiko.transport - DEBUG - _log:1210 - [chan 31] Max packet out: 32768 bytes
+2026-04-22 11:16:11,883 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 31 opened.
+2026-04-22 11:16:11,889 - paramiko.transport - DEBUG - _log:1210 - [chan 31] Sesch channel 31 request ok
+2026-04-22 11:16:11,896 - paramiko.transport - DEBUG - _log:1210 - [chan 31] Sesch channel 31 request ok
+2026-04-22 11:16:11,914 - paramiko.transport - DEBUG - _log:1210 - [chan 31] EOF received (31)
+2026-04-22 11:16:11,914 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:11,914 - paramiko.transport - DEBUG - _log:1210 - [chan 31] EOF sent (31)
+2026-04-22 11:16:12,915 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:12,916 - paramiko.transport - DEBUG - _log:1210 - [chan 32] Max packet in: 32768 bytes
+2026-04-22 11:16:12,920 - paramiko.transport - DEBUG - _log:1210 - [chan 32] Max packet out: 32768 bytes
+2026-04-22 11:16:12,920 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 32 opened.
+2026-04-22 11:16:12,926 - paramiko.transport - DEBUG - _log:1210 - [chan 32] Sesch channel 32 request ok
+2026-04-22 11:16:12,932 - paramiko.transport - DEBUG - _log:1210 - [chan 32] Sesch channel 32 request ok
+2026-04-22 11:16:12,953 - paramiko.transport - DEBUG - _log:1210 - [chan 32] EOF received (32)
+2026-04-22 11:16:12,953 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:12,954 - paramiko.transport - DEBUG - _log:1210 - [chan 32] EOF sent (32)
+2026-04-22 11:16:13,642 - ORanValidation - INFO - _connect_server_bg:1041 - 서버 연결 시작: slab@192.168.9.249
+2026-04-22 11:16:13,642 - ORanValidation - INFO - connect:230 - 이미 SSH 연결되어 있습니다
+2026-04-22 11:16:13,956 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:13,957 - paramiko.transport - DEBUG - _log:1210 - [chan 33] Max packet in: 32768 bytes
+2026-04-22 11:16:13,959 - paramiko.transport - DEBUG - _log:1210 - [chan 33] Max packet out: 32768 bytes
+2026-04-22 11:16:13,960 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 33 opened.
+2026-04-22 11:16:13,976 - paramiko.transport - DEBUG - _log:1210 - [chan 33] Sesch channel 33 request ok
+2026-04-22 11:16:13,981 - paramiko.transport - DEBUG - _log:1210 - [chan 33] Sesch channel 33 request ok
+2026-04-22 11:16:13,998 - paramiko.transport - DEBUG - _log:1210 - [chan 33] EOF received (33)
+2026-04-22 11:16:13,998 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 1
+2026-04-22 11:16:13,999 - paramiko.transport - DEBUG - _log:1210 - [chan 33] EOF sent (33)
+2026-04-22 11:16:13,999 - ORanValidation - INFO - startup_engine:492 - TRex 엔진 구동 시작: /home/slab/trex/v3.08
+2026-04-22 11:16:13,999 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: sudo -S pkill -f 't-rex-64'
+2026-04-22 11:16:14,000 - paramiko.transport - DEBUG - _log:1210 - [chan 34] Max packet in: 32768 bytes
+2026-04-22 11:16:14,047 - paramiko.transport - DEBUG - _log:1210 - [chan 34] Max packet out: 32768 bytes
+2026-04-22 11:16:14,047 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 34 opened.
+2026-04-22 11:16:14,050 - paramiko.transport - DEBUG - _log:1210 - [chan 34] Sesch channel 34 request ok
+2026-04-22 11:16:14,053 - paramiko.transport - DEBUG - _log:1210 - [chan 34] Sesch channel 34 request ok
+2026-04-22 11:16:14,068 - paramiko.transport - DEBUG - _log:1210 - [chan 34] EOF received (34)
+2026-04-22 11:16:14,068 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:16:14,068 - paramiko.transport - DEBUG - _log:1210 - [chan 34] EOF sent (34)
+2026-04-22 11:16:15,192 - ORanValidation - INFO - _connect_server_bg:1041 - 서버 연결 시작: slab@192.168.9.249
+2026-04-22 11:16:15,192 - ORanValidation - INFO - connect:230 - 이미 SSH 연결되어 있습니다
+2026-04-22 11:16:16,069 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: cd /home/slab/trex/v3.08 && sudo -S sh -c 'nohup ./t-rex-64 -i -c 6 > /tmp/trex_engine.log 2>&1 &'
+2026-04-22 11:16:16,069 - paramiko.transport - DEBUG - _log:1210 - [chan 35] Max packet in: 32768 bytes
+2026-04-22 11:16:16,074 - paramiko.transport - DEBUG - _log:1210 - [chan 35] Max packet out: 32768 bytes
+2026-04-22 11:16:16,075 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 35 opened.
+2026-04-22 11:16:16,079 - paramiko.transport - DEBUG - _log:1210 - [chan 35] Sesch channel 35 request ok
+2026-04-22 11:16:16,085 - paramiko.transport - DEBUG - _log:1210 - [chan 35] Sesch channel 35 request ok
+2026-04-22 11:16:16,092 - paramiko.transport - DEBUG - _log:1210 - [chan 35] EOF received (35)
+2026-04-22 11:16:16,092 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:16:16,093 - paramiko.transport - DEBUG - _log:1210 - [chan 35] EOF sent (35)
+2026-04-22 11:16:17,094 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:17,097 - paramiko.transport - DEBUG - _log:1210 - [chan 36] Max packet in: 32768 bytes
+2026-04-22 11:16:17,101 - paramiko.transport - DEBUG - _log:1210 - [chan 36] Max packet out: 32768 bytes
+2026-04-22 11:16:17,101 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 36 opened.
+2026-04-22 11:16:17,107 - paramiko.transport - DEBUG - _log:1210 - [chan 36] Sesch channel 36 request ok
+2026-04-22 11:16:17,114 - paramiko.transport - DEBUG - _log:1210 - [chan 36] Sesch channel 36 request ok
+2026-04-22 11:16:17,138 - paramiko.transport - DEBUG - _log:1210 - [chan 36] EOF received (36)
+2026-04-22 11:16:17,138 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:16:17,139 - paramiko.transport - DEBUG - _log:1210 - [chan 36] EOF sent (36)
+2026-04-22 11:16:17,140 - ORanValidation - INFO - startup_engine:492 - TRex 엔진 구동 시작: /home/slab/trex/v3.08
+2026-04-22 11:16:17,140 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: sudo -S pkill -f 't-rex-64'
+2026-04-22 11:16:17,141 - paramiko.transport - DEBUG - _log:1210 - [chan 37] Max packet in: 32768 bytes
+2026-04-22 11:16:17,190 - paramiko.transport - DEBUG - _log:1210 - [chan 37] Max packet out: 32768 bytes
+2026-04-22 11:16:17,191 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 37 opened.
+2026-04-22 11:16:17,195 - paramiko.transport - DEBUG - _log:1210 - [chan 37] Sesch channel 37 request ok
+2026-04-22 11:16:17,201 - paramiko.transport - DEBUG - _log:1210 - [chan 37] Sesch channel 37 request ok
+2026-04-22 11:16:17,229 - paramiko.transport - DEBUG - _log:1210 - [chan 37] EOF received (37)
+2026-04-22 11:16:17,229 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:16:17,229 - paramiko.transport - DEBUG - _log:1210 - [chan 37] EOF sent (37)
+2026-04-22 11:16:17,230 - paramiko.transport - DEBUG - _log:1210 - [chan 38] Max packet in: 32768 bytes
+2026-04-22 11:16:17,284 - paramiko.transport - DEBUG - _log:1210 - [chan 38] Max packet out: 32768 bytes
+2026-04-22 11:16:17,284 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 38 opened.
+2026-04-22 11:16:17,289 - paramiko.transport - DEBUG - _log:1210 - [chan 38] Sesch channel 38 request ok
+2026-04-22 11:16:17,292 - paramiko.transport.sftp - INFO - _log:169 - [chan 38] Opened sftp connection (server version 3)
+2026-04-22 11:16:17,292 - ORanValidation - INFO - open_sftp:302 - SFTP 클라이언트 열림
+2026-04-22 11:16:17,292 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: echo 'CmltcG9ydCBzeXMsIHRpbWUsIGpzb24Kc3lzLnBhdGguaW5zZXJ0KDAsICcvaG9tZS9zbGFiL3RyZXgvdjMuMDgvYXV0b2
+2026-04-22 11:16:17,293 - paramiko.transport - DEBUG - _log:1210 - [chan 39] Max packet in: 32768 bytes
+2026-04-22 11:16:17,295 - paramiko.transport - DEBUG - _log:1210 - [chan 39] Max packet out: 32768 bytes
+2026-04-22 11:16:17,296 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 39 opened.
+2026-04-22 11:16:17,300 - paramiko.transport - DEBUG - _log:1210 - [chan 39] Sesch channel 39 request ok
+2026-04-22 11:16:17,305 - paramiko.transport - DEBUG - _log:1210 - [chan 39] Sesch channel 39 request ok
+2026-04-22 11:16:17,305 - paramiko.transport - DEBUG - _log:1210 - [chan 39] EOF received (39)
+2026-04-22 11:16:17,305 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:16:17,306 - paramiko.transport - DEBUG - _log:1210 - [chan 39] EOF sent (39)
+2026-04-22 11:16:17,307 - paramiko.transport - DEBUG - _log:1210 - [chan 40] Max packet in: 32768 bytes
+2026-04-22 11:16:17,307 - ORanValidation - INFO - _start_trex_monitoring:1100 - TRex 모니터링 시작됨
+2026-04-22 11:16:17,308 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 38] stat(b'/tmp/pcap_output')
+2026-04-22 11:16:17,358 - paramiko.transport - DEBUG - _log:1210 - [chan 40] Max packet out: 32768 bytes
+2026-04-22 11:16:17,359 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 40 opened.
+2026-04-22 11:16:17,360 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 38] normalize(b'/tmp/pcap_output')
+2026-04-22 11:16:17,364 - paramiko.transport - DEBUG - _log:1210 - [chan 40] Sesch channel 40 request ok
+2026-04-22 11:16:17,367 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 38] listdir(b'/tmp/pcap_output/.')
+2026-04-22 11:16:17,372 - paramiko.transport - DEBUG - _log:1210 - [chan 40] Sesch channel 40 request ok
+2026-04-22 11:16:17,394 - paramiko.transport.sftp - INFO - _log:169 - [chan 38] sftp session closed.
+2026-04-22 11:16:17,394 - paramiko.transport - DEBUG - _log:1210 - [chan 38] EOF sent (38)
+2026-04-22 11:16:17,400 - paramiko.transport - DEBUG - _log:1210 - [chan 38] EOF received (38)
+2026-04-22 11:16:19,230 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: cd /home/slab/trex/v3.08 && sudo -S sh -c 'nohup ./t-rex-64 -i -c 6 > /tmp/trex_engine.log 2>&1 &'
+2026-04-22 11:16:19,230 - paramiko.transport - DEBUG - _log:1210 - [chan 41] Max packet in: 32768 bytes
+2026-04-22 11:16:19,235 - paramiko.transport - DEBUG - _log:1210 - [chan 41] Max packet out: 32768 bytes
+2026-04-22 11:16:19,236 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 41 opened.
+2026-04-22 11:16:19,249 - paramiko.transport - DEBUG - _log:1210 - [chan 41] Sesch channel 41 request ok
+2026-04-22 11:16:19,254 - paramiko.transport - DEBUG - _log:1210 - [chan 41] Sesch channel 41 request ok
+2026-04-22 11:16:19,261 - paramiko.transport - DEBUG - _log:1210 - [chan 41] EOF received (41)
+2026-04-22 11:16:19,261 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:16:19,261 - paramiko.transport - DEBUG - _log:1210 - [chan 41] EOF sent (41)
+2026-04-22 11:16:20,262 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: ps aux | grep '[t]-rex-64'
+2026-04-22 11:16:20,263 - paramiko.transport - DEBUG - _log:1210 - [chan 42] Max packet in: 32768 bytes
+2026-04-22 11:16:20,269 - paramiko.transport - DEBUG - _log:1210 - [chan 42] Max packet out: 32768 bytes
+2026-04-22 11:16:20,269 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 42 opened.
+2026-04-22 11:16:20,274 - paramiko.transport - DEBUG - _log:1210 - [chan 42] Sesch channel 42 request ok
+2026-04-22 11:16:20,277 - paramiko.transport - DEBUG - _log:1210 - [chan 42] Sesch channel 42 request ok
+2026-04-22 11:16:20,289 - paramiko.transport - DEBUG - _log:1210 - [chan 42] EOF received (42)
+2026-04-22 11:16:20,289 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:16:20,289 - paramiko.transport - DEBUG - _log:1210 - [chan 42] EOF sent (42)
+2026-04-22 11:16:20,291 - paramiko.transport - DEBUG - _log:1210 - [chan 43] Max packet in: 32768 bytes
+2026-04-22 11:16:20,339 - paramiko.transport - DEBUG - _log:1210 - [chan 43] Max packet out: 32768 bytes
+2026-04-22 11:16:20,340 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 43 opened.
+2026-04-22 11:16:20,345 - paramiko.transport - DEBUG - _log:1210 - [chan 43] Sesch channel 43 request ok
+2026-04-22 11:16:20,351 - paramiko.transport.sftp - INFO - _log:169 - [chan 43] Opened sftp connection (server version 3)
+2026-04-22 11:16:20,351 - ORanValidation - INFO - open_sftp:302 - SFTP 클라이언트 열림
+2026-04-22 11:16:20,351 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: echo 'CmltcG9ydCBzeXMsIHRpbWUsIGpzb24Kc3lzLnBhdGguaW5zZXJ0KDAsICcvaG9tZS9zbGFiL3RyZXgvdjMuMDgvYXV0b2
+2026-04-22 11:16:20,351 - paramiko.transport - DEBUG - _log:1210 - [chan 44] Max packet in: 32768 bytes
+2026-04-22 11:16:20,356 - paramiko.transport - DEBUG - _log:1210 - [chan 44] Max packet out: 32768 bytes
+2026-04-22 11:16:20,356 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 44 opened.
+2026-04-22 11:16:20,361 - paramiko.transport - DEBUG - _log:1210 - [chan 44] Sesch channel 44 request ok
+2026-04-22 11:16:20,364 - paramiko.transport - DEBUG - _log:1210 - [chan 44] Sesch channel 44 request ok
+2026-04-22 11:16:20,374 - paramiko.transport - DEBUG - _log:1210 - [chan 44] EOF received (44)
+2026-04-22 11:16:20,374 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 11:16:20,375 - paramiko.transport - DEBUG - _log:1210 - [chan 44] EOF sent (44)
+2026-04-22 11:16:20,375 - paramiko.transport - DEBUG - _log:1210 - [chan 45] Max packet in: 32768 bytes
+2026-04-22 11:16:20,376 - ORanValidation - INFO - _start_trex_monitoring:1100 - TRex 모니터링 시작됨
+2026-04-22 11:16:20,376 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 43] stat(b'/tmp/pcap_output')
+2026-04-22 11:16:20,433 - paramiko.transport - DEBUG - _log:1210 - [chan 45] Max packet out: 32768 bytes
+2026-04-22 11:16:20,433 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 45 opened.
+2026-04-22 11:16:20,433 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 43] normalize(b'/tmp/pcap_output')
+2026-04-22 11:16:20,441 - paramiko.transport - DEBUG - _log:1210 - [chan 45] Sesch channel 45 request ok
+2026-04-22 11:16:20,446 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 43] listdir(b'/tmp/pcap_output/.')
+2026-04-22 11:16:20,451 - paramiko.transport - DEBUG - _log:1210 - [chan 45] Sesch channel 45 request ok
+2026-04-22 11:16:20,476 - paramiko.transport.sftp - INFO - _log:169 - [chan 43] sftp session closed.
+2026-04-22 11:16:20,476 - paramiko.transport - DEBUG - _log:1210 - [chan 43] EOF sent (43)
+2026-04-22 11:16:20,483 - paramiko.transport - DEBUG - _log:1210 - [chan 43] EOF received (43)
+2026-04-22 11:16:51,851 - paramiko.transport - DEBUG - _log:1210 - [chan 46] Max packet in: 32768 bytes
+2026-04-22 11:16:51,856 - paramiko.transport - DEBUG - _log:1210 - [chan 46] Max packet out: 32768 bytes
+2026-04-22 11:16:51,856 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 46 opened.
+2026-04-22 11:16:51,864 - paramiko.transport - DEBUG - _log:1210 - [chan 46] Sesch channel 46 request ok
+2026-04-22 11:16:51,871 - paramiko.transport.sftp - INFO - _log:169 - [chan 46] Opened sftp connection (server version 3)
+2026-04-22 11:16:51,872 - ORanValidation - INFO - open_sftp:302 - SFTP 클라이언트 열림
+2026-04-22 11:16:51,873 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 46] stat(b'/tmp/pcap_output')
+2026-04-22 11:16:51,880 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 46] normalize(b'/tmp/pcap_output')
+2026-04-22 11:16:51,884 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 46] listdir(b'/tmp/pcap_output/.')
+2026-04-22 11:16:51,899 - paramiko.transport.sftp - INFO - _log:169 - [chan 46] sftp session closed.
+2026-04-22 11:16:51,900 - paramiko.transport - DEBUG - _log:1210 - [chan 46] EOF sent (46)
+2026-04-22 11:16:51,905 - paramiko.transport - DEBUG - _log:1210 - [chan 46] EOF received (46)
+2026-04-22 11:16:53,549 - ORanValidation - INFO - _build_pcap_bg:1421 - PCAP 빌드 시작: eCPRI_U_Plane_RRC.pcap
+2026-04-22 11:16:53,549 - ORanValidation - ERROR - _build_pcap_bg:1443 - PCAP 빌드 중 오류: PCAPBuilder.build_pcap_streaming() missing 2 required positional arguments: 'config' and 'ssh_password'
+Traceback (most recent call last):
+  File "C:\Users\thelastsun\Documents\Python\TCP SYN\interactive\oran_trex_master.py", line 1424, in _build_pcap_bg
+    is_success, result = PCAPBuilder.build_pcap_streaming(config)
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+TypeError: PCAPBuilder.build_pcap_streaming() missing 2 required positional arguments: 'config' and 'ssh_password'
+2026-04-22 11:17:07,405 - paramiko.transport - DEBUG - _log:1210 - [chan 47] Max packet in: 32768 bytes
+2026-04-22 11:17:07,410 - paramiko.transport - DEBUG - _log:1210 - [chan 47] Max packet out: 32768 bytes
+2026-04-22 11:17:07,411 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 47 opened.
+2026-04-22 11:17:07,416 - paramiko.transport - DEBUG - _log:1210 - [chan 47] Sesch channel 47 request ok
+2026-04-22 11:17:07,424 - paramiko.transport.sftp - INFO - _log:169 - [chan 47] Opened sftp connection (server version 3)
+2026-04-22 11:17:07,425 - ORanValidation - INFO - open_sftp:302 - SFTP 클라이언트 열림
+2026-04-22 11:17:07,425 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 47] stat(b'/tmp/pcap_output')
+2026-04-22 11:17:07,439 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 47] normalize(b'/tmp/pcap_output')
+2026-04-22 11:17:07,446 - paramiko.transport.sftp - DEBUG - _log:169 - [chan 47] listdir(b'/tmp/pcap_output/.')
+2026-04-22 11:17:07,463 - paramiko.transport.sftp - INFO - _log:169 - [chan 47] sftp session closed.
+2026-04-22 11:17:07,464 - paramiko.transport - DEBUG - _log:1210 - [chan 47] EOF sent (47)
+2026-04-22 11:17:07,469 - paramiko.transport - DEBUG - _log:1210 - [chan 47] EOF received (47)
+2026-04-22 11:17:09,852 - ORanValidation - INFO - _build_pcap_bg:1421 - PCAP 빌드 시작: eCPRI_U_Plane_RRC.pcap
+2026-04-22 11:17:09,852 - ORanValidation - ERROR - _build_pcap_bg:1443 - PCAP 빌드 중 오류: PCAPBuilder.build_pcap_streaming() missing 2 required positional arguments: 'config' and 'ssh_password'
+Traceback (most recent call last):
+  File "C:\Users\thelastsun\Documents\Python\TCP SYN\interactive\oran_trex_master.py", line 1424, in _build_pcap_bg
+    is_success, result = PCAPBuilder.build_pcap_streaming(config)
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+TypeError: PCAPBuilder.build_pcap_streaming() missing 2 required positional arguments: 'config' and 'ssh_password'

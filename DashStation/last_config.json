@@ -1,0 +1,1 @@
+{"server_ip": "192.168.9.249", "ssh_user": "slab", "ssh_pw": "slab", "trex_path": "0", "src_mac": "80:09:02:03:04:05", "dst_mac": "00:0a:25:00:01:02", "src_ip": "10.0.60.254", "dst_ip": "10.0.60.166", "dst_port": "830"}

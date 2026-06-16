@@ -1,0 +1,21 @@
+{
+    "server_ip": "192.168.9.249",
+    "ssh_user": "slab",
+    "ssh_pw": "slab",
+    "trex_path": "/home/slab/trex/v3.08",
+    "src_mac": "80:09:02:03:04:05",
+    "dst_mac": "00:0a:35:00:01:02",
+    "src_ip": "192.168.11.100",
+    "dst_ip": "192.168.11.2",
+    "dst_port": "830",
+    "vlan_id": "1000",
+    "pcap_path": "/tmp/pcap_output",
+    "pcap_name": "PTP_IEEE_1588.pcap",
+    "pkt_size": "64",
+    "rate": "19",
+    "duration": "60",
+    "attack_type": "PTP/IEEE 1588 (\ub3d9\uae30\ud654 \uad50\ub780)",
+    "trex_port": "1",
+    "trex_cores": "6",
+    "spoofing": true
+}

@@ -1,0 +1,192 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import paramiko
+import json
+import os
+
+class RFApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("RF Switch v1.0")
+        self.root.geometry("500x520") 
+        self.root.resizable(False, False)
+                
+        self.CLR_BG, self.CLR_CARD = "#f5f6fa", "#ffffff"
+        self.CLR_TEXT, self.CLR_ACCENT1 = "#2f3640", "#0984e3" 
+        self.CLR_ACCENT2, self.CLR_SYNC = "#e17055", "#487eb0"   
+        self.CLR_SUCCESS, self.CLR_OFF = "#2ecc71", "#dcdde1"
+        self.CLR_BRIGHT_SYNC = "#00d2d3" 
+        
+        self.root.configure(bg=self.CLR_BG)
+        self.cfg_file = "rf_config.json"
+        self.h, self.u, self.p = tk.StringVar(), tk.StringVar(), tk.StringVar()
+        self.st = tk.StringVar(value="● Disconnected")
+        
+        # Description 변수들
+        self.d12 = [tk.StringVar(value=f"PATH {i+1}") for i in range(2)]
+        self.d14 = [tk.StringVar(value=f"RF {i+1}") for i in range(4)]
+        
+        self.load_config()
+
+        style = ttk.Style()
+        style.theme_use('default')
+        style.configure("TNotebook", background=self.CLR_BG, borderwidth=0)
+        style.configure("TNotebook.Tab", background="#ced6e0", foreground=self.CLR_TEXT, padding=[15, 2])
+        style.map("TNotebook.Tab", background=[("selected", self.CLR_CARD)])
+
+        self.nb = ttk.Notebook(root)
+        self.nb.pack(expand=1, fill="both", padx=10, pady=5)
+        self.t1, self.t2 = tk.Frame(self.nb, bg=self.CLR_CARD), tk.Frame(self.nb, bg=self.CLR_CARD)
+        self.nb.add(self.t1, text=" CONTROL "), self.nb.add(self.t2, text=" CONFIG ")
+
+        self.ui_main()
+        self.ui_cfg()
+
+    def ui_cfg(self):
+        c = tk.Frame(self.t2, bg=self.CLR_CARD)
+        c.place(relx=.5, rely=.5, anchor="center")
+        
+        
+        fields = [("IP Address", self.h), ("ID", self.u), ("Password", self.p)]
+        for i, (l, v) in enumerate(fields):
+            tk.Label(c, text=l, fg=self.CLR_TEXT, bg=self.CLR_CARD, font=("Arial", 9, "bold")).grid(row=i, column=0, pady=5, sticky="e")
+            e = tk.Entry(c, textvariable=v, width=22, bg="#f1f2f6", fg="#2f3640", borderwidth=1, relief="solid")
+            if "Password" in l: e.config(show="*")
+            e.grid(row=i, column=1, padx=15)
+
+        # 2. Description 입력 (여기에 다시 넣었습니다!)
+        tk.Label(c, text="── Port Description ──", fg=self.CLR_TEXT, bg=self.CLR_CARD, font=("Arial", 8, "bold")).grid(row=3, columnspan=2, pady=(15, 5))
+        
+        # 1:2 설명
+        f_d12 = tk.Frame(c, bg=self.CLR_CARD)
+        f_d12.grid(row=4, columnspan=2)
+        for i in range(2):
+            tk.Entry(f_d12, textvariable=self.d12[i], width=12, font=("Arial", 8)).pack(side="left", padx=5)
+
+        # 1:4 설명
+        f_d14 = tk.Frame(c, bg=self.CLR_CARD)
+        f_d14.grid(row=5, columnspan=2, pady=5)
+        for i in range(4):
+            tk.Entry(f_d14, textvariable=self.d14[i], width=8, font=("Arial", 8)).pack(side="left", padx=2)
+        
+        # [복구] SAVE는 회색(#747d8c), CONNECT는 초록색(CLR_SUCCESS)
+        btn_f = tk.Frame(c, bg=self.CLR_CARD)
+        btn_f.grid(row=6, columnspan=2, pady=15)
+        tk.Button(btn_f, text="SAVE", bg="#747d8c", fg="white", font=("Arial", 9, "bold"), width=10, command=self.save_config).pack(side="left", padx=5)
+        tk.Button(btn_f, text="CONNECT", bg=self.CLR_SUCCESS, fg="white", font=("Arial", 9, "bold"), width=10, command=self.conn).pack(side="left", padx=5)
+
+    def ui_main(self):
+        top_f = tk.Frame(self.t1, bg="#dfe4ea")
+        top_f.pack(fill="x")
+        self.bar = tk.Label(top_f, textvariable=self.st, fg="#ff4757", bg="#dfe4ea", font=("Arial", 9, "bold"), pady=8)
+        self.bar.pack(side="left", padx=10)
+        
+        # [복구] 상단 퀵 커넥트 버튼도 초록색 유지
+        self.btn_q_conn = tk.Button(top_f, text="CONNECT", bg=self.CLR_SUCCESS, fg="white", font=("Arial", 8, "bold"), relief="flat", command=self.conn)
+        self.btn_q_conn.pack(side="right", padx=10, pady=5)
+        
+        m = tk.Frame(self.t1, bg=self.CLR_CARD); m.pack(pady=10, fill="both", expand=True)
+
+        # 버튼 텍스트를 Description(self.d12, self.d14)과 연동
+        tk.Label(m, text="── 1:2 RF SWITCH ──", fg=self.CLR_ACCENT2, bg=self.CLR_CARD, font=("Arial", 10, "bold")).pack(pady=(15, 5))
+        f1 = tk.Frame(m, bg=self.CLR_CARD); f1.pack()
+        self.b12 = []
+        for i in range(2):
+            btn = tk.Button(f1, textvariable=self.d12[i], width=15, height=2, font=("Arial", 10, "bold"), command=lambda idx=i: self.tx("1to2", idx))
+            btn.pack(side="left", padx=15); self.b12.append(btn)
+
+        tk.Label(m, text="── 1:4 RF SWITCH ──", fg=self.CLR_ACCENT1, bg=self.CLR_CARD, font=("Arial", 10, "bold")).pack(pady=(30, 5))
+        f2 = tk.Frame(m, bg=self.CLR_CARD); f2.pack()
+        self.b14 = []
+        for i in range(4):
+            btn = tk.Button(f2, textvariable=self.d14[i], width=9, height=2, font=("Arial", 9, "bold"), command=lambda idx=i: self.tx("1to4", idx))
+            btn.pack(side="left", padx=5); self.b14.append(btn)
+
+        self.btn_sync = tk.Button(self.t1, text="🔄 RE-SYNC DEVICE STATUS", bg=self.CLR_BRIGHT_SYNC, fg="white", font=("Arial", 9, "bold"), relief="flat", command=self.sync_logic, state="disabled")
+        self.btn_sync.pack(side="bottom", pady=20)
+        self.reset_c()
+
+    def load_config(self):
+        if os.path.exists(self.cfg_file):
+            try:
+                with open(self.cfg_file, 'r') as f:
+                    d = json.load(f)
+                    self.h.set(d.get("h","10.0.10.77")), self.u.set(d.get("u","debian")), self.p.set(d.get("p","temppwd"))
+                    # Description 불러오기
+                    d12_val = d.get("d12", ["PATH 1", "PATH 2"])
+                    d14_val = d.get("d14", ["RF 1", "RF 2", "RF 3", "RF 4"])
+                    for i in range(2): self.d12[i].set(d12_val[i])
+                    for i in range(4): self.d14[i].set(d14_val[i])
+            except: pass
+
+    def save_config(self):
+        # Description까지 포함하여 저장
+        data = {
+            "h": self.h.get(), "u": self.u.get(), "p": self.p.get(),
+            "d12": [v.get() for v in self.d12],
+            "d14": [v.get() for v in self.d14]
+        }
+        with open(self.cfg_file, 'w') as f:
+            json.dump(data, f)
+        messagebox.showinfo("OK", "Config & Description saved.")
+
+    def reset_c(self):
+        for b in self.b12 + self.b14: b.config(bg=self.CLR_OFF, fg="#57606f")
+
+    def upd(self, t, idx):
+        btns, color = (self.b12, self.CLR_ACCENT2) if t == "1to2" else (self.b14, self.CLR_ACCENT1)
+        for b in btns: b.config(bg=self.CLR_OFF, fg="#57606f")
+        if idx is not None and 0 <= idx < len(btns): btns[idx].config(bg=color, fg="white")
+
+    def get_ssh(self):
+        s = paramiko.SSHClient()
+        s.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        s.connect(self.h.get().strip(), username=self.u.get().strip(), password=self.p.get().strip(), timeout=5)
+        return s
+
+    def conn(self):
+        try:
+            self.st.set("● Connecting...")
+            self.root.update_idletasks()
+            s = self.get_ssh(); s.close()
+            self.st.set(f"● ONLINE: {self.h.get()}")
+            if hasattr(self, 'bar'): self.bar.config(bg="#dff9fb", fg=self.CLR_SUCCESS)
+            self.btn_sync.config(state="normal")
+            self.sync_logic()
+            if self.nb.index("current") == 1: self.nb.select(0)
+        except Exception as e:
+            self.st.set("● Connection Error")
+            if hasattr(self, 'bar'): self.bar.config(bg="#dfe4ea", fg="#ff4757")
+            messagebox.showerror("SSH Error", f"접속 실패: {str(e)}")
+
+    def sync_logic(self):
+        try:
+            s = self.get_ssh()
+            cmd = "echo $(cat /sys/class/gpio/gpio44/value),$(cat /sys/class/gpio/gpio30/value),$(cat /sys/class/gpio/gpio31/value)"
+            _, out, _ = s.exec_command(cmd)
+            res = out.read().decode().strip().split(',')
+            s.close()
+            if len(res) >= 3:
+                self.upd("1to2", int(res[0].strip()))
+                v1, v2 = int(res[1].strip()), int(res[2].strip())
+                val_map = {(0,0):0, (1,0):1, (0,1):2, (1,1):3}
+                self.upd("1to4", val_map.get((v1, v2), 0))
+        except: pass
+
+    def tx(self, t, v):
+        try:
+            s = self.get_ssh(); pw = self.p.get().strip()
+            if t == "1to2":
+                cmd = f"echo '{pw}' | sudo -S config-pin P8.12 out; echo {v} | sudo tee /sys/class/gpio/gpio44/value"
+            else:
+                tx_map = {0:(0,0), 1:(1,0), 2:(0,1), 3:(1,1)}
+                v1, v2 = tx_map.get(v, (0,0))
+                cmd = f"echo '{pw}' | sudo -S config-pin P9.11 out; echo '{pw}' | sudo -S config-pin P9.13 out; " \
+                      f"echo {v1} | sudo tee /sys/class/gpio/gpio30/value; echo {v2} | sudo tee /sys/class/gpio/gpio31/value"
+            stdin, stdout, stderr = s.exec_command(cmd)
+            stdout.read(); s.close(); self.upd(t, v)
+        except Exception as e: messagebox.showerror("Error", str(e))
+
+if __name__ == "__main__":
+    root = tk.Tk(); app = RFApp(root); root.mainloop()
+    

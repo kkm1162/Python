@@ -1,0 +1,16 @@
+; Standalone TeraTerm Macro
+:loop_start
+flushrecv
+timeout = 10
+wait '1'
+sendln 'show version'
+pause 5
+flushrecv
+timeout = 10
+wait 'sudo'
+if result=1 then
+ messagebox 'Errror' 'Error'
+ end
+endif
+goto loop_start
+end

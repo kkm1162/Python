@@ -1,0 +1,4 @@
+Client SENT :  verb 3
+Client SENT :  knownhosts --mode skip
+Client SENT :  listen --host 10.0.20.254 --port 4334 --login oranuser --timeout 300
+Waiting 300s for an SSH Call Home connection on port 4334...

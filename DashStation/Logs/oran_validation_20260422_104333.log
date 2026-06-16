@@ -1,0 +1,7 @@
+2026-04-22 10:43:33,790 - ORanValidation - INFO - <module>:1948 - ================================================================================
+2026-04-22 10:43:33,792 - ORanValidation - INFO - <module>:1949 - O-RAN O-RU DDoS Validation System v6.1 (Enhanced) 시작
+2026-04-22 10:43:33,793 - ORanValidation - INFO - <module>:1950 - 로그 파일: logs\oran_validation_20260422_104333.log
+2026-04-22 10:43:33,793 - ORanValidation - INFO - <module>:1951 - ================================================================================
+2026-04-22 10:43:38,562 - ORanValidation - ERROR - decrypt:122 - 복호화 실패: 'utf-8' codec can't decode byte 0xb2 in position 0: invalid start byte
+2026-04-22 10:43:38,563 - ORanValidation - INFO - _load_config:1847 - 설정 파일 로드 완료
+2026-04-22 10:43:38,592 - ORanValidation - INFO - __init__:942 - GUI 초기화 완료

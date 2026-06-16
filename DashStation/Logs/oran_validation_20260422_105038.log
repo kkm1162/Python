@@ -1,0 +1,64 @@
+2026-04-22 10:50:38,490 - ORanValidation - INFO - <module>:1942 - ================================================================================
+2026-04-22 10:50:38,491 - ORanValidation - INFO - <module>:1943 - O-RAN O-RU DDoS Validation System v6.1 (Enhanced) 시작
+2026-04-22 10:50:38,491 - ORanValidation - INFO - <module>:1944 - 로그 파일: logs\oran_validation_20260422_105038.log
+2026-04-22 10:50:38,491 - ORanValidation - INFO - <module>:1945 - ================================================================================
+2026-04-22 10:50:41,819 - ORanValidation - INFO - _load_config:1841 - 설정 파일 로드 완료
+2026-04-22 10:50:41,847 - ORanValidation - INFO - __init__:936 - GUI 초기화 완료
+2026-04-22 10:50:43,791 - ORanValidation - INFO - _connect_server_bg:1285 - 서버 연결 시작: slab@192.168.9.249
+2026-04-22 10:50:43,792 - ORanValidation - INFO - connect:236 - SSH 연결 시도: slab@192.168.9.249
+2026-04-22 10:50:43,810 - paramiko.transport - DEBUG - _log:1938 - starting thread (client mode): 0x43624050
+2026-04-22 10:50:43,811 - paramiko.transport - DEBUG - _log:1938 - Local version/idstring: SSH-2.0-paramiko_4.0.0
+2026-04-22 10:50:43,811 - paramiko.transport - DEBUG - _log:1938 - Remote version/idstring: SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.13
+2026-04-22 10:50:43,811 - paramiko.transport - INFO - _log:1938 - Connected (version 2.0, client OpenSSH_8.2p1)
+2026-04-22 10:50:43,814 - paramiko.transport - DEBUG - _log:1938 - === Key exchange possibilities ===
+2026-04-22 10:50:43,814 - paramiko.transport - DEBUG - _log:1938 - kex algos: curve25519-sha256, curve25519-sha256@libssh.org, ecdh-sha2-nistp256, ecdh-sha2-nistp384, ecdh-sha2-nistp521, diffie-hellman-group-exchange-sha256, diffie-hellman-group16-sha512, diffie-hellman-group18-sha512, diffie-hellman-group14-sha256, kex-strict-s-v00@openssh.com
+2026-04-22 10:50:43,814 - paramiko.transport - DEBUG - _log:1938 - server key: rsa-sha2-512, rsa-sha2-256, ssh-rsa, ecdsa-sha2-nistp256, ssh-ed25519
+2026-04-22 10:50:43,814 - paramiko.transport - DEBUG - _log:1938 - client encrypt: chacha20-poly1305@openssh.com, aes128-ctr, aes192-ctr, aes256-ctr, aes128-gcm@openssh.com, aes256-gcm@openssh.com
+2026-04-22 10:50:43,814 - paramiko.transport - DEBUG - _log:1938 - server encrypt: chacha20-poly1305@openssh.com, aes128-ctr, aes192-ctr, aes256-ctr, aes128-gcm@openssh.com, aes256-gcm@openssh.com
+2026-04-22 10:50:43,814 - paramiko.transport - DEBUG - _log:1938 - client mac: umac-64-etm@openssh.com, umac-128-etm@openssh.com, hmac-sha2-256-etm@openssh.com, hmac-sha2-512-etm@openssh.com, hmac-sha1-etm@openssh.com, umac-64@openssh.com, umac-128@openssh.com, hmac-sha2-256, hmac-sha2-512, hmac-sha1
+2026-04-22 10:50:43,814 - paramiko.transport - DEBUG - _log:1938 - server mac: umac-64-etm@openssh.com, umac-128-etm@openssh.com, hmac-sha2-256-etm@openssh.com, hmac-sha2-512-etm@openssh.com, hmac-sha1-etm@openssh.com, umac-64@openssh.com, umac-128@openssh.com, hmac-sha2-256, hmac-sha2-512, hmac-sha1
+2026-04-22 10:50:43,815 - paramiko.transport - DEBUG - _log:1938 - client compress: none, zlib@openssh.com
+2026-04-22 10:50:43,815 - paramiko.transport - DEBUG - _log:1938 - server compress: none, zlib@openssh.com
+2026-04-22 10:50:43,815 - paramiko.transport - DEBUG - _log:1938 - client lang: <none>
+2026-04-22 10:50:43,815 - paramiko.transport - DEBUG - _log:1938 - server lang: <none>
+2026-04-22 10:50:43,815 - paramiko.transport - DEBUG - _log:1938 - kex follows: False
+2026-04-22 10:50:43,815 - paramiko.transport - DEBUG - _log:1938 - === Key exchange agreements ===
+2026-04-22 10:50:43,815 - paramiko.transport - DEBUG - _log:1938 - Strict kex mode: True
+2026-04-22 10:50:43,815 - paramiko.transport - DEBUG - _log:1938 - Kex: curve25519-sha256@libssh.org
+2026-04-22 10:50:43,815 - paramiko.transport - DEBUG - _log:1938 - HostKey: ssh-ed25519
+2026-04-22 10:50:43,816 - paramiko.transport - DEBUG - _log:1938 - Cipher: aes128-ctr
+2026-04-22 10:50:43,816 - paramiko.transport - DEBUG - _log:1938 - MAC: hmac-sha2-256
+2026-04-22 10:50:43,816 - paramiko.transport - DEBUG - _log:1938 - Compression: none
+2026-04-22 10:50:43,816 - paramiko.transport - DEBUG - _log:1938 - === End of kex handshake ===
+2026-04-22 10:50:43,871 - paramiko.transport - DEBUG - _log:1938 - Resetting outbound seqno after NEWKEYS due to strict mode
+2026-04-22 10:50:43,871 - paramiko.transport - DEBUG - _log:1938 - kex engine KexCurve25519 specified hash_algo <built-in function openssl_sha256>
+2026-04-22 10:50:43,872 - paramiko.transport - DEBUG - _log:1938 - Switch to new keys ...
+2026-04-22 10:50:43,872 - paramiko.transport - DEBUG - _log:1938 - Resetting inbound seqno after NEWKEYS due to strict mode
+2026-04-22 10:50:43,872 - paramiko.transport - DEBUG - _log:1938 - Adding ssh-ed25519 host key for 192.168.9.249: b'e712cb68bf422e16ed3e5a1c9ea3bc1d'
+2026-04-22 10:50:43,872 - paramiko.transport - DEBUG - _log:1938 - Got EXT_INFO: {'server-sig-algs': b'ssh-ed25519,sk-ssh-ed25519@openssh.com,ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-dss,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,sk-ecdsa-sha2-nistp256@openssh.com'}
+2026-04-22 10:50:43,922 - paramiko.transport - DEBUG - _log:1938 - userauth is OK
+2026-04-22 10:50:43,954 - paramiko.transport - INFO - _log:1938 - Authentication (password) successful!
+2026-04-22 10:50:43,954 - ORanValidation - INFO - connect:246 - SSH 연결 성공: slab@192.168.9.249
+2026-04-22 10:50:43,955 - ORanValidation - INFO - startup_engine:614 - TRex 엔진 구동 시작 - 경로: /home/slab/trex/v3.08, 포트: 1, 코어: 6
+2026-04-22 10:50:43,955 - ORanValidation - INFO - startup_engine:617 - 기존 TRex 프로세스 종료 시도
+2026-04-22 10:50:43,955 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: sudo -S pkill -f 't-rex-64'
+2026-04-22 10:50:43,955 - paramiko.transport - DEBUG - _log:1210 - [chan 0] Max packet in: 32768 bytes
+2026-04-22 10:50:44,076 - paramiko.transport - DEBUG - _log:1938 - Received global request "hostkeys-00@openssh.com"
+2026-04-22 10:50:44,076 - paramiko.transport - DEBUG - _log:1938 - Rejecting "hostkeys-00@openssh.com" global request from server.
+2026-04-22 10:50:44,134 - paramiko.transport - DEBUG - _log:1210 - [chan 0] Max packet out: 32768 bytes
+2026-04-22 10:50:44,135 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 0 opened.
+2026-04-22 10:50:44,140 - paramiko.transport - DEBUG - _log:1210 - [chan 0] Sesch channel 0 request ok
+2026-04-22 10:50:44,144 - paramiko.transport - DEBUG - _log:1210 - [chan 0] Sesch channel 0 request ok
+2026-04-22 10:50:44,154 - paramiko.transport - DEBUG - _log:1210 - [chan 0] EOF received (0)
+2026-04-22 10:50:44,155 - ORanValidation - DEBUG - execute_command:283 - 명령 실행 완료 - Exit Code: 0
+2026-04-22 10:50:44,155 - paramiko.transport - DEBUG - _log:1210 - [chan 0] EOF sent (0)
+2026-04-22 10:50:46,155 - ORanValidation - INFO - startup_engine:623 - 명령 실행: cd /home/slab/trex/v3.08 && sudo -S ./t-rex-64 -i -c 6
+2026-04-22 10:50:46,155 - ORanValidation - DEBUG - execute_command:267 - SSH 명령 실행: cd /home/slab/trex/v3.08 && sudo -S ./t-rex-64 -i -c 6
+2026-04-22 10:50:46,156 - paramiko.transport - DEBUG - _log:1210 - [chan 1] Max packet in: 32768 bytes
+2026-04-22 10:50:46,160 - paramiko.transport - DEBUG - _log:1210 - [chan 1] Max packet out: 32768 bytes
+2026-04-22 10:50:46,161 - paramiko.transport - DEBUG - _log:1938 - Secsh channel 1 opened.
+2026-04-22 10:50:46,168 - paramiko.transport - DEBUG - _log:1210 - [chan 1] Sesch channel 1 request ok
+2026-04-22 10:50:46,174 - paramiko.transport - DEBUG - _log:1210 - [chan 1] Sesch channel 1 request ok
+2026-04-22 10:51:12,045 - ORanValidation - INFO - _connect_server_bg:1285 - 서버 연결 시작: slab@192.168.9.249
+2026-04-22 10:51:19,222 - ORanValidation - INFO - _connect_server_bg:1285 - 서버 연결 시작: slab@192.168.9.249
+2026-04-22 10:51:30,118 - ORanValidation - INFO - _connect_server_bg:1285 - 서버 연결 시작: slab@192.168.9.249
