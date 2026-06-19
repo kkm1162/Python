@@ -19,6 +19,7 @@ SUPERVISION_INTERVAL="${SUPERVISION_INTERVAL:-60}"
 SUPERVISION_EARLY_RESET=$((SUPERVISION_INTERVAL - 10))
 SSH_KEEPALIVE_INTERVAL="${SSH_KEEPALIVE_INTERVAL:-30}"
 CMD_LOCK_FILE="/var/tmp/netconf_tmp/netconf_cmd.lock"
+SUPPRESS_NP2_RPC_DUMP_FILE="/var/tmp/netconf_tmp/.suppress_np2_rpc_dump"
 NETCONF_CONTROL_FIFO="${NETCONF_CONTROL_FIFO:-/var/tmp/netconf_tmp/netconf_control.fifo}"
 # 세션 끊김(netopeer 종료·연속 RPC 실패) 후 listen부터 다시 시도 (0이면 한 번만 실행 후 종료)
 AUTO_RECONNECT="${AUTO_RECONNECT:-1}"
@@ -77,7 +78,7 @@ cleanup() {
     sudo iptables -D INPUT -p tcp --dport "$CALLHOME_PORT" -j DROP >/dev/null 2>&1
     sudo iptables -D INPUT -p tcp --dport "$CALLHOME_PORT" -s "$ALLOWED_IP" -j ACCEPT >/dev/null 2>&1
     
-    rm -f "$SUPERVISION_RESET" "$CMD_LOCK_FILE" "$NETCONF_CONTROL_FIFO"
+    rm -f "$SUPERVISION_RESET" "$CMD_LOCK_FILE" "$NETCONF_CONTROL_FIFO" "$SUPPRESS_NP2_RPC_DUMP_FILE"
     
     echo "[INFO] Cleanup complete. Exiting."
     exit 0
@@ -106,19 +107,17 @@ send_cmd() {
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S.%3N')
     local content_path=""
     local out_path=""
-    local config_path=""
     content_path=$(printf '%s\n' "$cmd" | sed -n -E 's/.*--content[= ]([^[:space:]]+).*/\1/p' | tr -d '\r"'"'"'')
     out_path=$(printf '%s\n' "$cmd" | sed -n -E 's/.*--out[= ]([^[:space:]]+).*/\1/p' | tr -d '\r"'"'"'')
-    config_path=$(printf '%s\n' "$cmd" | sed -n -E 's/.*--config[= ]([^[:space:]]+).*/\1/p' | tr -d '\r"'"'"'')
+    # GET(user-rpc --out): hide netopeer2-cli duplicate rpc dump; log via --content/--out files only.
+    # SET(edit-config) and other commands: leave netopeer2-cli output unchanged.
+    if [[ -n "$content_path" && -n "$out_path" ]]; then
+        : > "$SUPPRESS_NP2_RPC_DUMP_FILE" 2>/dev/null || touch "$SUPPRESS_NP2_RPC_DUMP_FILE"
+    fi
     {
         flock -x 201
         echo "[$timestamp] CLIENT_SENT: $cmd" >> "$LOG" 2>&1
-        if [[ -n "$config_path" && -f "$config_path" ]]; then
-            echo "[GUI] edit-config request xml begin ($config_path)" >> "$LOG" 2>&1
-            sed -n '1,1200p' "$config_path" >> "$LOG" 2>&1
-            echo "[GUI] edit-config request xml end ($config_path)" >> "$LOG" 2>&1
-        fi
-        if [[ -n "$content_path" && -f "$content_path" ]]; then
+        if [[ -n "$content_path" && -n "$out_path" && -f "$content_path" ]]; then
             echo "[GUI] user-rpc request xml begin ($content_path)" >> "$LOG" 2>&1
             sed -n '1,800p' "$content_path" >> "$LOG" 2>&1
             echo "[GUI] user-rpc request xml end ($content_path)" >> "$LOG" 2>&1
@@ -148,6 +147,7 @@ send_cmd() {
                 fi
             } 201>"$CMD_LOCK_FILE"
         fi
+        rm -f "$SUPPRESS_NP2_RPC_DUMP_FILE"
     fi
     LAST_RPC_TIME=$(date +%s)
     RPC_RESPONSE_RECEIVED=0
@@ -241,22 +241,23 @@ sleep "$CONN_DELAY"
 noise_filter() {
     local in_rpc_dump=0
     while IFS= read -r line; do
-        # Hide netopeer2-cli raw rpc/rpc-reply dump to avoid duplicate output.
-        # We keep explicit --out file logging (user-rpc reply xml begin/end).
-        if [[ $in_rpc_dump -eq 1 ]]; then
+        # GET(user-rpc --out) only: hide CLI rpc dump; reply is logged from --out file.
+        if [[ -f "$SUPPRESS_NP2_RPC_DUMP_FILE" ]]; then
+            if [[ $in_rpc_dump -eq 1 ]]; then
+                case "$line" in
+                    *"</rpc-reply>"*|*"</rpc>"*)
+                        in_rpc_dump=0
+                        ;;
+                esac
+                continue
+            fi
             case "$line" in
-                *"</rpc-reply>"*|*"</rpc>"*)
-                    in_rpc_dump=0
+                "<rpc "*|"<rpc>"|"<rpc-reply "*|"<rpc-reply>")
+                    in_rpc_dump=1
+                    continue
                     ;;
             esac
-            continue
         fi
-        case "$line" in
-            "<rpc "*|"<rpc>"|"<rpc-reply "*|"<rpc-reply>")
-                in_rpc_dump=1
-                continue
-                ;;
-        esac
         case "$line" in
             *"nc DEBUG: SSH:"*|*"ssh_packet_"*|*"ssh_socket_"*|*"channel_rcv_data"*|*"channel_default_bufferize"*|*"channel windows are now"*|*"Read ("*"buffered"*|*"Dispatching handler for packet type"*|*"bytes left in socket buffer"*)
                 continue

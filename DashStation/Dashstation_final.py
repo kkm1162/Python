@@ -211,27 +211,71 @@ class FolderGroup:
         return f
 
 # ========== [매크로 값 파싱] ==========
+def parse_wait_macro_fields(value, default_timeout=10):
+    """문구 대기/확인 값 파싱. 대기 문구에 ':'가 있어도 되도록 '::'로 timeout 구분"""
+    text = str(value).strip()
+    if not text:
+        return "", default_timeout, "에러"
+
+    if "::" in text:
+        parts = text.split("::")
+        target = parts[0]
+        timeout = default_timeout
+        error_msg = f"에러: {target}"
+        if len(parts) > 1 and parts[1].strip():
+            try:
+                timeout = int(parts[1].strip())
+            except ValueError:
+                timeout = default_timeout
+        if len(parts) > 2 and parts[2].strip():
+            error_msg = parts[2].strip()
+        return target, timeout, error_msg
+
+    return text, default_timeout, f"에러: {text}"
+
+def format_wait_macro_value(target, timeout=10, error_msg=None):
+    """문구 대기/확인 값을 저장용 문자열로 직렬화"""
+    target = str(target)
+    if error_msg:
+        return f"{target}::{timeout}::{error_msg}"
+    if timeout != 10:
+        return f"{target}::{timeout}"
+    return target
+
+def macro_steps_define_loop_label(steps):
+    """매크로 단계에 loop 라벨이 이미 있는지 확인"""
+    for step in steps:
+        action = step.get("action", "")
+        value = str(step.get("value", "")).strip().lower()
+        if "원문 TTL" in action and value.startswith(":loop"):
+            return True
+        if "처음으로" in action:
+            return True
+    return False
+
+def write_standalone_wait_lines(file_obj, target, timeout=10, escape_fn=None):
+    """Standalone TTL 저장용 wait 구문 (GUI에 보이는 내용과 동일하게)"""
+    escape_fn = escape_fn or (lambda s: s.replace("'", "''").replace('\\', '\\\\'))
+    if timeout != 10:
+        file_obj.write(f"timeout = {timeout}\n")
+    file_obj.write(f"wait '{escape_fn(target)}'\n")
+
 def parse_macro_value(action, value):
     """매크로 값 파싱 - 액션별 처리"""
-    parts = value.split(':')
-    
     if "문구" in action:
+        target, timeout, error_msg = parse_wait_macro_fields(value)
+        return {
+            'target': target,
+            'timeout': timeout,
+            'error_msg': error_msg
+        }
+
+    if "대기" in action:
         try:
-            return {
-                'target': parts[0],
-                'timeout': int(parts[1]) if len(parts) > 1 else 10,
-                'error_msg': parts[2] if len(parts) > 2 else f"에러: {parts[0]}"
-            }
-        except (ValueError, IndexError):
-            return {'target': parts[0], 'timeout': 10, 'error_msg': f"에러: {parts[0]}"}
-    
-    elif "대기" in action:
-        try:
-            return {'delay': float(parts[0])}
-        except (ValueError, IndexError):
+            return {'delay': float(str(value).strip())}
+        except (ValueError, TypeError):
             return {'delay': 1.0}
-    else:
-        return {'value': value}
+    return {'value': value}
 
 def normalize_pause_seconds(value, default=1):
     """TTL pause용 정수 초 값으로 정규화"""
@@ -339,7 +383,7 @@ def parse_ttl_file(file_path):
                 context['last_wait_target'] = target
                 steps.append({
                     'action': '문구 대기 (wait)',
-                    'value': f"{target}:{context['last_timeout']}"
+                    'value': format_wait_macro_value(target, context['last_timeout'])
                 })
             i += 1
         
@@ -347,7 +391,7 @@ def parse_ttl_file(file_path):
             if 'goto loop' in line.lower():
                 steps.append({
                     'action': '문구 확인 후 진행',
-                    'value': f"{context['last_wait_target']}:{context['last_timeout']}"
+                    'value': format_wait_macro_value(context['last_wait_target'], context['last_timeout'])
                 })
             elif 'messagebox' in line.lower() or (i+1 < len(combined_lines) and 'messagebox' in combined_lines[i+1].lower()):
                 error_msg = "에러 발생"
@@ -361,7 +405,7 @@ def parse_ttl_file(file_path):
                         break
                 steps.append({
                     'action': '문구 확인 후 종료',
-                    'value': f"{context['last_wait_target']}:{context['last_timeout']}:{error_msg}"
+                    'value': format_wait_macro_value(context['last_wait_target'], context['last_timeout'], error_msg)
                 })
             i += 1
         
@@ -662,7 +706,9 @@ class SessionRow:
                     json.dump(cur_steps, f, indent=4, ensure_ascii=False)
                 
                 with open(os.path.join(MACRO_DIR, f"{name}.ttl"), 'w', encoding='cp949', errors='replace') as f:
-                    f.write("; Standalone TeraTerm Macro\n:loop_start\n")
+                    f.write("; Standalone TeraTerm Macro\n")
+                    if not macro_steps_define_loop_label(cur_steps):
+                        f.write(":loop_start\n")
                     for s in cur_steps:
                         act, val = s['action'], s['value']
                         parsed = parse_macro_value(act, val)
@@ -680,18 +726,20 @@ class SessionRow:
                         elif "화면 청소" in act:
                             f.write("clearscreen 0\nflushrecv\n")
                         elif "문구 대기" in act:
-                            target = self._escape_teraterm_string(parsed['target'])
-                            timeout = parsed['timeout']
-                            f.write(f"flushrecv\ntimeout = {timeout}\nwait '{target}'\n")
+                            write_standalone_wait_lines(
+                                f, parsed['target'], parsed['timeout'], self._escape_teraterm_string
+                            )
                         elif "확인 후 진행" in act:
-                            target = self._escape_teraterm_string(parsed['target'])
-                            timeout = parsed['timeout']
-                            f.write(f"flushrecv\ntimeout = {timeout}\nwait '{target}'\nif result=0 goto loop_start\n")
+                            write_standalone_wait_lines(
+                                f, parsed['target'], parsed['timeout'], self._escape_teraterm_string
+                            )
+                            f.write("if result=0 goto loop_start\n")
                         elif "확인 후 종료" in act:
-                            target = self._escape_teraterm_string(parsed['target'])
-                            timeout = parsed['timeout']
                             error_msg = self._escape_teraterm_string(parsed['error_msg'])
-                            f.write(f"flushrecv\ntimeout = {timeout}\nwait '{target}'\nif result=1 then\n messagebox '{error_msg}' 'Error'\nendif\n")
+                            write_standalone_wait_lines(
+                                f, parsed['target'], parsed['timeout'], self._escape_teraterm_string
+                            )
+                            f.write(f"if result=1 then\n messagebox '{error_msg}' 'Error'\nendif\n")
                         elif "처음으로" in act:
                             f.write("goto loop_start\n")
                     f.write("end\n")
