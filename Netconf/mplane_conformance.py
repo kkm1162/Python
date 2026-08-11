@@ -288,6 +288,11 @@ def prepare_mplane_conformance_bundle(
         rpc[sheet] = new_xml
         warnings.extend(tw)
 
+    for sheet in ("PDSCH", "PUSCH", "PRACH"):
+        body = (rpc.get(sheet) or "").strip()
+        if body:
+            rpc[sheet] = mp.normalize_uplane_rpc_element_order(body, sheet)
+
     pusch_body = (rpc.get("PUSCH") or "").strip()
     prach_body = (rpc.get("PRACH") or "").strip()
     if pusch_body and prach_body:

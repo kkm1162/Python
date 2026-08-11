@@ -55,7 +55,7 @@ if [[ -z "$L2SW_IP" || -z "$L2SW_ID" || -z "$L2SW_PW" ]]; then
 	exit 2
 fi
 if [[ -z "$ALARM_OFF_CMDS" ]]; then
-	echo "[ERROR] ALARM_OFF_CMDS required (comma-separated commands)"
+	echo "[ERROR] ALARM_OFF_CMDS required (commands separated by ', ')"
 	exit 2
 fi
 
@@ -248,10 +248,8 @@ _alarm_before=$(grep -acE '<fault-id>' "$LOG" 2>/dev/null) || true
 
 TIMEOUT_ITER=$(( ALARM_TIMEOUT_SEC * 5 ))
 
-IFS=',' read -ra OFF_ARR <<< "$ALARM_OFF_CMDS"
+split_l2sw_cmds "$ALARM_OFF_CMDS" OFF_ARR
 for _cmd in "${OFF_ARR[@]}"; do
-	_cmd="$(echo "$_cmd" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
-	[[ -n "$_cmd" ]] || continue
 	l2sw_send "$_cmd"
 done
 echo "[OK]	STEP 3.	L2SW OFF commands sent (${#OFF_ARR[@]} commands)"
@@ -264,7 +262,12 @@ for _w in $(seq 1 "$TIMEOUT_ITER"); do
 	_sync_now=$(grep -acE 'synchronization-state-change' "$LOG" 2>/dev/null) || true
 	if [[ "${_sync_now:-0}" =~ ^[0-9]+$ ]] && (( _sync_now > _sync_before )); then
 		RESULT4="OK"
+		emit_conformance_event_times_progress
 		break
+	fi
+	# ~1s: stream HOLDOVER/FREERUN times to GUI as soon as they appear in LOG
+	if (( _w % 5 == 0 )); then
+		emit_conformance_event_times_progress
 	fi
 	sleep 0.2
 done
@@ -273,6 +276,7 @@ if [[ "$RESULT4" != "OK" ]]; then
 	test_fail "sync-state-change notification timeout"
 	exit 1
 fi
+emit_conformance_event_times_progress
 
 ########################################################################################
 # STEP 5. Alarm occur notification (is-cleared=false)
@@ -283,8 +287,12 @@ for _w in $(seq 1 "$TIMEOUT_ITER"); do
 	if [[ "${_alarm_now:-0}" =~ ^[0-9]+$ ]] && (( _alarm_now > _alarm_before )); then
 		if grep -a -E '<is-cleared>false</is-cleared>' "$LOG" >/dev/null 2>&1; then
 			RESULT5="OK"
+			emit_conformance_event_times_progress
 			break
 		fi
+	fi
+	if (( _w % 5 == 0 )); then
+		emit_conformance_event_times_progress
 	fi
 	sleep 0.2
 done
@@ -293,6 +301,7 @@ if [[ "$RESULT5" != "OK" ]]; then
 	test_fail "alarm-occur notification timeout"
 	exit 1
 fi
+emit_conformance_event_times_progress
 
 ########################################################################################
 # STEP 6. Get active-alarm-list (alarm should exist)
@@ -323,10 +332,8 @@ fi
 if [[ -n "${ALARM_ON_CMDS:-}" ]]; then
 	_alarm_clear_before=$(grep -acE '<is-cleared>true</is-cleared>' "$LOG" 2>/dev/null) || true
 
-	IFS=',' read -ra ON_ARR <<< "$ALARM_ON_CMDS"
+	split_l2sw_cmds "$ALARM_ON_CMDS" ON_ARR
 	for _cmd in "${ON_ARR[@]}"; do
-		_cmd="$(echo "$_cmd" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
-		[[ -n "$_cmd" ]] || continue
 		l2sw_send "$_cmd"
 	done
 	echo "[OK]	STEP 7.	L2SW ON commands sent (${#ON_ARR[@]} commands)"
@@ -339,7 +346,11 @@ if [[ -n "${ALARM_ON_CMDS:-}" ]]; then
 		_alarm_clear_now=$(grep -acE '<is-cleared>true</is-cleared>' "$LOG" 2>/dev/null) || true
 		if [[ "${_alarm_clear_now:-0}" =~ ^[0-9]+$ ]] && (( _alarm_clear_now > _alarm_clear_before )); then
 			RESULT8="OK"
+			emit_conformance_event_times_progress
 			break
+		fi
+		if (( _w % 5 == 0 )); then
+			emit_conformance_event_times_progress
 		fi
 		sleep 0.2
 	done

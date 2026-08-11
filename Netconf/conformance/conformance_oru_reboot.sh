@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-# O-RAN M-Plane 3.1.1.1 — Transport / Call Home (positive), GUI + /var/tmp 환경
-# - Call Home 리스너 포트: CALLHOME_PORT (기본 4334). JSON의 PORT는 NETCONF SSH(830)용으로만 표시.
-# - 로그: LOG_PATH가 있으면 그 아래, 없으면 ${CONFORMANCE_REMOTE_DIR:-/var/tmp/conformance}/logs/<PRODUCT>/
+# GUI Conformance helper: Call Home → login → o-ran-operations <reset/>
+# Used after a selected test when 「재부팅」 is checked.
 set -u
 set -o pipefail
 
-TESTID="3111"
+TESTID="oru_reboot"
 CONFIG=""
 while [ $# -gt 0 ]; do
 	case "$1" in
@@ -33,39 +32,36 @@ if [[ ! -f "$CONFIG" ]]; then
 	exit 2
 fi
 
-if ! command -v jq >/dev/null 2>&1; then
-	echo "[ERROR] jq not found in PATH=$PATH (install jq or use GUI jq shim under /var/tmp/conformance/bin)"
-	exit 2
-fi
-
 USER=$(jq -r '.["management-configurations"]["NETCONF-ID"] // empty' "$CONFIG")
 PASSWORD=$(jq -r '.["management-configurations"]["NETCONF-PW"] // empty' "$CONFIG")
 ALLOWED_IP=$(jq -r '.["management-configurations"]["SERVER-IP"] // empty' "$CONFIG")
 LOCAL_IP=$(jq -r '.["management-configurations"]["LOCAL-IP"] // empty' "$CONFIG")
-NETCONF_PORT=$(jq -r '.["management-configurations"]["PORT"] // empty' "$CONFIG")
 PRODUCT=$(jq -r '.["management-configurations"]["PRODUCT-CODE"] // empty' "$CONFIG")
 
-# Call Home 수신: miniDU_callhome.sh 와 동일하게 CALLHOME_PORT 사용 (기본 4334)
 LISTEN_PORT="${CALLHOME_PORT:-4334}"
+NETCONF_TMP="${NETCONF_TMP:-/var/tmp/netconf_tmp}"
+LOGIN_WAIT_SEC="${LOGIN_WAIT_SEC:-120}"
+LOGIN_POLL_SEC="${LOGIN_POLL_SEC:-0.2}"
+CONN_DELAY="${CONN_DELAY:-1}"
 
-echo "[INFO] USER=$USER, ALLOWED_IP=$ALLOWED_IP, LOCAL_IP=$LOCAL_IP, LISTEN_PORT=$LISTEN_PORT (Call Home), NETCONF_PORT=$NETCONF_PORT (JSON PORT), PRODUCT=$PRODUCT"
-if [[ -z "$USER" || -z "$ALLOWED_IP" || -z "$LOCAL_IP" ]]; then
-	echo "[ERROR] empty USER/ALLOWED_IP/LOCAL_IP from $CONFIG — check Settings + jq"
-	exit 2
-fi
+echo "[INFO] ORU reboot helper: USER=$USER, ALLOWED_IP=$ALLOWED_IP, LOCAL_IP=$LOCAL_IP, LISTEN_PORT=$LISTEN_PORT, PRODUCT=$PRODUCT"
 
 LOG_BASE="${LOG_PATH:-${CONFORMANCE_REMOTE_DIR:-/var/tmp/conformance}/logs}"
 LOG_BASE="${LOG_BASE%/}"
 LOG_DIR="${LOG_BASE}/${PRODUCT:-_unknown_}"
-mkdir -p "$LOG_DIR"
+mkdir -p "$LOG_DIR" "$NETCONF_TMP/edit"
 LOG="$LOG_DIR/CONF_${TESTID}_$(date +'%y%m%d_%H-%M-%S').log"
 : >"$LOG"
 chmod 0644 "$LOG" 2>/dev/null || true
 
+RESET_RPC="${NETCONF_TMP}/edit/oru_gui_reset.xml"
+cat >"$RESET_RPC" <<'EORPC'
+<reset xmlns="urn:o-ran:operations:1.0"/>
+EORPC
+
 send_cmd() {
 	local cmd="$*"
 	echo "Client SENT : $cmd" >>"$LOG" 2>&1
-	# coproc 종료 후 NP2/NP2[1] 이 사라지면 set -u 환경에서 확장만으로도 exit 1 될 수 있음
 	set +u
 	local _wfd="${NP2[1]:-}"
 	set -u
@@ -73,12 +69,7 @@ send_cmd() {
 	echo "$cmd" >&"${_wfd}" 2>/dev/null || true
 }
 
-test_fail() {
-	echo "[FAIL] $*"
-}
-
 COPROC_READY=0
-# bash 가 coproc 종료 후 NAME_PID 를 비울 수 있어, 처음부터 복사해 두고 kill/wait 에만 사용
 NETOPEER_COPROC_PID=""
 cleanup() {
 	if [[ "$COPROC_READY" == "1" ]]; then
@@ -97,7 +88,7 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM HUP
 
-# 이전 중단된 실행의 잔여 프로세스/포트 정리
+# Free Call Home port (miniDU / previous test may still hold it)
 sudo fuser -k "${LISTEN_PORT}/tcp" 2>/dev/null || true
 sudo iptables -D INPUT -p tcp --dport "$LISTEN_PORT" -j DROP 2>/dev/null || true
 sudo iptables -D INPUT -p tcp --dport "$LISTEN_PORT" -s "$ALLOWED_IP" -j ACCEPT 2>/dev/null || true
@@ -105,7 +96,9 @@ sleep 1
 
 sudo iptables -A INPUT -p tcp --dport "$LISTEN_PORT" -j DROP
 sudo iptables -I INPUT -p tcp --dport "$LISTEN_PORT" -s "$ALLOWED_IP" -j ACCEPT
-sleep 3
+if [[ "$CONN_DELAY" != "0" && -n "$CONN_DELAY" ]]; then
+	sleep "$CONN_DELAY"
+fi
 
 coproc NP2 {
 	setsid stdbuf -oL sshpass -p "$PASSWORD" netopeer2-cli 2>&1
@@ -115,46 +108,65 @@ exec 3>&"${NP2[1]}"
 COPROC_READY=1
 
 send_cmd "verb 3"
+sleep 0.2
 send_cmd "knownhosts --mode skip"
+sleep 0.3
+
+LISTEN_LOG_START=$(wc -l <"$LOG" | tr -d ' ')
+echo "[INFO] Starting CallHome listener on ${LISTEN_PORT} for ORU reset..."
 send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login $USER --timeout 300"
 
-# tail -F 는 기본으로 마지막 10줄만 먼저 보여 줘서, verbose 로그 뒤에 남은 "Authentication successful" 등을 놓침 → 파일 전체 grep 폴링.
-RESULT1="NOK"
-PAT_ACCEPT="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
-for _w in $(seq 1 300); do
-	if grep -a -F "$PAT_ACCEPT" "$LOG" >/dev/null 2>&1; then
-		RESULT1="OK"
+LOGIN="NOK"
+login_deadline=$(( $(date +%s) + LOGIN_WAIT_SEC ))
+while [[ $(date +%s) -lt $login_deadline ]]; do
+	if tail -n "+${LISTEN_LOG_START}" "$LOG" 2>/dev/null | grep -q "Authentication successful"; then
+		LOGIN="OK"
+		echo "[INFO] Login successful — sending ORU reset"
+		break
+	fi
+	if tail -n "+${LISTEN_LOG_START}" "$LOG" 2>/dev/null | grep -qiE "authentication failed|Authentication failed"; then
+		echo "[ERROR] Authentication failed"
+		LOGIN="FAIL"
+		break
+	fi
+	sleep "$LOGIN_POLL_SEC"
+done
+
+if [[ "$LOGIN" != "OK" ]]; then
+	echo "[FAIL] Call Home / login not established (LOGIN=${LOGIN})"
+	exit 1
+fi
+
+sleep 1
+send_cmd "subscribe --stream NETCONF"
+sleep 1
+
+RESET_MARK=$(wc -l <"$LOG" | tr -d ' ')
+send_cmd "user-rpc --content $RESET_RPC"
+echo "[INFO] Sent <reset xmlns=\"urn:o-ran:operations:1.0\"/>"
+
+# Wait briefly for rpc-reply ok / notification (RU may drop quickly)
+RESULT="NOK"
+for _w in $(seq 1 50); do
+	if tail -n "+$((RESET_MARK + 1))" "$LOG" 2>/dev/null | grep -qiE '<ok\s*/>|rpc-reply'; then
+		RESULT="OK"
+		break
+	fi
+	# Session drop after reset is also success
+	if ! kill -0 "$NETOPEER_COPROC_PID" 2>/dev/null; then
+		RESULT="OK"
+		echo "[INFO] netopeer exited after reset (expected)"
 		break
 	fi
 	sleep 0.2
 done
 
-echo "STEP 1. Criteria : The Netconf Client receive the CallHome from ORU"
-echo "STEP 1. CallHome : $RESULT1"
-if [[ "$RESULT1" != "OK" ]]; then
-	exit 1
+if [[ "$RESULT" == "OK" ]]; then
+	echo "[OK] ORU reset RPC accepted / session ending"
+	echo "[PASS] ORU reboot requested"
+	exit 0
 fi
 
-RESULT2="NOK"
-for _w in $(seq 1 120); do
-	if grep -a -F "Authentication successful" "$LOG" >/dev/null 2>&1; then
-		RESULT2="OK"
-		break
-	fi
-	sleep 0.2
-done
-
-echo "[$RESULT2] STEP 2. Successfully login with the correct username and password ($USER / ***)"
-if [[ "$RESULT2" != "OK" ]]; then
-	test_fail "login"
-	exit 1
-fi
-
-echo "[INFO] 3.1.1.1 positive path completed. Detailed log: $LOG"
-trap - EXIT INT TERM
-cleanup || true
-# coproc 자식이 아직 살아 있으면 bash 가 종료 시 그 exit 코드를 쓰는 경우가 있어 명시적으로 reap
-if [[ -n "${NETOPEER_COPROC_PID:-}" ]]; then
-	wait "$NETOPEER_COPROC_PID" 2>/dev/null || true
-fi
+echo "[WARN] No clear rpc-reply for reset within timeout — RU may still reboot"
+echo "[PASS] ORU reboot requested (best-effort)"
 exit 0

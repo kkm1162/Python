@@ -140,6 +140,9 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.remote_cfg_cache: dict[str, str] = {}
         self.log_buffer: list[str] = []
         self.hidden_log_chunks: list[str] = []
+        self._log_stream_carry = ""
+        self._rpc_exchange_collecting = False
+        self._rpc_exchange_buf: list[str] = []
         self.hidden_render_active = False
         self.log_lock = threading.Lock()
         self.max_log_lines = 500
@@ -176,10 +179,12 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.perf_debug_var = tk.BooleanVar(value=False)
         self.auto_xml_send_var = tk.BooleanVar(value=False)
         self.auto_xml_send_done = False
-        self.auto_start_var = tk.BooleanVar(value=False)
+        self.auto_start_var = tk.BooleanVar(value=True)
         self._user_stop_requested = False
         self._auto_start_retry_job: str | None = None
-        self._auto_restart_delay_ms = 10_000
+        self._auto_restart_delay_ms = 5_000
+        self._transport_reconnect_pending = False
+        self._session_lost_logged = False
         self.perf_stats: dict[str, float] = {}
         self.perf_counts: dict[str, int] = {}
         self.perf_max: dict[str, float] = {}
@@ -219,6 +224,9 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self._recent_log_for_session: str = ""
         self._session_watch_job: str | None = None
         self._session_watch_rounds: int = 0
+        self._last_session_activity_mono: float = 0.0
+        self._session_lost_at_mono: float = 0.0
+        self._session_lost_force_reconnect_sec: float = 180.0
         self._mplane_tables: dict[str, tuple[list[str], list[list[str]]]] = {}
         self._mplane_table_widgets: dict[str, dict[str, Any]] = {}
         self._mplane_table_vars: dict[str, dict[str, Any]] = {}
@@ -239,7 +247,12 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self._mplane_find_idx: int = -1
         self.mplane_cc_on_vars: list[tk.BooleanVar] = []
         self.mplane_debug_log_path = Path(__file__).with_name("mplane_ui_debug.log")
+        self.mplane_scroll_canvas: tk.Canvas | None = None
+        self.mplane_scroll_wrap: ttk.Frame | None = None
+        self.mplane_scroll_inner: ttk.Frame | None = None
+        self._mplane_wheel_bound: bool = False
         self.conformance_check_vars: dict[str, tk.BooleanVar] = {}
+        self.conformance_reboot_vars: dict[str, tk.BooleanVar] = {}
         self.conformance_scroll_canvas: tk.Canvas | None = None
         self.conformance_list_tree: ttk.Treeview | None = None
         self._conformance_run_active_targets: set[str] | None = None
@@ -287,9 +300,12 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.conformance_run_conn_delay_var = tk.StringVar(value="3")
         self.conformance_post_listen_wait_var = tk.StringVar(value="0")
         self.conformance_run_repeat_var = tk.StringVar(value="1")
+        self.conformance_reboot_wait_var = tk.StringVar(value="360")
         self.conformance_last_run_hint_var = tk.StringVar(value="")
         self._conformance_last_run_snapshot_cache: dict[str, Any] | None = None
         self._conformance_final_results: dict[str, dict[str, Any]] = {}
+        self._conformance_session_run_stats: dict[str, Any] = self._conformance_new_session_run_stats()
+        self._conformance_run_stats_mode: str | None = None
         self._conformance_results_summary_win: tk.Toplevel | None = None
         self._conformance_results_summary_tree: ttk.Treeview | None = None
         self._conformance_results_summary_summary_var: tk.StringVar | None = None
@@ -929,6 +945,11 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
 
         settings_labels = {
             "LOCAL_IF": "Server NIC (ethping -i)",
+            "CONN_DELAY": "Start delay before listen (s)",
+            "POST_LISTEN_WAIT": "Wait after listen cmd (s)",
+            "NP2_BOOT_WAIT": "netopeer2-cli boot wait (s)",
+            "NP2_YANG_WAIT": "netopeer YANG preload max (s)",
+            "LOGIN_WAIT_SEC": "Call Home login wait (s)",
         }
         defaults = {
             "USER": "oranuser",
@@ -936,6 +957,11 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "ALLOWED_IP": "10.0.20.128",
             "LOCAL_IP": "10.0.20.254",
             "CALLHOME_PORT": "4334",
+            "CONN_DELAY": "1",
+            "POST_LISTEN_WAIT": "0",
+            "NP2_BOOT_WAIT": "2",
+            "NP2_YANG_WAIT": "90",
+            "LOGIN_WAIT_SEC": "120",
             "NETCONF_PORT": "830",
             "PRODUCT": "nDLPU",
             "LOG_PATH": "/var/tmp/log/nDLPU",
@@ -964,7 +990,11 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         ttk.Label(
             form,
             text=(
-                "이 값들은 miniDU_callhome.sh 실행 시 환경변수로 전달됩니다 (예: LOG_PATH, NETCONF_PORT). "
+                "이 값들은 miniDU_callhome.sh 실행 시 환경변수로 전달됩니다 (예: LOG_PATH, CONN_DELAY). "
+                "CONN_DELAY·POST_LISTEN_WAIT 를 줄이면 Start 접속이 빨라집니다 (불안정하면 CONN_DELAY=2~3). "
+                "NP2_BOOT_WAIT: netopeer2-cli 기동 후 verb 전 추가 대기 (기본 2s). "
+                "NP2_YANG_WAIT: 첫 기동 YANG 로딩 최대 대기 (기본 90s). "
+                "LOGIN_WAIT_SEC: RU Call Home·로그인 대기 (기본 120s). "
                 "CLI-ID/CLI-PW·ALLOWED_IP 등은 장비·자동화 스크립트에서 참조할 수 있습니다. "
                 "Server NIC: miniDU fronthaul (ethping -i, 예: dasan). "
                 "Conformance 3.1.13.1 등에서는 항목 설정의 Server NIC에도 동일 값을 넣을 수 있습니다."
@@ -983,7 +1013,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         ttk.Checkbutton(btn_frame, text="Auto XML Send", variable=self.auto_xml_send_var).pack(side="left", padx=10)
         ttk.Checkbutton(
             btn_frame,
-            text="Auto Start (after manual Start: retry every 10s if failed/disconnected)",
+            text="Auto reconnect on disconnect (until Stop)",
             variable=self.auto_start_var,
             command=self._on_auto_start_toggled,
         ).pack(side="left", padx=10)
@@ -1169,6 +1199,109 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             except tk.TclError:
                 pass
 
+    def _append_session_log_tail(self, text: str) -> None:
+        if not text or not self.is_running:
+            return
+        with self.log_lock:
+            self._recent_log_for_session += text
+            if len(self._recent_log_for_session) > 128_000:
+                self._recent_log_for_session = self._recent_log_for_session[-128_000:]
+
+    @staticmethod
+    def _recent_session_log_chunk(tail: str, *, max_chars: int = 4500, max_lines: int = 30) -> str:
+        if not tail:
+            return ""
+        lines = tail.splitlines()
+        if len(lines) > max_lines:
+            lines = lines[-max_lines:]
+        chunk = "\n".join(lines)
+        if len(chunk) > max_chars:
+            chunk = chunk[-max_chars:]
+        return chunk
+
+    @staticmethod
+    def _log_indicates_session_alive(upper: str) -> bool:
+        """True only when supervision/login is actively working — not generic rpc-reply."""
+        if not upper:
+            return False
+        if any(
+            m in upper
+            for m in (
+                "SUPERVISION RESET SUCCESSFUL",
+                "HEARTBEAT SUCCESSFUL, SESSION ALIVE",
+                "LOGIN SUCCESSFUL",
+            )
+        ):
+            return True
+        if "AUTHENTICATION SUCCESSFUL" in upper and "SUPERVISION ACTIVE" in upper:
+            return True
+        return False
+
+    @staticmethod
+    def _log_indicates_minidu_reconnect_cycle(upper: str) -> bool:
+        """miniDU is already reconnecting internally — not a new user-visible disconnect."""
+        if not upper:
+            return False
+        return any(
+            m in upper
+            for m in (
+                "RECONNECTING IN",
+                "CALL HOME SESSION ROUND",
+                "NETOPEER2-CLI BOOT WAIT",
+                "LOGIN NOT ESTABLISHED THIS ROUND",
+                "WAITING FOR CLIENT CONNECTION",
+                "STARTING CALLHOME LISTENER",
+                "NETOPEER2-CLI 세션 종료",
+                "CLOSE-SESSION",
+            )
+        )
+
+    @classmethod
+    def _log_indicates_session_lost(cls, upper: str, *, recent_only: str = "") -> bool:
+        """Session lost: active NETCONF ended or supervision failed (ORU reboot)."""
+        recent = (recent_only or upper).upper()
+        if cls._log_indicates_session_alive(recent):
+            return False
+        if cls._log_indicates_minidu_reconnect_cycle(recent):
+            return False
+
+        if any(
+            m in recent
+            for m in (
+                "NETOPEER2-CLI 프로세스 종료",
+                "NETOPEER2-CLI DIED",
+                "NETOPEER2-CLI EXITED",
+                "NETCONF SESSION ENDED",
+                "M-PLANE ACTIVATION END",
+                "MAX SESSION ERRORS",
+            )
+        ):
+            return True
+
+        if "BOTH SUPERVISION RESET AND HEARTBEAT FAILED" in recent:
+            return True
+
+        if "SUPERVISION RESET TIMEOUT" in recent:
+            after_timeout = recent.split("SUPERVISION RESET TIMEOUT")[-1]
+            if not cls._log_indicates_session_alive(after_timeout):
+                return True
+
+        return False
+
+    def _update_session_activity_from_log(self, text: str) -> None:
+        upper = text.upper()
+        if any(
+            m in upper
+            for m in (
+                "SUPERVISION RESET SUCCESSFUL",
+                "HEARTBEAT SUCCESSFUL, SESSION ALIVE",
+                "AUTHENTICATION SUCCESSFUL",
+                "ACCEPTED A CONNECTION ON",
+                "SUPERVISION ACTIVE",
+            )
+        ):
+            self._last_session_activity_mono = time.monotonic()
+
     def _cancel_session_watch(self) -> None:
         jid = self._session_watch_job
         self._session_watch_job = None
@@ -1187,17 +1320,67 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self._session_watch_job = None
         if not self.is_running:
             return
-        if self.session_established and self.manual_send_ready:
+        if self._user_stop_requested:
             return
-        self._session_watch_rounds += 1
-        if self._session_watch_rounds > 100:
+
+        ch = self.paramiko_channel
+        if ch is not None and getattr(ch, "closed", False):
+            self._handle_transport_ended("ssh channel closed (watch)", -1)
             return
+        client = self.paramiko_client
+        if client is not None:
+            try:
+                tr = client.get_transport()
+                if tr is None or not tr.is_active():
+                    self._handle_transport_ended("ssh transport inactive (watch)", -1)
+                    return
+            except Exception:
+                self._handle_transport_ended("ssh transport error (watch)", -1)
+                return
+        proc = self.proc
+        if proc is not None and proc.poll() is not None:
+            rc = proc.returncode if proc.returncode is not None else -1
+            self._handle_transport_ended(f"process exited (watch rc={rc})", rc)
+            return
+
         with self.log_lock:
             tail = self._recent_log_for_session
         if tail:
-            self._detect_session_established(tail[-24_000:])
-        if self.session_established and self.manual_send_ready:
-            return
+            tail_slice = tail[-32_000:]
+            recent = self._recent_session_log_chunk(tail_slice)
+            self._update_session_activity_from_log(recent)
+            self._detect_session_lost(recent)
+            if not (self.session_established and self.manual_send_ready):
+                self._detect_session_established(tail_slice)
+
+        if (
+            getattr(self, "_session_lost_logged", False)
+            and not self.session_established
+            and self._session_lost_at_mono > 0
+            and (time.monotonic() - self._session_lost_at_mono) > self._session_lost_force_reconnect_sec
+            and not self._transport_reconnect_pending
+        ):
+            if self._conformance_run_busy or self._conformance_stop_idle_wait:
+                self.append_log(
+                    "[GUI] NETCONF session still down during Conformance run — "
+                    "will retry Start after tests finish (or click Stop).\n"
+                )
+                self._session_lost_at_mono = time.monotonic()
+            elif self.auto_start_var.get():
+                with self.log_lock:
+                    tail_chk = self._recent_log_for_session[-8000:]
+                if self._log_indicates_minidu_reconnect_cycle(tail_chk.upper()):
+                    self._session_lost_at_mono = time.monotonic()
+                else:
+                    self.append_log(
+                        f"[GUI] Session lost >{int(self._session_lost_force_reconnect_sec)}s — forcing Start reconnect.\n"
+                    )
+                    self._handle_transport_ended("session lost timeout (watch)", -1)
+                    return
+
+        self._session_watch_rounds += 1
+        if self._session_watch_rounds > 500:
+            self._session_watch_rounds = 0
         self._session_watch_job = self.after(2500, self._session_watch_tick)
 
     def _build_mplane_cc_sheet(self, parent: ttk.Widget) -> None:
@@ -1487,6 +1670,9 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
 
         inner = ttk.Frame(canv, padding=2)
         win_id = canv.create_window((0, 0), window=inner, anchor="nw")
+        self.mplane_scroll_wrap = scroll_wrap
+        self.mplane_scroll_canvas = canv
+        self.mplane_scroll_inner = inner
 
         def _on_inner_configure(_e: tk.Event | None = None) -> None:
             canv.configure(scrollregion=canv.bbox("all"))
@@ -1499,6 +1685,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             canv.itemconfigure(win_id, width=max(1, int(e.width)))
 
         canv.bind("<Configure>", _on_canvas_configure)
+        self._mplane_enable_mousewheel_scroll()
 
         # Control-Sheet edit grid is intentionally hidden.
         # Values are written back to Control-Sheet cells during Excel Save.
@@ -1537,6 +1724,77 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             text="Save / Apply / Conformance: M-Plane Control 탭(GUI)이 기준. xlsx는 Reload·보관용.",
             foreground="#64748b",
         ).pack(side="left", padx=14)
+
+    def _mplane_pointer_over_scroll_area(self, event: tk.Event | None = None) -> bool:
+        """True when the pointer is over the M-Plane table scroll canvas (or its children)."""
+        canv = self.mplane_scroll_canvas
+        wrap = self.mplane_scroll_wrap
+        if canv is None or wrap is None:
+            return False
+        try:
+            if event is not None and hasattr(event, "x_root") and hasattr(event, "y_root"):
+                w: Any = self.winfo_containing(int(event.x_root), int(event.y_root))
+            else:
+                x, y = self.winfo_pointerxy()
+                w = self.winfo_containing(x, y)
+        except Exception:
+            return False
+        while w is not None:
+            if w in (canv, wrap, self.mplane_scroll_inner):
+                return True
+            try:
+                w = w.master
+            except Exception:
+                break
+        return False
+
+    def _mplane_on_mousewheel(self, event: tk.Event) -> str | None:
+        """Scroll M-Plane tables with the mouse wheel while the pointer is over that area."""
+        if not self._mplane_pointer_over_scroll_area(event):
+            return None
+        canv = self.mplane_scroll_canvas
+        if canv is None:
+            return None
+        # Windows / macOS: event.delta; Linux often uses Button-4/5 separately.
+        delta = getattr(event, "delta", 0) or 0
+        if delta:
+            steps = int(-1 * (delta / 120))
+            if steps == 0:
+                steps = -1 if delta > 0 else 1
+            # Shift+wheel → horizontal scroll when content is wider than viewport.
+            state = int(getattr(event, "state", 0) or 0)
+            if state & 0x0001:  # Shift
+                canv.xview_scroll(steps, "units")
+            else:
+                canv.yview_scroll(steps, "units")
+            return "break"
+        return None
+
+    def _mplane_on_mousewheel_linux(self, event: tk.Event) -> str | None:
+        if not self._mplane_pointer_over_scroll_area(event):
+            return None
+        canv = self.mplane_scroll_canvas
+        if canv is None:
+            return None
+        num = int(getattr(event, "num", 0) or 0)
+        state = int(getattr(event, "state", 0) or 0)
+        steps = -1 if num == 4 else 1 if num == 5 else 0
+        if steps == 0:
+            return None
+        if state & 0x0001:
+            canv.xview_scroll(steps, "units")
+        else:
+            canv.yview_scroll(steps, "units")
+        return "break"
+
+    def _mplane_enable_mousewheel_scroll(self) -> None:
+        """Bind wheel once; works for nested Entry cells created after Reload."""
+        if self._mplane_wheel_bound:
+            return
+        self.bind_all("<MouseWheel>", self._mplane_on_mousewheel, add="+")
+        self.bind_all("<Button-4>", self._mplane_on_mousewheel_linux, add="+")
+        self.bind_all("<Button-5>", self._mplane_on_mousewheel_linux, add="+")
+        self._mplane_wheel_bound = True
 
     def _mplane_browse_workbook(self) -> None:
         p = filedialog.askopenfilename(filetypes=[("Excel workbook", "*.xlsx"), ("All files", "*.*")])
@@ -2169,6 +2427,14 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.bind_all("<Control-C>", self._mplane_on_global_copy, add="+")
         self.bind_all("<Control-v>", self._mplane_on_global_paste, add="+")
         self.bind_all("<Control-V>", self._mplane_on_global_paste, add="+")
+        canv = self.mplane_scroll_canvas
+        if canv is not None:
+            try:
+                canv.update_idletasks()
+                canv.configure(scrollregion=canv.bbox("all"))
+                canv.yview_moveto(0)
+            except Exception:
+                pass
         self._dbg_mplane("render_done")
 
     def _mplane_apply_off_row_styles(self) -> None:
@@ -2899,6 +3165,10 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 new_xml, ws = mp.apply_full_table_to_rpc(xml, sheet, headers, rows)
             rpc[sheet] = new_xml
             warns.extend(ws)
+        for sheet in ("PDSCH", "PUSCH", "PRACH"):
+            body = (rpc.get(sheet) or "").strip()
+            if body:
+                rpc[sheet] = mp.normalize_uplane_rpc_element_order(body, sheet)
         return warns
 
     @staticmethod
@@ -2941,6 +3211,11 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 new_xml, ws = mp.apply_full_table_to_rpc(xml, sheet, headers, rows)
             rpc[sheet] = new_xml
             warns.extend(ws)
+
+        for sheet in ("PDSCH", "PUSCH", "PRACH"):
+            body = (rpc.get(sheet) or "").strip()
+            if body:
+                rpc[sheet] = mp.normalize_uplane_rpc_element_order(body, sheet)
 
         return warns
 
@@ -4328,10 +4603,10 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         return re.sub(r"[\x00-\x08\x0b-\x1f\x7f]", "", text)
 
     @staticmethod
-    def _pretty_xml_if_possible(line: str) -> str:
-        raw = line.strip()
-        if not (raw.startswith("<") and raw.endswith(">")):
-            return line
+    def _pretty_xml_if_possible(text: str) -> str:
+        raw = text.strip()
+        if not raw.startswith("<"):
+            return text
         try:
             pretty = xml.dom.minidom.parseString(raw).toprettyxml(indent="  ")
             pretty = "\n".join(
@@ -4339,18 +4614,107 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             )
             return pretty + "\n"
         except Exception:
-            return line
+            return text if text.endswith("\n") else text + "\n"
+
+    def _format_rpc_exchange_xml(self, blob: str) -> str:
+        """Pretty-print rpc + rpc-reply inside one NETCONF RPC exchange block."""
+        # Drop netopeer/libssh noise that may have leaked into the capture window.
+        cleaned_lines: list[str] = []
+        for ln in blob.splitlines():
+            if self._should_hide_line(ln + "\n"):
+                continue
+            cleaned_lines.append(ln)
+        blob = "\n".join(cleaned_lines).strip()
+        if not blob:
+            return ""
+        limit = self._max_log_pretty_chars
+        m = re.search(r"</rpc\s*>", blob, flags=re.IGNORECASE)
+        pieces: list[str] = []
+        if m:
+            head = blob[: m.end()].strip()
+            tail = blob[m.end() :].strip()
+            if head:
+                pieces.append(head)
+            if tail:
+                pieces.append(tail)
+        else:
+            pieces = [blob]
+        out: list[str] = []
+        for piece in pieces:
+            if not piece:
+                continue
+            if len(piece) <= limit:
+                out.append(self._pretty_xml_if_possible(piece))
+            else:
+                out.append(piece if piece.endswith("\n") else piece + "\n")
+        return "".join(out)
 
     def _should_hide_line(self, line: str) -> bool:
         line_upper = line.upper()
         stripped_upper = line_upper.lstrip()
 
-        # Never hide GUI orchestration / Conformance-runner lines (these are not NETCONF XML).
-        if stripped_upper.startswith("[GUI]"):
-            return False
+        # Strip GUI / Conformance prefixes so content rules still apply.
+        content_upper = stripped_upper
+        for pref in (
+            "[CONFORMANCE-RUN] ",
+            "[CONFORMANCE-SYNC] ",
+            "[CONFORMANCE] ",
+            "[CONFORMANCE-DEBUG] ",
+            "[GUI] ",
+        ):
+            if content_upper.startswith(pref):
+                content_upper = content_upper[len(pref) :].lstrip()
+                break
+
+        # Drop netopeer2 / libssh DEBUG·VERBOSE noise (and SSH packet chatter).
+        # Also catch concatenated lines like "...packet type 94[GUI] ..."
+        if (
+            "NC DEBUG:" in line_upper
+            or "NC VERBOSE:" in line_upper
+            or content_upper.startswith("NC DEBUG:")
+            or content_upper.startswith("NC VERBOSE:")
+            or content_upper.startswith("DEBUG:")
+            or content_upper.startswith("VERBOSE:")
+            or "SSH_PACKET_" in line_upper
+            or "SSH_SOCKET_" in line_upper
+            or "SSH_CHANNEL_" in line_upper
+            or "CHANNEL_RCV_DATA" in line_upper
+            or "CHANNEL_DEFAULT_BUFFERIZE" in line_upper
+            or "CHANNEL_WRITE_COMMON" in line_upper
+            or "CHANNEL WINDOWS ARE NOW" in line_upper
+            or "PACKET_SEND2" in line_upper
+            or "BYTES LEFT IN SOCKET BUFFER" in line_upper
+            or "DISPATCHING HANDLER FOR PACKET TYPE" in line_upper
+            or "SSH_PACKET_NEED_REKEY" in line_upper
+            or "SSH_PACKET_SOCKET_CALLBACK" in line_upper
+            or "SSH_PACKET_PROCESS" in line_upper
+            or "ENABLING POLLOUT FOR SOCKET" in line_upper
+            or content_upper.startswith("SENDING MESSAGE:")
+        ):
+            return True
+
+        # Hide [GUI] / [INFO] lines from the log window.
+        if (
+            stripped_upper.startswith("[GUI]")
+            or content_upper.startswith("[GUI]")
+            or "[GUI] NETCONF RPC EXCHANGE" in line_upper
+            or "[GUI] RPC REPLY VERDICT" in line_upper
+            or "[GUI] EDIT-CONFIG" in line_upper
+            or "[GUI] USER-RPC" in line_upper
+            or "[GUI] RAW RPC" in line_upper
+            or "[GUI] UPLOADED" in line_upper
+            or "[GUI] REUSED CACHED" in line_upper
+        ):
+            return True
+        if content_upper.startswith("[INFO]") or stripped_upper.startswith("[INFO]"):
+            return True
+
+        # Keep Conformance-runner / important verdict lines.
         if "[CONFORMANCE" in line_upper or "[CONFORMANCE-RUN]" in line_upper:
             return False
-        if stripped_upper.startswith(("[TRACE:", "[INFO]", "[WARN]", "[ERROR]", "[FAIL]", "[OK]")):
+        if stripped_upper.startswith(("[TRACE:", "[WARN]", "[ERROR]", "[FAIL]", "[OK]")):
+            return False
+        if content_upper.startswith(("[WARN]", "[ERROR]", "[FAIL]", "[OK]")):
             return False
         if "CLIENT SENT" in line_upper:
             return False
@@ -4360,7 +4724,14 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             return False
         if "AUTHENTICATION SUCCESSFUL" in line_upper or "ACCEPTED A CONNECTION ON" in line_upper:
             return False
-        if stripped_upper.strip() in ("OK", "NOK"):
+        if stripped_upper.strip() in ("OK", "NOK", "ERROR"):
+            return False
+        if re.search(
+            r"\b(ERROR-TAG|ERROR-MESSAGE|ERROR-TYPE|ERROR-SEVERITY|BAD-ELEMENT|BAD-ATTRIBUTE|OPERATION-FAILED)\b",
+            line_upper,
+        ):
+            return False
+        if re.match(r"^\s*(type|tag|severity|path|message)\s*:", line, flags=re.IGNORECASE):
             return False
 
         # Otherwise keep only NETCONF-centric lines (historic log filter behaviour).
@@ -4381,6 +4752,8 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "</RPC-ERROR",
             "<ERROR-",
             "</ERROR-",
+            "<BAD-ELEMENT",
+            "<BAD-ATTRIBUTE",
             "<ALARM-NOTIF",
             "</ALARM-NOTIF",
             "<FAULT-",
@@ -4456,16 +4829,49 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
 
     def append_log(self, line: str) -> None:
         t0 = time.perf_counter()
+        line = self._log_stream_carry + line
+        self._log_stream_carry = ""
+        if not line:
+            return
+        # Paramiko/tail can split one long <rpc-reply> line across reads; buffer until newline.
+        if not line.endswith("\n"):
+            last_nl = line.rfind("\n")
+            if last_nl < 0:
+                self._log_stream_carry = line
+                return
+            self._log_stream_carry = line[last_nl + 1 :]
+            line = line[: last_nl + 1]
+
         line = self._sanitize_log_text(line)
         if not line:
             return
 
         kept_parts: list[str] = []
         for part in line.splitlines(keepends=True):
+            part_u = part.upper()
+            if "[GUI] NETCONF RPC EXCHANGE BEGIN" in part_u:
+                self._rpc_exchange_collecting = True
+                self._rpc_exchange_buf = []
+                # Do not show the [GUI] begin marker.
+                continue
+            if self._rpc_exchange_collecting:
+                if "[GUI] NETCONF RPC EXCHANGE END" in part_u:
+                    if self._rpc_exchange_buf:
+                        formatted = self._format_rpc_exchange_xml("".join(self._rpc_exchange_buf))
+                        if formatted:
+                            kept_parts.append(formatted)
+                        self._rpc_exchange_buf = []
+                    self._rpc_exchange_collecting = False
+                    # Do not show the [GUI] end marker (may be glued onto a DEBUG line).
+                    continue
+                # Filter DEBUG/noise while collecting the exchange window.
+                if self._should_hide_line(part):
+                    continue
+                self._rpc_exchange_buf.append(part)
+                continue
             if self._should_hide_line(part):
                 continue
             p = part
-            # Keep NETCONF payload readable with lightweight pretty-print.
             s = p.strip()
             su = s.upper()
             if len(s) <= self._max_log_pretty_chars and s.startswith("<") and any(
@@ -4476,6 +4882,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                     "<NOTIFICATION",
                     "<DATA",
                     "<HELLO",
+                    "<EDIT-CONFIG",
                 )
             ):
                 p = self._pretty_xml_if_possible(s)
@@ -4485,11 +4892,16 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             return
         merged = "".join(kept_parts)
         self._register_rpc_error_summary(merged)
+        self._detect_remote_start_failure(merged)
+        if self.is_running and not self._user_stop_requested:
+            self._update_session_activity_from_log(merged)
+            self._detect_session_lost(merged)
+            self._detect_session_established(merged)
         with self.log_lock:
             self.log_buffer.append(merged)
             self._recent_log_for_session += merged
-            if len(self._recent_log_for_session) > 96_000:
-                self._recent_log_for_session = self._recent_log_for_session[-96_000:]
+            if len(self._recent_log_for_session) > 128_000:
+                self._recent_log_for_session = self._recent_log_for_session[-128_000:]
         self._perf_record("append_log", time.perf_counter() - t0)
 
     def _flush_log_buffer(self) -> None:
@@ -4587,6 +4999,9 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         with self.log_lock:
             self.log_buffer.clear()
             self.hidden_log_chunks.clear()
+            self._log_stream_carry = ""
+            self._rpc_exchange_collecting = False
+            self._rpc_exchange_buf = []
         self.rpc_error_items.clear()
         self.rpc_error_seen.clear()
         self._refresh_rpc_error_summary_widget()
@@ -4687,6 +5102,8 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 else ""
             ),
             "conformance_checked": {k: bool(v.get()) for k, v in self.conformance_check_vars.items()},
+            "conformance_reboot_checked": {k: bool(v.get()) for k, v in self.conformance_reboot_vars.items()},
+            "conformance_reboot_wait_sec": self.conformance_reboot_wait_var.get(),
             "conformance_run_remote_dir": self.conformance_run_remote_dir_var.get(),
             "conformance_run_sw_pkg": self.conformance_run_sw_pkg_var.get(),
             "conformance_run_sw_remote_dir": self.conformance_run_sw_remote_dir_var.get(),
@@ -4782,6 +5199,20 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 bv = self.conformance_check_vars.get(str(fname))
                 if bv is not None:
                     bv.set(bool(val))
+        conf_rb = data.get("conformance_reboot_checked")
+        if isinstance(conf_rb, dict) and self.conformance_reboot_vars:
+            for fname, val in conf_rb.items():
+                bv = self.conformance_reboot_vars.get(str(fname))
+                if bv is not None:
+                    bv.set(bool(val))
+        crw = data.get("conformance_reboot_wait_sec")
+        if isinstance(crw, str) and crw.strip():
+            self.conformance_reboot_wait_var.set(crw.strip())
+        elif crw is not None:
+            try:
+                self.conformance_reboot_wait_var.set(str(int(crw)))
+            except (TypeError, ValueError):
+                pass
         self._conformance_apply_last_run_from_config(data.get("conformance_last_run"))
         self._conformance_apply_final_results_from_config(data.get("conformance_final_results"))
         crd = data.get("conformance_run_remote_dir")
@@ -5051,16 +5482,26 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.is_running = running
         self.start_btn.config(state="disabled" if running else "normal")
         self.stop_btn.config(state="normal" if running else "disabled")
-        self.status_var.set("Running" if running else "Idle")
-        if not running:
+        if running:
+            self.status_var.set("Running")
+            self._transport_reconnect_pending = False
+            self._session_lost_logged = False
+        else:
             self.session_established = False
             self.manual_send_ready = False
             self.auto_xml_send_done = False
             self._conformance_auto_sync_scheduled = False
             self._cancel_session_watch()
+            if self._user_stop_requested:
+                self.status_var.set("Idle")
+            elif self.auto_start_var.get():
+                self.status_var.set("Reconnecting...")
+                self.start_btn.config(state="disabled")
+                self.stop_btn.config(state="normal")
+                self.after(400, self._enqueue_auto_restart_if_configured)
+            else:
+                self.status_var.set("Idle")
         self._sync_manual_send_widgets()
-        if not running:
-            self.after(300, self._enqueue_auto_restart_if_configured)
         self.after(0, self._refresh_log_target_hint_line)
 
     def manual_start_script(self) -> None:
@@ -5095,7 +5536,11 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.session_established = False
         self.manual_send_ready = False
         self.auto_xml_send_done = False
+        self._remote_start_failed_handled = False
         self._conformance_auto_sync_scheduled = False
+        self._transport_reconnect_pending = False
+        self._session_lost_logged = False
+        self._session_lost_at_mono = 0.0
         with self.log_lock:
             self._recent_log_for_session = ""
         self._set_running(True)
@@ -5119,31 +5564,28 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 pass
 
     def _enqueue_auto_restart_if_configured(self) -> None:
-        auto_on = bool(self.auto_start_var.get())
         if self._conformance_run_busy or self._conformance_stop_idle_wait:
-            if auto_on:
-                self._conformance_dbg(
-                    f"auto_start: 스킵 (busy={self._conformance_run_busy} stop_idle_wait={self._conformance_stop_idle_wait})"
-                )
             return
         if self.is_running:
             return
-        if not auto_on:
-            return
         if self._user_stop_requested:
-            self._conformance_dbg("auto_start: 스킵 (_user_stop_requested — 마지막 Stop이 사용자 요청)")
+            return
+        if getattr(self, "_remote_start_failed_handled", False):
+            return
+        if not self.auto_start_var.get():
+            self.append_log("[GUI] Auto-reconnect disabled (uncheck setting or click Stop).\n")
+            self.status_var.set("Idle")
+            self.start_btn.config(state="normal")
+            self.stop_btn.config(state="disabled")
             return
         if self.proc is not None and self.proc.poll() is None:
-            self._conformance_dbg("auto_start: 스킵 (subprocess 아직 실행 중)")
             return
         ch = self.paramiko_channel
         if ch is not None and not getattr(ch, "closed", False):
-            self._conformance_dbg("auto_start: 스킵 (paramiko 채널 아직 열림)")
             return
         self._cancel_auto_start_retry_job()
         sec = max(1, self._auto_restart_delay_ms // 1000)
-        self._conformance_dbg(f"auto_start: {sec}s 후 Start 재시도 예약")
-        self.append_log(f"[GUI] Auto-start: will retry Start in {sec}s (until Stop or unchecked).\n")
+        self.append_log(f"[GUI] Auto-reconnect: retry Start in {sec}s (Stop to cancel).\n")
         self._auto_start_retry_job = self.after(self._auto_restart_delay_ms, self._fire_auto_start_retry_tick)
 
     def _fire_auto_start_retry_tick(self) -> None:
@@ -5161,7 +5603,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         pch = self.paramiko_channel
         if pch is not None and not getattr(pch, "closed", False):
             return
-        self.append_log("[GUI] Auto-start: retrying...\n")
+        self.append_log("[GUI] Auto-reconnect: retrying Start...\n")
         self.start_script()
 
     def _on_auto_start_toggled(self) -> None:
@@ -5220,10 +5662,15 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 self.after(0, self._set_running, False)
                 return
 
+            # 이전 miniDU/netopeer·stale lock 정리 후 Start (flock 충돌·sleep infinity 방지)
+            self._cleanup_remote_daemons_blocking(
+                reason="pre-start", include_start_script=True, timeout_s=12.0
+            )
+
             exports = " ".join(
                 f"{k}={shlex.quote(v)}" for k, v in field_values.items() if v != ""
             )
-            remote_cmd = f"{exports} bash {shlex.quote(remote_script)}"
+            remote_cmd = f"{exports} exec bash {shlex.quote(remote_script)}"
             ch_port_probe = (field_values.get("CALLHOME_PORT") or field_values.get("PORT") or "4334").strip() or "4334"
             product_probe = (field_values.get("PRODUCT") or "").strip()
             use_password = bool(ssh_password)
@@ -5288,7 +5735,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
     ) -> None:
         # Start 직후 무출력/정지처럼 보일 때 원격 상태를 즉시 보여준다.
         self.after(0, self.append_log, "[POSTCHECK] worker started.\n")
-        time.sleep(6)
+        time.sleep(2)
         try:
             import paramiko  # type: ignore
         except Exception:
@@ -5398,8 +5845,8 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             return
         pending: list[str] = []
         last_flush = time.monotonic()
-        coalesce_sec = 0.1
-        coalesce_chars = 6144
+        coalesce_sec = 0.08
+        coalesce_max_chars = 262144
 
         def _flush_paramiko_log(*, force: bool = False) -> None:
             nonlocal pending, last_flush
@@ -5407,8 +5854,13 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             blob = "".join(pending)
             if not blob:
                 return
-            if not force and (now - last_flush) < coalesce_sec and len(blob) < coalesce_chars:
-                return
+            if not force:
+                elapsed = now - last_flush
+                has_nl = "\n" in blob
+                if not has_nl and len(blob) < coalesce_max_chars and elapsed < 0.35:
+                    return
+                if has_nl and elapsed < coalesce_sec and len(blob) < coalesce_max_chars:
+                    return
             pending.clear()
             last_flush = now
             self.after(0, lambda b=blob: self.append_log(b))
@@ -5420,6 +5872,9 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                     data = ch.recv(4096).decode(errors="ignore")
                     if data:
                         had_data = True
+                        self._append_session_log_tail(data)
+                        self._update_session_activity_from_log(data)
+                        self._detect_session_lost(data)
                         self._detect_session_established(data)
                         pending.append(data)
                         _flush_paramiko_log(force=False)
@@ -5427,6 +5882,9 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                     data = ch.recv_stderr(4096).decode(errors="ignore")
                     if data:
                         had_data = True
+                        self._append_session_log_tail(data)
+                        self._update_session_activity_from_log(data)
+                        self._detect_session_lost(data)
                         self._detect_session_established(data)
                         pending.append(data)
                         _flush_paramiko_log(force=False)
@@ -5437,9 +5895,52 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                     time.sleep(0.05)
         except Exception as exc:
             _flush_paramiko_log(force=True)
-            self.after(0, self.append_log, f"\n[GUI] Output read error: {exc}\n")
+            self.after(0, lambda e=exc: self._handle_transport_ended(f"ssh read error: {e}", -1))
             return
         _flush_paramiko_log(force=True)
+
+    def _handle_transport_ended(self, reason: str, rc: int = 0) -> None:
+        """SSH/subprocess transport lost while Start active — schedule GUI-side reconnect."""
+        if self._user_stop_requested:
+            if self.is_running:
+                self.append_log(f"\n[GUI] Process exited with code {rc}\n")
+                self._set_running(False)
+            return
+        if self._transport_reconnect_pending:
+            return
+        if not self.is_running:
+            return
+        self._transport_reconnect_pending = True
+        self.stop_event.set()
+        ch = self.paramiko_channel
+        if ch is not None:
+            try:
+                ch.close()
+            except Exception:
+                pass
+        if self.paramiko_client is not None:
+            try:
+                self.paramiko_client.close()
+            except Exception:
+                pass
+        self.paramiko_channel = None
+        self.paramiko_client = None
+        proc = self.proc
+        if proc is not None and proc.poll() is None:
+            try:
+                if os.name == "nt":
+                    proc.send_signal(signal.CTRL_BREAK_EVENT)
+                else:
+                    proc.terminate()
+            except Exception:
+                pass
+        self.proc = None
+        self.append_log(f"\n[GUI] Connection lost: {reason} (rc={rc}).\n")
+        if self.auto_start_var.get():
+            self._cleanup_remote_daemons_async(
+                reason=f"auto-reconnect prep ({reason})", include_start_script=True
+            )
+        self._set_running(False)
 
     def _watch_paramiko_channel(self) -> None:
         ch = self.paramiko_channel
@@ -5461,19 +5962,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 time.sleep(0.2)
         except Exception:
             rc = -1
-        self.after(0, self.append_log, f"\n[GUI] Process exited with code {rc}\n")
-        try:
-            ch.close()
-        except Exception:
-            pass
-        if self.paramiko_client is not None:
-            try:
-                self.paramiko_client.close()
-            except Exception:
-                pass
-        self.paramiko_channel = None
-        self.paramiko_client = None
-        self.after(0, self._set_running, False)
+        self.after(0, lambda r=rc: self._handle_transport_ended("ssh channel ended", r))
 
     def _read_output(self) -> None:
         if self.proc is None or self.proc.stdout is None:
@@ -5481,6 +5970,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         for line in self.proc.stdout:
             if self.stop_event.is_set():
                 break
+            self._detect_session_lost(line)
             self._detect_session_established(line)
             self.after(0, self.append_log, line)
 
@@ -5488,9 +5978,8 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         if self.proc is None:
             return
         rc = self.proc.wait()
-        self.after(0, self.append_log, f"\n[GUI] Process exited with code {rc}\n")
-        self.after(0, self._set_running, False)
         self.proc = None
+        self.after(0, lambda r=rc: self._handle_transport_ended("local ssh process ended", r))
 
     def stop_script(self) -> None:
         self._user_stop_requested = True
@@ -5548,11 +6037,13 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             parts.append(f"pkill -TERM -f {sq} 2>/dev/null || true")
             parts.append(_w)
             parts.append(f"pkill -KILL -f {sq} 2>/dev/null || true")
+            parts.append("rm -f /var/tmp/netconf_tmp/miniDU_callhome.lock")
         parts.extend(
             [
                 "pkill -TERM -f netopeer2-cli 2>/dev/null || true",
                 _w,
                 "pkill -KILL -f netopeer2-cli 2>/dev/null || true",
+                "rm -f /var/tmp/netconf_tmp/miniDU_callhome.lock",
                 "exit 0",
             ]
         )
@@ -5666,6 +6157,70 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             except Exception:
                 pass
 
+    def _detect_remote_start_failure(self, text: str) -> None:
+        if not self.is_running:
+            return
+        u = text.upper()
+        if "MINIDU_CALLHOME.SH ALREADY RUNNING" in u.replace("-", "_"):
+            self._flag_remote_start_failed("miniDU lock/flock — Stop 후 Start 하세요.")
+            return
+        if "ANOTHER MINIDU_CALLHOME.SH INSTANCE" in u.replace("-", "_"):
+            self._flag_remote_start_failed("원격 miniDU가 이미 실행 중입니다 — Stop 후 Start 하세요.")
+
+    def _flag_remote_start_failed(self, msg: str) -> None:
+        if getattr(self, "_remote_start_failed_handled", False):
+            return
+        self._remote_start_failed_handled = True
+
+        def _apply() -> None:
+            self.append_log(f"[GUI] Start failed: {msg}\n")
+            self._set_running(False)
+            try:
+                messagebox.showerror("Start failed", msg)
+            except Exception:
+                pass
+
+        self.after(0, _apply)
+
+    def _detect_session_lost(self, text: str) -> None:
+        if not self.is_running or self._user_stop_requested:
+            return
+        if not (self.session_established or self.manual_send_ready):
+            return
+        recent = self._recent_session_log_chunk(text)
+        upper = recent.upper()
+        if not self._log_indicates_session_lost(upper, recent_only=upper):
+            return
+        self.session_established = False
+        self.manual_send_ready = False
+        self.auto_xml_send_done = False
+        self.after(0, self._sync_manual_send_widgets)
+        if not self._session_lost_logged:
+            self._session_lost_logged = True
+            self._session_lost_at_mono = time.monotonic()
+            self.after(
+                0,
+                self.append_log,
+                "[GUI] NETCONF session lost — remote script reconnecting; waiting for login...\n",
+            )
+            self.after(0, lambda: self.status_var.set("Session lost — waiting..."))
+        self._schedule_session_watch()
+
+    def _maybe_reconnect_start_after_conformance(self) -> None:
+        """Conformance run ended while Start session was lost — retry if auto-reconnect is on."""
+        if not getattr(self, "_session_lost_logged", False):
+            return
+        if self.session_established and self.manual_send_ready:
+            return
+        if not self.is_running or self._user_stop_requested:
+            return
+        if self._transport_reconnect_pending:
+            return
+        if not self.auto_start_var.get():
+            return
+        self.append_log("[GUI] Conformance finished — forcing Start reconnect after session loss.\n")
+        self._handle_transport_ended("session lost after conformance", -1)
+
     def _detect_session_established(self, text: str) -> None:
         if self.session_established:
             upper = text.upper()
@@ -5685,9 +6240,17 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "SUPERVISION ACTIVE",
         ]
         if any(m in upper for m in markers):
+            if getattr(self, "_session_lost_logged", False):
+                # Planned Conformance reboot/reconnect must keep PASS/FAIL totals.
+                if not bool(getattr(self, "_conformance_run_busy", False)):
+                    self._conformance_reset_session_run_stats("ORU 재부팅/재연결")
             self.session_established = True
+            self._session_lost_logged = False
+            self._session_lost_at_mono = 0.0
+            self._last_session_activity_mono = time.monotonic()
             self.after(0, self.append_log, "[GUI] Session established detected. Netconf Client is available.\n")
             self.manual_send_ready = True
+            self.after(0, lambda: self.status_var.set("Running"))
             self.after(0, self._sync_manual_send_widgets)
             self.after(0, self.append_log, "[GUI] Manual send enabled.\n")
             # Conformance auto-upload disabled while tab is viewer-only
@@ -5926,7 +6489,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 cmd = self._upload_and_build_user_rpc_command(
                     stripped,
                     cache_kind="raw_custom_rpc",
-                    with_out=False,
+                    with_out=True,
                 )
                 self._perf_record("prepare_payload", time.perf_counter() - t0)
                 self.append_log(f"[GUI] RAW RPC custom(as-is) -> {cmd}\n")
@@ -6114,6 +6677,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                     self._perf_record("cfg_cache_hit", 0.0)
                 cmd = f"edit-config --target {target} --defop {defop} --config={remote_path}"
                 self.append_log(f"[GUI] RAW RPC -> {cmd}\n")
+                self.append_log(f"[GUI] edit-config config uploaded: {remote_path}\n")
                 return cmd
 
         try:
@@ -6154,6 +6718,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 raise RuntimeError(msg)
             cmd = f"edit-config --target {target} --defop {defop} --config={remote_path}"
             self.append_log(f"[GUI] RAW RPC -> {cmd}\n")
+            self.append_log(f"[GUI] edit-config config uploaded: {remote_path}\n")
             return cmd
 
         if op_name == "get-config":

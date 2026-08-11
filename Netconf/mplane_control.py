@@ -27,21 +27,92 @@ def normalize_header(s: str) -> str:
 
 
 def read_sheet_rpc_text(ws) -> str:
-    """Rebuild line-oriented RPC XML from worksheet (handles merged / multi-column rows)."""
+    """
+    Rebuild line-oriented RPC XML from worksheet.
+
+    - Joins multi-column XML fragments (e.g. ``<name>`` | ``1000`` | ``</name>``).
+    - Only uses the contiguous column band that actually contains ``<…>`` tags, so a
+      side table on the right (PDSCH/PUSCH grids) is not glued into the RPC text.
+    """
+    # Propagate merged-cell values to every cell in the merge range.
+    merge_fill: dict[tuple[int, int], Any] = {}
+    try:
+        for mr in getattr(ws, "merged_cells", None).ranges if getattr(ws, "merged_cells", None) else ():
+            top = ws.cell(mr.min_row, mr.min_col).value
+            if top is None:
+                continue
+            for r in range(mr.min_row, mr.max_row + 1):
+                for c in range(mr.min_col, mr.max_col + 1):
+                    merge_fill[(r, c)] = top
+    except Exception:
+        merge_fill = {}
+
+    rows = list(ws.iter_rows(values_only=False))
+    xml_cols: set[int] = set()
+    for row in rows:
+        if not row:
+            continue
+        for cell in row:
+            v = cell.value
+            if v is None:
+                v = merge_fill.get((cell.row, cell.column))
+            if v is None:
+                continue
+            s = str(v)
+            if s.startswith("="):
+                continue
+            if "<" in s:
+                xml_cols.add(int(cell.column))
+
+    # Include interstitial columns between leftmost/rightmost XML columns (split tag/value).
+    if xml_cols:
+        c0, c1 = min(xml_cols), max(xml_cols)
+        # Cap band width: fragments are usually within a few columns; wide bands are side tables.
+        if c1 - c0 > 8:
+            # Prefer the densest cluster of XML columns near the left.
+            sorted_cols = sorted(xml_cols)
+            best = (sorted_cols[0], sorted_cols[0])
+            best_n = 1
+            for i, start in enumerate(sorted_cols):
+                j = i
+                while j + 1 < len(sorted_cols) and sorted_cols[j + 1] - start <= 8:
+                    j += 1
+                n = j - i + 1
+                if n > best_n or (n == best_n and start < best[0]):
+                    best_n = n
+                    best = (start, sorted_cols[j])
+            c0, c1 = best[0], best[1]
+        use_cols = set(range(c0, c1 + 1))
+    else:
+        use_cols = None  # fallback: all columns
+
     lines: list[str] = []
-    for row in ws.iter_rows(values_only=True):
+    for row in rows:
         if not row:
             continue
         parts: list[str] = []
-        for c in row:
-            if c is None:
+        for cell in row:
+            if use_cols is not None and int(cell.column) not in use_cols:
+                continue
+            v = cell.value
+            if v is None:
+                v = merge_fill.get((cell.row, cell.column))
+            if v is None:
+                parts.append("")
+                continue
+            s = str(v)
+            # Uncalculated formula cache (data_only=True) leaves None; formula text is useless for RPC.
+            if s.startswith("="):
                 parts.append("")
             else:
-                parts.append(str(c))
+                parts.append(s)
         raw = "".join(parts)
-        # Preserve leading spaces (indentation); only trim trailing CR/LF artifacts.
-        if raw.strip():
-            lines.append(raw.rstrip())
+        if not raw.strip():
+            continue
+        # One Excel cell may hold several XML lines.
+        for piece in raw.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+            if piece.strip():
+                lines.append(piece.rstrip())
     return "\n".join(lines)
 
 
@@ -1089,6 +1160,7 @@ def apply_full_table_to_rpc(xml: str, kind: str, headers: list[str], rows: list[
             out, ok = replace_nth_tag(out, target_tag, val, base + i)
             if not ok:
                 warns.append(f"{kind}: could not replace <{target_tag}> index {base + i}")
+    out = normalize_uplane_rpc_element_order(out, kind)
     return out, warns
 
 
@@ -1506,7 +1578,7 @@ def _set_compression_leaf(block: str, tag: str, value: str) -> str:
 
 
 def _normalize_compression_block(block: str) -> str:
-    """Emit compression children in vendor order: type, iq-bitwidth, method, exponent."""
+    """Emit compression children in ACORN/Atom order: type, method, iq-bitwidth, exponent."""
     comp_pat = re.compile(r"<compression>\s*([\s\S]*?)</compression>", re.IGNORECASE)
     m = comp_pat.search(block)
     if not m:
@@ -1521,7 +1593,7 @@ def _normalize_compression_block(block: str) -> str:
         return (mm.group(1) or "").strip() if mm.lastindex else ""
 
     leaves: list[tuple[str, str]] = []
-    for tag in ("compression-type", "iq-bitwidth", "compression-method", "exponent"):
+    for tag in ("compression-type", "compression-method", "iq-bitwidth", "exponent"):
         val = _grab(tag)
         if val:
             leaves.append((tag, val))
@@ -1530,6 +1602,183 @@ def _normalize_compression_block(block: str) -> str:
     body = "".join(f"\n            <{tag}>{val}</{tag}>" for tag, val in leaves)
     new_comp = f"<compression>{body}\n          </compression>"
     return block[: m.start()] + new_comp + block[m.end() :]
+
+
+def _pop_first_element(xml: str, tag: str) -> tuple[str, str]:
+    """Remove and return the first complete ``<tag>…</tag>`` (or self-closing) fragment."""
+    pat = re.compile(
+        rf"<{re.escape(tag)}\b[^>]*>[\s\S]*?</{re.escape(tag)}>",
+        re.IGNORECASE | re.DOTALL,
+    )
+    m = pat.search(xml or "")
+    if m:
+        return m.group(0), (xml[: m.start()] + xml[m.end() :])
+    pat_sc = re.compile(rf"<{re.escape(tag)}\s*/>", re.IGNORECASE)
+    m2 = pat_sc.search(xml or "")
+    if m2:
+        return m2.group(0), (xml[: m2.start()] + xml[m2.end() :])
+    return "", xml or ""
+
+
+def _container_open_close(block: str, container_tag: str) -> tuple[str, str, str] | None:
+    m_open = re.search(rf"^(\s*<{re.escape(container_tag)}\b[^>]*>\s*)", block, re.IGNORECASE)
+    m_close = re.search(rf"(\s*</{re.escape(container_tag)}\s*>\s*)$", block, re.IGNORECASE)
+    if not m_open or not m_close:
+        return None
+    inner = block[m_open.end() : m_close.start()]
+    return m_open.group(1), inner, m_close.group(1)
+
+
+def _reorder_child_elements(block: str, container_tag: str, child_order: list[str]) -> str:
+    """Reorder direct children inside a container block (unknown children trail at end)."""
+    parsed = _container_open_close(block, container_tag)
+    if parsed is None:
+        return block
+    open_tok, inner, close_tok = parsed
+    frags: dict[str, str] = {}
+    remainder = inner
+    for tag in child_order:
+        frag, remainder = _pop_first_element(remainder, tag)
+        if frag:
+            frags[tag] = frag.strip()
+    extra = remainder.strip()
+    lines: list[str] = []
+    for tag in child_order:
+        if tag in frags:
+            lines.append(frags[tag])
+    if extra:
+        lines.append(extra)
+    if not lines:
+        return block
+    body = "\n".join(lines)
+    if body and not body.endswith("\n"):
+        body += "\n"
+    return f"{open_tok}{body}{close_tok}"
+
+
+_COMPRESSION_CHILD_ORDER = ["compression-type", "compression-method", "iq-bitwidth", "exponent"]
+_PRB_SCS_CHILD_ORDER = ["scs", "number-of-prb"]
+_UL_FFT_CHILD_ORDER = ["scs", "ul-fft-sampling-offset"]
+_EAXC_CHILD_ORDER = [
+    "o-du-port-bitmask",
+    "band-sector-bitmask",
+    "ccid-bitmask",
+    "ru-port-bitmask",
+    "eaxc-id",
+]
+_EP_CHILD_ORDER = [
+    "name",
+    "compression",
+    "frame-structure",
+    "cp-type",
+    "cp-length",
+    "cp-length-other",
+    "offset-to-absolute-frequency-center",
+    "number-of-prb-per-scs",
+    "ul-fft-sampling-offsets",
+    "e-axcid",
+]
+_TX_CARRIER_CHILD_ORDER = [
+    "name",
+    "absolute-frequency-center",
+    "center-of-channel-bandwidth",
+    "channel-bandwidth",
+    "active",
+    "type",
+    "downlink-radio-frame-offset",
+    "downlink-sfn-offset",
+    "gain",
+    "t-da-offset",
+]
+_RX_CARRIER_CHILD_ORDER = [
+    "name",
+    "absolute-frequency-center",
+    "center-of-channel-bandwidth",
+    "channel-bandwidth",
+    "active",
+    "type",
+    "n-ta-offset",
+    "t-au-offset",
+    "gain-correction",
+    "downlink-radio-frame-offset",
+    "downlink-sfn-offset",
+]
+_TX_LINK_CHILD_ORDER = ["name", "processing-element", "tx-array-carrier", "low-level-tx-endpoint"]
+_RX_LINK_CHILD_ORDER = ["name", "processing-element", "rx-array-carrier", "low-level-rx-endpoint"]
+
+
+def _normalize_endpoint_block(block: str, kind_u: str) -> str:
+    container = "low-level-tx-endpoints" if kind_u == "PDSCH" else "low-level-rx-endpoints"
+    order = list(_EP_CHILD_ORDER)
+    if kind_u == "PDSCH":
+        order = [t for t in order if t != "ul-fft-sampling-offsets"]
+    out = _reorder_child_elements(block, container, order)
+    out = _reorder_child_elements(out, "compression", _COMPRESSION_CHILD_ORDER)
+    out = _reorder_child_elements(out, "number-of-prb-per-scs", _PRB_SCS_CHILD_ORDER)
+    out = _reorder_child_elements(out, "ul-fft-sampling-offsets", _UL_FFT_CHILD_ORDER)
+    out = _reorder_child_elements(out, "e-axcid", _EAXC_CHILD_ORDER)
+    return _normalize_compression_block(out)
+
+
+def _normalize_carrier_block(block: str, kind_u: str) -> str:
+    container = "tx-array-carriers" if kind_u == "PDSCH" else "rx-array-carriers"
+    order = _TX_CARRIER_CHILD_ORDER if kind_u == "PDSCH" else _RX_CARRIER_CHILD_ORDER
+    return _reorder_child_elements(block, container, order)
+
+
+def _normalize_link_block(block: str, kind_u: str) -> str:
+    container = "low-level-tx-links" if kind_u == "PDSCH" else "low-level-rx-links"
+    order = _TX_LINK_CHILD_ORDER if kind_u == "PDSCH" else _RX_LINK_CHILD_ORDER
+    return _reorder_child_elements(block, container, order)
+
+
+def normalize_uplane_rpc_element_order(text: str, kind: str) -> str:
+    """
+    ACORN/Atom expects fixed child order per CC chunk:
+      endpoints → (carriers) → links, with compression type/method/iq-bitwidth inside endpoints.
+    """
+    raw = (text or "").strip()
+    if not raw:
+        return text
+    kind_u = kind.upper()
+    if kind_u == "PDSCH":
+        ep_tag, car_tag, link_tag = "low-level-tx-endpoints", "tx-array-carriers", "low-level-tx-links"
+        include_car = True
+    elif kind_u in ("PUSCH", "PRACH"):
+        ep_tag, car_tag, link_tag = "low-level-rx-endpoints", "rx-array-carriers", "low-level-rx-links"
+        include_car = kind_u == "PUSCH"
+    else:
+        return text
+
+    eps = [_normalize_endpoint_block(b, kind_u) for b in _extract_closed_blocks(raw, ep_tag)]
+    cars = [_normalize_carrier_block(b, kind_u) for b in _extract_closed_blocks(raw, car_tag)]
+    links = [_normalize_link_block(b, kind_u) for b in _extract_closed_blocks(raw, link_tag)]
+    if not eps and not cars and not links:
+        return text
+
+    spans: list[tuple[int, int]] = []
+    for tag in (ep_tag, car_tag, link_tag):
+        for m in _closed_block_pattern(tag).finditer(raw):
+            spans.append((m.start(), m.end()))
+    if not spans:
+        return text
+    spans.sort()
+    prefix = raw[: spans[0][0]]
+    suffix = raw[spans[-1][1] :]
+
+    n = max(len(eps), len(links), len(cars) if include_car else 0)
+    chunks: list[str] = []
+    for i in range(n):
+        if i < len(eps):
+            chunks.append(eps[i])
+        if include_car and i < len(cars):
+            chunks.append(cars[i])
+        if i < len(links):
+            chunks.append(links[i])
+    middle = "\n".join(chunks)
+    if middle and not middle.endswith("\n"):
+        middle += "\n"
+    return prefix + middle + suffix
 
 
 def _remove_compression_leaf(block: str, tag: str) -> str:
@@ -1903,6 +2152,7 @@ def apply_acorn_control_details_to_rpc(
     for j in range(len(new_link), len(link_blocks)):
         new_link.append(link_blocks[j])
     out = _replace_closed_blocks(out, link_blk, new_link)
+    out = normalize_uplane_rpc_element_order(out, kind)
     return out, warns
 
 
@@ -2104,29 +2354,66 @@ def ensure_cuplane_interface_fields(xml: str, live: dict[str, str]) -> str:
     if not ifname and not base and not vlan and not mac:
         return text
 
-    def _has_tag(tag: str, block: str) -> bool:
-        return bool(re.search(rf"<{re.escape(tag)}\b", block, flags=re.IGNORECASE))
+    def _extract_tag_block(tag: str, block: str) -> str | None:
+        m = re.search(
+            rf"<{re.escape(tag)}\b[^>]*>[\s\S]*?</{re.escape(tag)}\s*>",
+            block,
+            flags=re.IGNORECASE,
+        )
+        return m.group(0) if m else None
 
     def _patch_iface(m: re.Match[str]) -> str:
         open_part, body, close_part = m.group(1), m.group(2), m.group(3)
-        parts: list[str] = []
-        if ifname and not _has_tag("name", body):
-            parts.append(f"<name>{ifname}</name>")
-        if not _has_tag("type", body) and "l2vlan" not in body.lower():
-            parts.append(
-                '<type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:l2vlan</type>'
+        # Canonical order matching ACORN / netconf client templates:
+        # name → base-interface → vlan-id → mac-address → type → port-reference → …
+        name_blk = _extract_tag_block("name", body)
+        base_blk = _extract_tag_block("base-interface", body)
+        vlan_blk = _extract_tag_block("vlan-id", body)
+        mac_blk = _extract_tag_block("mac-address", body)
+        type_blk = _extract_tag_block("type", body)
+        port_blk = _extract_tag_block("port-reference", body)
+
+        def _empty_leaf(blk: str | None) -> bool:
+            if not blk:
+                return True
+            return bool(re.search(r">\s*<", blk))
+
+        if ifname and _empty_leaf(name_blk):
+            name_blk = f"<name>{ifname}</name>"
+        if base and _empty_leaf(base_blk):
+            base_blk = f'<base-interface xmlns="urn:o-ran:interfaces:1.0">{base}</base-interface>'
+        if vlan and _empty_leaf(vlan_blk):
+            vlan_blk = f'<vlan-id xmlns="urn:o-ran:interfaces:1.0">{vlan}</vlan-id>'
+        if mac and _empty_leaf(mac_blk):
+            mac_blk = f'<mac-address xmlns="urn:o-ran:interfaces:1.0">{mac}</mac-address>'
+        if _empty_leaf(type_blk) and "l2vlan" not in (body or "").lower():
+            type_blk = (
+                '<type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">'
+                "ianaift:l2vlan</type>"
             )
-        if base and not _has_tag("base-interface", body):
-            parts.append(
-                f'<base-interface xmlns="urn:o-ran:interfaces:1.0">{base}</base-interface>'
+
+        # Remove rebuilt leaves from remainder (keep any other children).
+        remainder = body
+        for tag in ("name", "base-interface", "vlan-id", "mac-address", "type", "port-reference"):
+            remainder = re.sub(
+                rf"\s*<{re.escape(tag)}\b[^>]*>[\s\S]*?</{re.escape(tag)}\s*>\s*",
+                "\n",
+                remainder,
+                count=1,
+                flags=re.IGNORECASE,
             )
-        if vlan and not _has_tag("vlan-id", body):
-            parts.append(f'<vlan-id xmlns="urn:o-ran:interfaces:1.0">{vlan}</vlan-id>')
-        if mac and not _has_tag("mac-address", body):
-            parts.append(f'<mac-address xmlns="urn:o-ran:interfaces:1.0">{mac}</mac-address>')
-        if parts:
-            body = "\n          " + "\n          ".join(parts) + body
-        return open_part + body + close_part
+        remainder = re.sub(r"\n{2,}", "\n", remainder).strip()
+
+        ordered: list[str] = []
+        for blk in (name_blk, base_blk, vlan_blk, mac_blk, type_blk, port_blk):
+            if blk:
+                ordered.append(blk)
+        if remainder:
+            ordered.append(remainder)
+        if not ordered:
+            return open_part + body + close_part
+        body2 = "\n          " + "\n          ".join(ordered) + "\n        "
+        return open_part + body2 + close_part
 
     return re.sub(
         r"(<interface>\s*)([\s\S]*?)(\s*</interface>)",
