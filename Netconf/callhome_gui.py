@@ -168,6 +168,26 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.remote_password = tk.StringVar(value="")
         self.remote_script_path = tk.StringVar(value="/var/tmp/miniDU_callhome.sh")
         self.remote_key_path = tk.StringVar(value="")
+        # Lab profiles (e.g. 10.0.20.x ↔ 10.0.60.x): named snapshots of network-related settings
+        self._profiles: dict[str, Any] = {}
+        self.profile_name_var = tk.StringVar(value="lab-20")
+        self.profile_combo: ttk.Combobox | None = None
+        self.field_notes_widget: tk.Text | None = None  # legacy; Guardrails tab replaced notes
+        self.guardrails_check_vars: dict[str, tk.BooleanVar] = {}
+        self.guardrails_result_vars: dict[str, tk.StringVar] = {}
+        self.guardrails_busy = False
+        self._guardrails_cancel = threading.Event()
+        self._guardrails_user_items: list[dict[str, str]] = []
+        self._guardrails_per_test_settings: dict[str, dict[str, str]] = {}
+        self.guardrails_list_tree: ttk.Treeview | None = None
+        self._guardrails_settings_item_id: str = "dhcp_v4"
+        self.guardrails_run_repeat_var = tk.StringVar(value="1")
+        self._guardrails_detail_by_id: dict[str, str] = {}
+        self._guardrails_detail_text: tk.Text | None = None
+        self.guardrails_detail_win_geometry = "900x520"
+        # VLAN Discovery: 시험 후 untag 원복을 미룬 경우 (버튼으로 추후 실행)
+        self._guardrails_vlan_restore_pending: dict[str, Any] | None = None
+        self.guardrails_vlan_restore_btn: ttk.Button | None = None
 
         self.fields: dict[str, tk.StringVar] = {}
         self.status_var = tk.StringVar(value="Idle")
@@ -896,11 +916,13 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         mplane_tab = ttk.Frame(self.notebook)
         conformance_tab = ttk.Frame(self.notebook)
         self._conformance_tab_frame = conformance_tab
+        field_notes_tab = ttk.Frame(self.notebook)
         shortcuts_tab = ttk.Frame(self.notebook)
         self.notebook.add(settings_tab, text="Settings")
         self.notebook.add(mplane_tab, text="M-Plane Control")
         self.notebook.add(scheduler_tab, text="Netconf Client")
         self.notebook.add(conformance_tab, text="Conformance")
+        self.notebook.add(field_notes_tab, text="M-Plane Test")
         self.notebook.add(shortcuts_tab, text="Shortcuts")
 
         mode_frame = ttk.LabelFrame(settings_tab, text="Execution Mode", padding=8)
@@ -923,22 +945,59 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
 
         ttk.Label(remote_frame, text="SSH_PORT", width=24).grid(row=1, column=0, padx=8, pady=6, sticky="w")
         ttk.Entry(remote_frame, textvariable=self.remote_port, width=36).grid(row=1, column=1, padx=8, pady=6, sticky="we")
-        ttk.Label(remote_frame, text="REMOTE_SCRIPT_PATH", width=24).grid(row=1, column=2, padx=8, pady=6, sticky="w")
-        ttk.Entry(remote_frame, textvariable=self.remote_script_path, width=36).grid(
+        ttk.Label(remote_frame, text="SSH_PASSWORD(optional)", width=24).grid(row=1, column=2, padx=8, pady=6, sticky="w")
+        ttk.Entry(remote_frame, textvariable=self.remote_password, width=36, show="*").grid(
             row=1, column=3, padx=8, pady=6, sticky="we"
         )
+        # REMOTE_SCRIPT_PATH 고정(/var/tmp/miniDU_callhome.sh) — UI 숨김, 값은 유지
+        self.remote_script_path.set("/var/tmp/miniDU_callhome.sh")
 
-        ttk.Label(remote_frame, text="SSH_PASSWORD(optional)", width=24).grid(row=2, column=0, padx=8, pady=6, sticky="w")
-        ttk.Entry(remote_frame, textvariable=self.remote_password, width=36, show="*").grid(
-            row=2, column=1, padx=8, pady=6, sticky="we"
-        )
         ttk.Label(
             remote_frame,
-            text="SSH_USER/HOST는 Linux 접속 계정 정보입니다. PASSWORD 기반 접속을 사용합니다.",
+            text="SSH_USER/HOST는 Linux 접속 계정 정보입니다. PASSWORD 기반 접속을 사용합니다. "
+            "(REMOTE_SCRIPT_PATH=/var/tmp/miniDU_callhome.sh 고정)",
             foreground="#555555",
-        ).grid(row=3, column=0, columnspan=4, padx=8, pady=(0, 6), sticky="w")
+        ).grid(row=2, column=0, columnspan=4, padx=8, pady=(0, 6), sticky="w")
         remote_frame.columnconfigure(1, weight=1)
         remote_frame.columnconfigure(3, weight=1)
+
+        profile_frame = ttk.LabelFrame(
+            settings_tab,
+            text="Lab Profile — 대역/현장 설정 묶음 (예: lab-20 / lab-60)",
+            padding=8,
+        )
+        profile_frame.pack(fill="x", padx=8, pady=(0, 10))
+        ttk.Label(profile_frame, text="Profile").grid(row=0, column=0, padx=8, pady=6, sticky="w")
+        self.profile_combo = ttk.Combobox(
+            profile_frame,
+            textvariable=self.profile_name_var,
+            width=28,
+            values=("lab-20", "lab-60"),
+        )
+        self.profile_combo.grid(row=0, column=1, padx=8, pady=6, sticky="we")
+        ttk.Button(profile_frame, text="Load", command=self._profile_load_selected).grid(
+            row=0, column=2, padx=4, pady=6
+        )
+        ttk.Button(profile_frame, text="Save", command=self._profile_save_selected).grid(
+            row=0, column=3, padx=4, pady=6
+        )
+        ttk.Button(profile_frame, text="Save As…", command=self._profile_save_as).grid(
+            row=0, column=4, padx=4, pady=6
+        )
+        ttk.Button(profile_frame, text="Delete", command=self._profile_delete_selected).grid(
+            row=0, column=5, padx=4, pady=6
+        )
+        ttk.Label(
+            profile_frame,
+            text=(
+                "Load: 선택한 프로파일로 Settings/SSH/M-Plane·SWM 관련 값을 채웁니다.  "
+                "Save: 현재 화면 값을 그 이름에 덮어씁니다.  "
+                "10.0.20 ↔ 10.0.60 전환 시 프로파일만 바꾸면 됩니다."
+            ),
+            foreground="#555555",
+            wraplength=980,
+        ).grid(row=1, column=0, columnspan=6, padx=8, pady=(0, 4), sticky="w")
+        profile_frame.columnconfigure(1, weight=1)
 
         form = ttk.LabelFrame(settings_tab, text="ORU Netconf configration", padding=8)
         form.pack(fill="x", padx=8, pady=10)
@@ -950,12 +1009,23 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "NP2_BOOT_WAIT": "netopeer2-cli boot wait (s)",
             "NP2_YANG_WAIT": "netopeer YANG preload max (s)",
             "LOGIN_WAIT_SEC": "Call Home login wait (s)",
+            "ALLOWED_IP": "★ RU IPv4 (CallHome/SSH)",
+            "LOCAL_IP": "Controller IPv4 (listen)",
+            "ALLOWED_IP_V6": "★ RU IPv6 global (CallHome/SSH)",
+            "LOCAL_IP_V6": "Controller IPv6 global (listen)",
+            "CLI-ID": "★ RU SSH ID",
+            "CLI-PW": "★ RU SSH PW",
+            "LOG_PATH": "LOG_PATH (= /var/tmp/log/PRODUCT)",
         }
         defaults = {
             "USER": "oranuser",
             "PASSWORD": "o-ran-password",
-            "ALLOWED_IP": "10.0.20.128",
-            "LOCAL_IP": "10.0.20.254",
+            "ALLOWED_IP": "10.0.60.144",
+            "LOCAL_IP": "10.0.60.253",
+            "ALLOWED_IP_V6": "",
+            "LOCAL_IP_V6": "2001:1200:1100:1000::253",
+            "CLI-ID": "",
+            "CLI-PW": "",
             "CALLHOME_PORT": "4334",
             "CONN_DELAY": "1",
             "POST_LISTEN_WAIT": "0",
@@ -965,42 +1035,88 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "NETCONF_PORT": "830",
             "PRODUCT": "nDLPU",
             "LOG_PATH": "/var/tmp/log/nDLPU",
-            # O-RU 쉘 자동화 시 sshpass 등으로 CLI-ID/CLI-PW 전달에 사용할 수 있음
-            "CLI-ID": "",
-            "CLI-PW": "",
+            # 숨김(미사용): 값은 유지·전달만
             "LOCAL_IF": "",
         }
+        settings_hidden = {
+            "LOCAL_IF",
+            "NETCONF_PORT",
+            "CONN_DELAY",
+            "POST_LISTEN_WAIT",
+            "NP2_BOOT_WAIT",
+            "NP2_YANG_WAIT",
+            "LOCAL_IP",
+            "LOCAL_IP_V6",
+        }
 
-        for i, (key, value) in enumerate(defaults.items()):
-            label = settings_labels.get(key, key)
-            ttk.Label(form, text=label, width=24).grid(row=i // 2, column=(i % 2) * 2, padx=8, pady=6, sticky="w")
+        visible_i = 0
+        for key, value in defaults.items():
             var = tk.StringVar(value=value)
             self.fields[key] = var
+            if key in settings_hidden:
+                continue
+            label = settings_labels.get(key, key)
+            lbl_kw: dict[str, Any] = {"text": label, "width": 28}
+            if key in ("ALLOWED_IP", "ALLOWED_IP_V6", "CLI-ID", "CLI-PW"):
+                lbl_kw["foreground"] = "#b45309"
+                lbl_kw["font"] = ("", 9, "bold")
+            ttk.Label(form, **lbl_kw).grid(
+                row=visible_i // 2, column=(visible_i % 2) * 2, padx=8, pady=6, sticky="w"
+            )
             show = "*" if key in ("PASSWORD", "CLI-PW") else ""
-            ttk.Entry(form, textvariable=var, width=36, show=show).grid(
-                row=i // 2,
-                column=(i % 2) * 2 + 1,
+            state = "readonly" if key == "LOG_PATH" else "normal"
+            ttk.Entry(form, textvariable=var, width=36, show=show, state=state).grid(
+                row=visible_i // 2,
+                column=(visible_i % 2) * 2 + 1,
                 padx=8,
                 pady=6,
                 sticky="we",
             )
+            visible_i += 1
+
+        def _sync_log_path_from_product(*_args: Any) -> None:
+            try:
+                prod = (self.fields.get("PRODUCT").get() or "").strip()  # type: ignore[union-attr]
+            except Exception:
+                return
+            if not prod:
+                return
+            safe = re.sub(r"[^0-9A-Za-z._-]+", "_", prod).strip("._") or "product"
+            path = f"/var/tmp/log/{safe}"
+            try:
+                lp = self.fields.get("LOG_PATH")
+                if lp is not None and (lp.get() or "").strip() != path:
+                    lp.set(path)
+            except Exception:
+                pass
+
+        try:
+            self.fields["PRODUCT"].trace_add("write", _sync_log_path_from_product)
+            self._sync_log_path_from_product = _sync_log_path_from_product
+            _sync_log_path_from_product()
+        except Exception:
+            self._sync_log_path_from_product = lambda *_a: None  # type: ignore[assignment]
+            pass
+        # Controller listen IP: lab untag/tag 자동 (Settings UI 숨김)
+        try:
+            self._apply_lab_controller_listen_ips("untag")
+        except Exception:
+            pass
 
         form.columnconfigure(1, weight=1)
         form.columnconfigure(3, weight=1)
         ttk.Label(
             form,
             text=(
-                "이 값들은 miniDU_callhome.sh 실행 시 환경변수로 전달됩니다 (예: LOG_PATH, CONN_DELAY). "
-                "CONN_DELAY·POST_LISTEN_WAIT 를 줄이면 Start 접속이 빨라집니다 (불안정하면 CONN_DELAY=2~3). "
-                "NP2_BOOT_WAIT: netopeer2-cli 기동 후 verb 전 추가 대기 (기본 2s). "
-                "NP2_YANG_WAIT: 첫 기동 YANG 로딩 최대 대기 (기본 90s). "
+                "이 값들은 miniDU_callhome.sh 실행 시 환경변수로 전달됩니다. "
+                "LOG_PATH 는 PRODUCT 변경 시 /var/tmp/log/<PRODUCT> 로 자동 설정됩니다. "
                 "LOGIN_WAIT_SEC: RU Call Home·로그인 대기 (기본 120s). "
-                "CLI-ID/CLI-PW·ALLOWED_IP 등은 장비·자동화 스크립트에서 참조할 수 있습니다. "
-                "Server NIC: miniDU fronthaul (ethping -i, 예: dasan). "
-                "Conformance 3.1.13.1 등에서는 항목 설정의 Server NIC에도 동일 값을 넣을 수 있습니다."
+                "★ ALLOWED_IP / ALLOWED_IP_V6 · ★ RU SSH ID/PW(CLI-ID/PW) 는 전 시험 공용. "
+                "Controller LOCAL_IP*: untag 10.0.60.253 / 2001:1200:1100:1000::253, "
+                "tag 10.0.61.253 / 2001:1300:1100:1000::253 (VLAN Discovery 시 자동)."
             ),
             foreground="#555555",
-        ).grid(row=(len(defaults) + 1) // 2 + 1, column=0, columnspan=4, padx=8, pady=(0, 6), sticky="w")
+        ).grid(row=(visible_i + 1) // 2 + 1, column=0, columnspan=4, padx=8, pady=(0, 6), sticky="w")
 
         btn_frame = ttk.Frame(settings_tab)
         btn_frame.pack(fill="x", padx=8, pady=8)
@@ -1077,6 +1193,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
 
         self._build_mplane_tab(mplane_tab)
         self._build_conformance_tab(conformance_tab)
+        self._build_guardrails_tab(field_notes_tab)
 
         shortcuts_frame = ttk.LabelFrame(shortcuts_tab, text="Keyboard Shortcuts", padding=10)
         shortcuts_frame.pack(fill="both", expand=True, padx=8, pady=8)
@@ -4706,6 +4823,22 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             or "[GUI] REUSED CACHED" in line_upper
         ):
             return True
+        # Keep CallHome / host-key progress (otherwise Start looks "stuck" after listen).
+        if any(
+            t in line_upper
+            for t in (
+                "HOST-KEY",
+                "CALLHOME LISTEN",
+                "CALLHOME TCP ACCEPTED",
+                "LOGIN SUCCESSFUL",
+                "LOGIN NOT ESTABLISHED",
+                "ARE YOU SURE YOU WANT TO CONTINUE CONNECTING",
+                "AUTHENTICITY OF THE HOST",
+                "WAITING FOR NETOPEER AUTH",
+            )
+        ):
+            return False
+
         if content_upper.startswith("[INFO]") or stripped_upper.startswith("[INFO]"):
             return True
 
@@ -4849,6 +4982,13 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         kept_parts: list[str] = []
         for part in line.splitlines(keepends=True):
             part_u = part.upper()
+            # M-Plane Test progress must always show (never swallow into RPC exchange buffer).
+            if "[M-PLANE TEST]" in part_u:
+                if self._rpc_exchange_collecting:
+                    # keep collecting in background but still display this line
+                    pass
+                kept_parts.append(part)
+                continue
             if "[GUI] NETCONF RPC EXCHANGE BEGIN" in part_u:
                 self._rpc_exchange_collecting = True
                 self._rpc_exchange_buf = []
@@ -5122,6 +5262,14 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 {"local": a, "remote": b} for a, b in self._conformance_extra_uploads
             ],
             "message_tabs": message_data,
+            "profiles": copy.deepcopy(getattr(self, "_profiles", {}) or {}),
+            "active_profile": (self.profile_name_var.get() or "").strip(),
+            "guardrails_checked": {k: bool(v.get()) for k, v in self.guardrails_check_vars.items()},
+            "guardrails_last_results": {k: v.get() for k, v in self.guardrails_result_vars.items()},
+            "guardrails_run_repeat": self.guardrails_run_repeat_var.get(),
+            "guardrails_per_test_settings": copy.deepcopy(
+                getattr(self, "_guardrails_per_test_settings", {}) or {}
+            ),
         }
         cl = self._conformance_last_run_snapshot_cache
         if not omit and isinstance(cl, dict) and cl.get("by_script"):
@@ -5149,7 +5297,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self.remote_host.set(str(data.get("remote_host", self.remote_host.get())))
         self.remote_port.set(str(data.get("remote_port", self.remote_port.get())))
         self.remote_password.set(str(data.get("remote_password", self.remote_password.get())))
-        self.remote_script_path.set(str(data.get("remote_script_path", self.remote_script_path.get())))
+        self.remote_script_path.set("/var/tmp/miniDU_callhome.sh")
         self.remote_key_path.set(str(data.get("remote_key_path", self.remote_key_path.get())))
         self.send_mode_var.set("raw_rpc")
         self.perf_debug_var.set(bool(data.get("perf_debug", self.perf_debug_var.get())))
@@ -5275,6 +5423,6982 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 self.add_message_tab(initial_title=str(t.get("title", "MSG")))
                 self.message_tabs[-1]["text"].delete("1.0", "end")
                 self.message_tabs[-1]["text"].insert("1.0", str(t.get("content", "")))
+        profs = data.get("profiles")
+        if isinstance(profs, dict):
+            cleaned: dict[str, Any] = {}
+            for name, body in profs.items():
+                n = str(name).strip()
+                if n and isinstance(body, dict):
+                    cleaned[n] = body
+            self._profiles = cleaned
+        ap = data.get("active_profile")
+        if isinstance(ap, str) and ap.strip():
+            self.profile_name_var.set(ap.strip())
+        self._profile_refresh_combo()
+        gchk = data.get("guardrails_checked")
+        if isinstance(gchk, dict) and self.guardrails_check_vars:
+            for key, val in gchk.items():
+                bv = self.guardrails_check_vars.get(str(key))
+                if bv is not None:
+                    bv.set(bool(val))
+        gres = data.get("guardrails_last_results")
+        if isinstance(gres, dict) and self.guardrails_result_vars:
+            for key, val in gres.items():
+                rv = self.guardrails_result_vars.get(str(key))
+                if rv is not None:
+                    rv.set("" if val is None else str(val))
+        grr = data.get("guardrails_run_repeat")
+        if isinstance(grr, (str, int)) and str(grr).strip() != "":
+            try:
+                self.guardrails_run_repeat_var.set(str(grr).strip())
+            except Exception:
+                pass
+        gfields = data.get("guardrails_per_test_settings")
+        if not isinstance(gfields, dict):
+            # migrate legacy flat guardrails_fields → dhcp_boot_shared
+            legacy = data.get("guardrails_fields")
+            if isinstance(legacy, dict):
+                gfields = {"dhcp_boot_shared": {str(k): str(v) for k, v in legacy.items() if v is not None}}
+        if isinstance(gfields, dict):
+            store = getattr(self, "_guardrails_per_test_settings", None)
+            if store is None:
+                self._guardrails_per_test_settings = {}
+                store = self._guardrails_per_test_settings
+            for iid, vals in gfields.items():
+                if isinstance(vals, dict):
+                    store[str(iid)] = {str(k): str(v) for k, v in vals.items() if v is not None}
+        for iid in list(getattr(self, "guardrails_check_vars", {}) or {}):
+            try:
+                self._guardrails_sync_tree_row(str(iid))
+            except Exception:
+                pass
+        try:
+            sync = getattr(self, "_sync_log_path_from_product", None)
+            if callable(sync):
+                sync()
+        except Exception:
+            pass
+        try:
+            self._apply_lab_controller_listen_ips("untag")
+        except Exception:
+            pass
+
+    def _profile_snapshot(self) -> dict[str, Any]:
+        """Network/lab-related settings switched between 10.0.20 ↔ 10.0.60 (and similar)."""
+        return {
+            "remote_user": self.remote_user.get(),
+            "remote_host": self.remote_host.get(),
+            "remote_port": self.remote_port.get(),
+            "remote_password": self.remote_password.get(),
+            "remote_script_path": self.remote_script_path.get(),
+            "runtime_fields": {k: v.get() for k, v in self.fields.items()},
+            "mplane_fields": {k: v.get() for k, v in self.mplane_fields.items()},
+            "conformance_run_remote_dir": self.conformance_run_remote_dir_var.get(),
+            "conformance_run_sw_pkg": self.conformance_run_sw_pkg_var.get(),
+            "conformance_run_sw_remote_dir": self.conformance_run_sw_remote_dir_var.get(),
+            "conformance_per_test_settings": copy.deepcopy(
+                getattr(self, "_conformance_per_test_settings", {}) or {}
+            ),
+            "guardrails_per_test_settings": copy.deepcopy(
+                getattr(self, "_guardrails_per_test_settings", {}) or {}
+            ),
+        }
+
+    def _profile_apply_snapshot(self, snap: dict[str, Any]) -> None:
+        if not isinstance(snap, dict):
+            return
+        was = getattr(self, "_config_hydrating", False)
+        self._config_hydrating = True
+        try:
+            if "remote_user" in snap:
+                self.remote_user.set(str(snap.get("remote_user", "")))
+            if "remote_host" in snap:
+                self.remote_host.set(str(snap.get("remote_host", "")))
+            if "remote_port" in snap:
+                self.remote_port.set(str(snap.get("remote_port", "")))
+            if "remote_password" in snap:
+                self.remote_password.set(str(snap.get("remote_password", "")))
+            # REMOTE_SCRIPT_PATH 고정
+            self.remote_script_path.set("/var/tmp/miniDU_callhome.sh")
+            rf = snap.get("runtime_fields")
+            if isinstance(rf, dict):
+                for key, value in rf.items():
+                    if key in self.fields:
+                        self.fields[key].set("" if value is None else str(value))
+            mf = snap.get("mplane_fields")
+            if isinstance(mf, dict):
+                for key, value in mf.items():
+                    var = self.mplane_fields.get(str(key))
+                    if var is not None:
+                        var.set("" if value is None else str(value))
+            for var, key in (
+                (self.conformance_run_remote_dir_var, "conformance_run_remote_dir"),
+                (self.conformance_run_sw_pkg_var, "conformance_run_sw_pkg"),
+                (self.conformance_run_sw_remote_dir_var, "conformance_run_sw_remote_dir"),
+            ):
+                v = snap.get(key)
+                if isinstance(v, str):
+                    var.set(v)
+            pts = snap.get("conformance_per_test_settings")
+            if isinstance(pts, dict):
+                for fname, vals in pts.items():
+                    if isinstance(vals, dict):
+                        self._conformance_per_test_settings[str(fname)] = {
+                            str(k): str(v) for k, v in vals.items()
+                        }
+                try:
+                    self._conformance_reconcile_per_test_settings()
+                except Exception:
+                    pass
+            gf = snap.get("guardrails_per_test_settings")
+            if not isinstance(gf, dict):
+                legacy = snap.get("guardrails_fields")
+                if isinstance(legacy, dict):
+                    gf = {"dhcp_boot_shared": {str(k): str(v) for k, v in legacy.items() if v is not None}}
+            if isinstance(gf, dict):
+                store = getattr(self, "_guardrails_per_test_settings", None)
+                if store is None:
+                    self._guardrails_per_test_settings = {}
+                    store = self._guardrails_per_test_settings
+                for iid, vals in gf.items():
+                    if isinstance(vals, dict):
+                        store[str(iid)] = {str(k): str(v) for k, v in vals.items() if v is not None}
+        finally:
+            self._config_hydrating = was
+            try:
+                sync = getattr(self, "_sync_log_path_from_product", None)
+                if callable(sync):
+                    sync()
+            except Exception:
+                pass
+            try:
+                self._apply_lab_controller_listen_ips("untag")
+            except Exception:
+                pass
+
+    def _profile_refresh_combo(self) -> None:
+        names = sorted(self._profiles.keys(), key=str.lower)
+        if "lab-20" not in names:
+            names = ["lab-20", *names]
+        if "lab-60" not in names:
+            # keep lab-60 near top for 20/60 switching
+            if names and names[0] == "lab-20":
+                names = ["lab-20", "lab-60", *[n for n in names if n not in ("lab-20", "lab-60")]]
+            else:
+                names = ["lab-60", *names]
+        # unique preserve order
+        seen: set[str] = set()
+        ordered: list[str] = []
+        for n in names:
+            if n not in seen:
+                seen.add(n)
+                ordered.append(n)
+        if self.profile_combo is not None:
+            self.profile_combo["values"] = tuple(ordered)
+        cur = (self.profile_name_var.get() or "").strip()
+        if cur not in ordered and ordered:
+            self.profile_name_var.set(ordered[0])
+
+    def _profile_load_selected(self) -> None:
+        name = (self.profile_name_var.get() or "").strip()
+        if not name:
+            messagebox.showwarning("Profile", "프로파일 이름을 입력하거나 선택하세요.")
+            return
+        snap = self._profiles.get(name)
+        if not isinstance(snap, dict):
+            messagebox.showwarning(
+                "Profile",
+                f"'{name}' 프로파일이 아직 없습니다.\n현재 설정을 맞춘 뒤 Save / Save As로 저장하세요.",
+            )
+            return
+        self._profile_apply_snapshot(snap)
+        self.append_log(f"[GUI] Profile loaded: {name}\n")
+        self._save_current_config()
+        messagebox.showinfo("Profile", f"프로파일 '{name}' 을(를) 불러왔습니다.")
+
+    def _profile_save_selected(self) -> None:
+        name = (self.profile_name_var.get() or "").strip()
+        if not name:
+            messagebox.showwarning("Profile", "프로파일 이름을 입력하세요.")
+            return
+        self._profiles[name] = self._profile_snapshot()
+        self._profile_refresh_combo()
+        self._save_current_config()
+        self.append_log(f"[GUI] Profile saved: {name}\n")
+        messagebox.showinfo("Profile", f"프로파일 '{name}' 에 현재 설정을 저장했습니다.")
+
+    def _profile_save_as(self) -> None:
+        name = simpledialog.askstring("Save Profile As", "새 프로파일 이름:", parent=self)
+        if name is None:
+            return
+        name = name.strip()
+        if not name:
+            messagebox.showwarning("Profile", "이름이 비어 있습니다.")
+            return
+        if name in self._profiles:
+            if not messagebox.askyesno("Profile", f"'{name}' 이(가) 이미 있습니다. 덮어쓸까요?"):
+                return
+        self.profile_name_var.set(name)
+        self._profiles[name] = self._profile_snapshot()
+        self._profile_refresh_combo()
+        self._save_current_config()
+        self.append_log(f"[GUI] Profile saved as: {name}\n")
+        messagebox.showinfo("Profile", f"프로파일 '{name}' 으로 저장했습니다.")
+
+    def _profile_delete_selected(self) -> None:
+        name = (self.profile_name_var.get() or "").strip()
+        if not name:
+            return
+        if name not in self._profiles:
+            messagebox.showwarning("Profile", f"'{name}' 은(는) 저장된 프로파일이 아닙니다.")
+            return
+        if not messagebox.askyesno("Profile", f"프로파일 '{name}' 을(를) 삭제할까요?"):
+            return
+        del self._profiles[name]
+        self._profile_refresh_combo()
+        self._save_current_config()
+    _GUARDRAILS_DHCP_SHARED_KEY = "dhcp_boot_shared"
+    _GUARDRAILS_RU_SSH_FIELDS: list[dict[str, Any]] = [
+        {
+            "key": "oru_cli_id",
+            "label": "RU SSH ID",
+            "default": "",
+            "hint": "Settings ★ RU SSH ID 사용 (숨김)",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "oru_cli_pw",
+            "label": "RU SSH PW",
+            "default": "",
+            "hint": "Settings ★ RU SSH PW 사용 (숨김)",
+            "password": True,
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "probe_v4",
+            "label": "RU IPv4",
+            "default": "",
+            "hint": "Settings ALLOWED_IP 사용 (숨김)",
+            "wide": True,
+            "hidden": True,
+        },
+        {
+            "key": "probe_v6",
+            "label": "RU IPv6",
+            "default": "",
+            "hint": "Settings ALLOWED_IP_V6 사용 (숨김)",
+            "wide": True,
+            "hidden": True,
+        },
+        {
+            "key": "ru_mac",
+            "label": "RU MAC",
+            "default": "",
+            "hint": "ALLOWED_IP ping→ip neigh 자동 (숨김)",
+            "wide": True,
+            "hidden": True,
+        },
+        {
+            "key": "mplane_if",
+            "label": "M-Plane NIC",
+            "default": "",
+            "hint": "solid NIC (fe80%scope). 비우면 LOCAL_IF",
+            "wide": False,
+        },
+        {
+            "key": "ssh_family",
+            "label": "SSH family",
+            "default": "v4",
+            "hint": "v4 또는 v6",
+            "wide": False,
+        },
+    ]
+    _GUARDRAILS_DHCP_COMMON_FIELDS: list[dict[str, Any]] = [
+        {"key": "l2sw_ip", "label": "L2SW IP", "default": "", "hint": "다산 M3500 관리 IP", "wide": True},
+        {
+            "key": "l2sw_id",
+            "label": "L2SW ID",
+            "default": "",
+            "hint": "고정 사용 — UI 숨김",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "l2sw_pw",
+            "label": "L2SW PW",
+            "default": "",
+            "hint": "고정 사용 — UI 숨김",
+            "password": True,
+            "wide": False,
+            "hidden": True,
+        },
+        {"key": "l2sw_if", "label": "L2SW IF", "default": "", "hint": "RU MAC → show mac 자동 (숨김)", "wide": False, "hidden": True},
+        {"key": "acl_num", "label": "ACL #", "default": "110", "hint": "포트에만 bind (ACL 본문은 스위치에 유지)", "wide": False},
+        {
+            "key": "ru_mac",
+            "label": "RU MAC",
+            "default": "",
+            "hint": "ALLOWED_IP ping→ip neigh 자동 (숨김)",
+            "wide": True,
+            "hidden": True,
+        },
+        {
+            "key": "mplane_if",
+            "label": "M-Plane NIC",
+            "default": "",
+            "hint": "solid NIC (fe80%scope). 비우면 LOCAL_IF",
+            "wide": False,
+        },
+        {
+            "key": "oru_cli_id",
+            "label": "RU SSH ID",
+            "default": "",
+            "hint": "Settings ★ RU SSH ID 사용 (숨김)",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "oru_cli_pw",
+            "label": "RU SSH PW",
+            "default": "",
+            "hint": "Settings ★ RU SSH PW 사용 (숨김)",
+            "password": True,
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "ru_if_name",
+            "label": "RU IF name",
+            "default": "",
+            "hint": "검사 iface (예: eth0). 비우면 전체",
+            "wide": False,
+        },
+        {
+            "key": "probe_v4",
+            "label": "RU IPv4",
+            "default": "",
+            "hint": "Settings ALLOWED_IP 사용 (숨김)",
+            "wide": True,
+            "hidden": True,
+        },
+        {
+            "key": "probe_v6",
+            "label": "RU IPv6",
+            "default": "",
+            "hint": "Settings ALLOWED_IP_V6 사용 (숨김)",
+            "wide": True,
+            "hidden": True,
+        },
+        {"key": "pass_sec", "label": "PASS ≤초", "default": "240", "hint": "이하면 PASS", "wide": False},
+        {"key": "timeout_sec", "label": "Timeout 초", "default": "540", "hint": "복구 대기 한도", "wide": False},
+        {"key": "poll_sec", "label": "RU확인주기", "default": "5", "hint": "초 · SSH up/down 검사 주기", "wide": False},
+        {
+            "key": "stable_sec",
+            "label": "복구유지 초",
+            "default": "10",
+            "hint": "SSH healthy 연속 유지 초 (한 번 성공만으로 PASS 안 함)",
+            "wide": False,
+            "hidden": True,
+        },
+        {"key": "down_detect_sec", "label": "Down감지 초", "default": "180", "hint": "재부팅(비정상) 대기", "wide": False},
+    ]
+    _GUARDRAILS_DHCP_CAPTURE_FIELDS: list[dict[str, Any]] = [
+        {
+            "key": "dhcp_host",
+            "label": "DHCP SSH host",
+            "default": "",
+            "hint": "비우면 Settings 원격(solid)에서 tcpdump. 있으면 solid→이 호스트 SSH",
+            "wide": True,
+        },
+        {
+            "key": "dhcp_id",
+            "label": "DHCP SSH ID",
+            "default": "",
+            "hint": "dhcp_host 쓸 때 필수",
+            "wide": False,
+        },
+        {
+            "key": "dhcp_pw",
+            "label": "DHCP SSH PW",
+            "default": "",
+            "hint": "SSH + sudo -S 공통(vlan100 ip addr add). 비우면 sudo -n만 시도→실패 많음",
+            "password": True,
+            "wide": False,
+        },
+        {
+            "key": "dhcp_port",
+            "label": "DHCP SSH port",
+            "default": "22",
+            "hint": "22 고정 — UI 숨김",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "dhcp_if",
+            "label": "Capture IF",
+            "default": "",
+            "hint": "dhcp_host ifconfig 10.0.60/61 자동 (숨김)",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "use_sudo",
+            "label": "sudo tcpdump",
+            "default": "1",
+            "hint": "1=sudo -n tcpdump (NOPASSWD 필요)",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "capture_sec",
+            "label": "Capture 초",
+            "default": "300",
+            "hint": "기본 300 — UI 숨김",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "require_reboot",
+            "label": "Reboot prompt",
+            "default": "1",
+            "hint": "1=캡처 시작 후 재부팅 안내",
+            "wide": False,
+            "hidden": True,  # dhcp 통합시험은 자동 reset — UI 불필요
+        },
+        {
+            "key": "ru_mac",
+            "label": "RU MAC",
+            "default": "",
+            "hint": "ALLOWED_IP ping→ip neigh 자동 (숨김)",
+            "wide": True,
+            "hidden": True,
+        },
+        {
+            "key": "reset_mode",
+            "label": "Reset mode",
+            "default": "auto",
+            "hint": "auto|mplane=기존 conformance_oru_reboot.sh 호출(수정 없음) / manual",
+            "wide": False,
+            "hidden": True,  # 현장은 항상 auto — UI 불필요
+        },
+    ]
+    _GUARDRAILS_VLAN_DISC_FIELDS: list[dict[str, Any]] = [
+        {
+            "key": "vlan_discovery_vid",
+            "label": "★ 시험 VLAN ID",
+            "default": "100",
+            "hint": "RU 변경 시 필수 — 예: 100",
+            "wide": False,
+            "emphasize": True,
+        },
+        {
+            "key": "vlan_discovery_base_vid",
+            "label": "원복(base) VLAN ID",
+            "default": "1",
+            "hint": "reset 직후 trunk remove, 원복 시 다시 add (기본 1)",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "vlan_discovery_solid_parent",
+            "label": "DHCP호스트 VLAN parent",
+            "default": "",
+            "hint": "비우면 Capture IF → vlan<VID> 임시 생성",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "vlan_discovery_solid_cidr",
+            "label": "DHCP호스트 VLAN IP",
+            "default": "10.0.61.252/24",
+            "hint": "반드시 /24 (10.0.61.252/24). /32·마스크생략 시 ping이 GW로 나감",
+            "wide": True,
+            "hidden": True,
+        },
+        {
+            "key": "vlan_discovery_solid_cidr_v6",
+            "label": "DHCP호스트 VLAN IPv6",
+            "default": "2001:1300:1100:1000::252/64",
+            "hint": "GUI 자동: tag=1300::252 / untag=1200::252 (대상 /64 우선)",
+            "wide": True,
+            "hidden": True,  # 시험 상황별 자동 — UI 불필요
+        },
+        {
+            "key": "vlan_discovery_name",
+            "label": "시험 VLAN 이름",
+            "default": "",
+            "hint": "비우면 이름 생략",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "dhcp_renew_cmd",
+            "label": "DHCP renew 명령",
+            "default": "dhcp vlan-discovery renew force",
+            "hint": "원복 시 RU SSH 명령 (소문자)",
+            "wide": True,
+        },
+    ]
+    _GUARDRAILS_DHCP_L2SW_FIELDS: list[dict[str, Any]] = [
+        {"key": "l2sw_ip", "label": "L2SW IP", "default": "", "hint": "다산 M3500", "wide": True},
+        {
+            "key": "l2sw_id",
+            "label": "L2SW ID",
+            "default": "",
+            "hint": "고정 — 숨김",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "l2sw_pw",
+            "label": "L2SW PW",
+            "default": "",
+            "hint": "고정 — 숨김",
+            "password": True,
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "l2sw_if",
+            "label": "L2SW IF",
+            "default": "",
+            "hint": "RU MAC → show mac 자동 (숨김)",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "acl_num",
+            "label": "ACL #",
+            "default": "110",
+            "hint": "extended 100-199",
+            "wide": False,
+            "hidden": True,
+        },
+    ]
+    _GUARDRAILS_DHCP_COMMON_HIDDEN: list[dict[str, Any]] = [
+        {
+            "key": "oru_cli_id",
+            "label": "RU SSH ID",
+            "default": "",
+            "hint": "Settings ★ RU SSH ID 사용 (숨김)",
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "oru_cli_pw",
+            "label": "RU SSH PW",
+            "default": "",
+            "hint": "Settings ★ RU SSH PW 사용 (숨김)",
+            "password": True,
+            "wide": False,
+            "hidden": True,
+        },
+        {
+            "key": "probe_v4",
+            "label": "RU IPv4",
+            "default": "",
+            "hint": "Settings ALLOWED_IP 사용 (숨김)",
+            "wide": True,
+            "hidden": True,
+        },
+        {
+            "key": "probe_v6",
+            "label": "RU IPv6",
+            "default": "",
+            "hint": "Settings ALLOWED_IP_V6 사용 (숨김)",
+            "wide": True,
+            "hidden": True,
+        },
+        {
+            "key": "mplane_if",
+            "label": "M-Plane NIC",
+            "default": "",
+            "hint": "fe80%scope (비우면 LOCAL_IF)",
+            "wide": False,
+            "hidden": True,
+        },
+        {"key": "pass_sec", "label": "PASS ≤초", "default": "240", "hint": "주소 복구 PASS 한도", "wide": False},
+        {"key": "timeout_sec", "label": "Timeout 초", "default": "540", "hint": "복구 대기 한도", "wide": False},
+        {"key": "poll_sec", "label": "RU확인주기", "default": "5", "hint": "초 · SSH up/down 검사 주기", "wide": False},
+        {
+            "key": "stable_sec",
+            "label": "복구유지 초",
+            "default": "10",
+            "hint": "SSH healthy 연속 유지 (기본 10s)",
+            "wide": False,
+            "hidden": True,
+        },
+        {"key": "down_detect_sec", "label": "Down감지 초", "default": "180", "hint": "재부팅 감지", "wide": False},
+    ]
+    _GUARDRAILS_PER_TEST_SCHEMA: dict[str, dict[str, Any]] = {
+        "dhcp_v4": {
+            "title": "DHCP v4 Boot — 재시작 후 IPv4 재수신",
+            "settings_key": "dhcp_v4",
+            "family": "v4",
+            "mode": "boot",
+            "fields": list(_GUARDRAILS_DHCP_CAPTURE_FIELDS) + list(_GUARDRAILS_DHCP_COMMON_HIDDEN) + [
+                {
+                    "key": "healthy_regex_v4",
+                    "label": "Healthy regex v4",
+                    "default": r"inet\s+\d+\.\d+\.\d+\.\d+/",
+                    "hint": "있으면 표시용. 없어도 SSH 성공이면 PASS",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "option_regex",
+                    "label": "Option regex (60)",
+                    "default": r"(?i)(Option\s*60|Vendor-Class|vendor.class)",
+                    "hint": "tcpdump -vv",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "enable_discovery",
+                    "label": "Enable Discovery",
+                    "default": "0",
+                    "hint": "1=Option 43/Controller도",
+                    "wide": False,
+                    "hidden": True,
+                },
+                {
+                    "key": "discovery_regex",
+                    "label": "Discovery regex (43)",
+                    "default": r"(?i)(Option\s*43|Vendor-Specific|vendor.specific)",
+                    "hint": "",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "expected_controllers",
+                    "label": "Controller IPs",
+                    "default": "",
+                    "hint": "비우면 LOCAL_IP",
+                    "wide": True,
+                    "hidden": True,
+                },
+            ],
+        },
+        "dhcp_v4_vlan": {
+            "title": "DHCP v4 VLAN Discovery — L2SW trunk/ACL",
+            "settings_key": "dhcp_v4_vlan",
+            "family": "v4",
+            "mode": "vlan",
+            "fields": list(_GUARDRAILS_DHCP_CAPTURE_FIELDS)
+            + list(_GUARDRAILS_VLAN_DISC_FIELDS)
+            + list(_GUARDRAILS_DHCP_L2SW_FIELDS)
+            + list(_GUARDRAILS_DHCP_COMMON_HIDDEN)
+            + [
+                {
+                    "key": "healthy_regex_v4",
+                    "label": "Healthy regex v4",
+                    "default": r"inet\s+\d+\.\d+\.\d+\.\d+/",
+                    "hint": "있으면 표시용. 없어도 SSH 성공이면 PASS",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "option_regex",
+                    "label": "Option regex (60)",
+                    "default": r"(?i)(Option\s*60|Vendor-Class|vendor.class)",
+                    "hint": "tcpdump -vv",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "enable_discovery",
+                    "label": "Enable Discovery",
+                    "default": "0",
+                    "hint": "1=Option 43/Controller도",
+                    "wide": False,
+                    "hidden": True,
+                },
+                {
+                    "key": "discovery_regex",
+                    "label": "Discovery regex (43)",
+                    "default": r"(?i)(Option\s*43|Vendor-Specific|vendor.specific)",
+                    "hint": "",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "expected_controllers",
+                    "label": "Controller IPs",
+                    "default": "",
+                    "hint": "비우면 LOCAL_IP",
+                    "wide": True,
+                    "hidden": True,
+                },
+            ],
+        },
+        "dhcp_v6": {
+            "title": "DHCP v6 Boot — 재시작 후 IPv6 재수신",
+            "settings_key": "dhcp_v6",
+            "family": "v6",
+            "mode": "boot",
+            "fields": list(_GUARDRAILS_DHCP_CAPTURE_FIELDS) + list(_GUARDRAILS_DHCP_COMMON_HIDDEN) + [
+                {
+                    "key": "healthy_regex",
+                    "label": "Healthy regex v6",
+                    "default": r"inet6\s+[0-9a-fA-F:]+/",
+                    "hint": "있으면 표시용. 없어도 SSH 성공이면 PASS",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "option_regex",
+                    "label": "Option regex (16)",
+                    "default": r"(?i)(Option\s*16|vendor.class|Vendor Class)",
+                    "hint": "tcpdump -vv",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "enable_ia_na",
+                    "label": "Check IA_NA (Opt3)",
+                    "default": "1",
+                    "hint": "v6 필수 검사 — UI 숨김",
+                    "wide": False,
+                    "hidden": True,
+                },
+                {
+                    "key": "ia_na_regex",
+                    "label": "IA_NA regex",
+                    "default": r"(?i)(IA[_-]?NA|Identity Association for Non-temporary)",
+                    "hint": "tcpdump/Wireshark Solicit Option 3",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "enable_discovery",
+                    "label": "Enable Discovery",
+                    "default": "0",
+                    "hint": "1=Option 17/Controller도",
+                    "wide": False,
+                    "hidden": True,
+                },
+                {
+                    "key": "discovery_regex",
+                    "label": "Discovery regex (17)",
+                    "default": r"(?i)(Option\s*17|vendor.opts|Vendor-opts|vendor.options)",
+                    "hint": "",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "expected_controllers",
+                    "label": "Controller IPs",
+                    "default": "",
+                    "hint": "비우면 LOCAL_IP",
+                    "wide": True,
+                    "hidden": True,
+                },
+            ],
+        },
+        "dhcp_v6_vlan": {
+            "title": "DHCP v6 VLAN Discovery — L2SW trunk/ACL",
+            "settings_key": "dhcp_v6_vlan",
+            "family": "v6",
+            "mode": "vlan",
+            "fields": list(_GUARDRAILS_DHCP_CAPTURE_FIELDS)
+            + list(_GUARDRAILS_VLAN_DISC_FIELDS)
+            + list(_GUARDRAILS_DHCP_L2SW_FIELDS)
+            + list(_GUARDRAILS_DHCP_COMMON_HIDDEN)
+            + [
+                {
+                    "key": "healthy_regex",
+                    "label": "Healthy regex v6",
+                    "default": r"inet6\s+[0-9a-fA-F:]+/",
+                    "hint": "있으면 표시용. 없어도 SSH 성공이면 PASS",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "option_regex",
+                    "label": "Option regex (16)",
+                    "default": r"(?i)(Option\s*16|vendor.class|Vendor Class)",
+                    "hint": "tcpdump -vv",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "enable_ia_na",
+                    "label": "Check IA_NA (Opt3)",
+                    "default": "1",
+                    "hint": "v6 필수 검사 — UI 숨김",
+                    "wide": False,
+                    "hidden": True,
+                },
+                {
+                    "key": "ia_na_regex",
+                    "label": "IA_NA regex",
+                    "default": r"(?i)(IA[_-]?NA|Identity Association for Non-temporary)",
+                    "hint": "tcpdump/Wireshark Solicit Option 3",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "enable_discovery",
+                    "label": "Enable Discovery",
+                    "default": "0",
+                    "hint": "1=Option 17/Controller도",
+                    "wide": False,
+                    "hidden": True,
+                },
+                {
+                    "key": "discovery_regex",
+                    "label": "Discovery regex (17)",
+                    "default": r"(?i)(Option\s*17|vendor.opts|Vendor-opts|vendor.options)",
+                    "hint": "",
+                    "wide": True,
+                    "hidden": True,
+                },
+                {
+                    "key": "expected_controllers",
+                    "label": "Controller IPs",
+                    "default": "",
+                    "hint": "비우면 LOCAL_IP",
+                    "wide": True,
+                    "hidden": True,
+                },
+            ],
+        },
+        # legacy
+        "dhcp_options": {
+            "title": "DHCP Options (legacy)",
+            "settings_key": "dhcp_options",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_DHCP_CAPTURE_FIELDS),
+        },
+        "dhcp_boot": {
+            "title": "DHCP boot (legacy combined)",
+            "settings_key": "dhcp_boot_shared",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_DHCP_COMMON_FIELDS),
+        },
+        "dhcp_v4_only_boot": {
+            "title": "DHCPv4-only (포트 DHCPv6 drop)",
+            "settings_key": "dhcp_boot_shared",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_DHCP_COMMON_FIELDS) + [
+                {
+                    "key": "healthy_regex_v4",
+                    "label": "Healthy regex",
+                    "default": r"inet\s+\d+\.\d+\.\d+\.\d+/",
+                    "hint": "SSH 출력 — IPv4 inet",
+                    "wide": True,
+                },
+            ],
+        },
+        "dhcp_v6_only_boot": {
+            "title": "DHCPv6-only (포트 DHCPv4 drop)",
+            "settings_key": "dhcp_boot_shared",
+            "family": "v6",
+            "fields": list(_GUARDRAILS_DHCP_COMMON_FIELDS) + [
+                {
+                    "key": "healthy_regex",
+                    "label": "Healthy regex",
+                    "default": r"inet6\s+[0-9a-fA-F:]+/",
+                    "hint": "SSH 출력 — global inet6",
+                    "wide": True,
+                },
+            ],
+        },
+        "vlan_discovery": {
+            "title": "M-Plane VLAN Discovery",
+            "settings_key": "vlan_discovery",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_RU_SSH_FIELDS) + [
+                {
+                    "key": "vid_min",
+                    "label": "VID min",
+                    "default": "1",
+                    "hint": "vlan-discovery 범위 하한",
+                    "wide": False,
+                },
+                {
+                    "key": "vid_max",
+                    "label": "VID max",
+                    "default": "4094",
+                    "hint": "vlan-discovery 범위 상한",
+                    "wide": False,
+                },
+                {
+                    "key": "expected_vid",
+                    "label": "Expected VID",
+                    "default": "",
+                    "hint": "부팅 후 확인할 VLAN ID (필수)",
+                    "wide": False,
+                },
+                {
+                    "key": "pre_cmds",
+                    "label": "Pre cmds (재부팅 전)",
+                    "default": "",
+                    "hint": "RU에서 vid range 설정 CLI",
+                    "wide": True,
+                },
+                {
+                    "key": "check_cmd",
+                    "label": "RU check cmd",
+                    "default": (
+                        "ip -d link; ip -4 -o addr; "
+                        "show yang-module-data o-ran-interfaces; "
+                        "show interfaces"
+                    ),
+                    "hint": "재부팅 후 VLAN/주소 확인",
+                    "wide": True,
+                },
+                {
+                    "key": "expect_regex",
+                    "label": "Expect regex",
+                    "default": "",
+                    "hint": "비우면 expected_vid 자동 패턴",
+                    "wide": True,
+                },
+                {
+                    "key": "require_reboot",
+                    "label": "Reboot wait",
+                    "default": "1",
+                    "hint": "1=SSH down→up 대기 후 검사, 0=즉시 검사",
+                    "wide": False,
+                },
+                {"key": "pass_sec", "label": "PASS ≤초", "default": "240", "hint": "복구 한도(재부팅 시)", "wide": False},
+                {"key": "timeout_sec", "label": "Timeout 초", "default": "540", "hint": "복구 타임아웃", "wide": False},
+                {"key": "poll_sec", "label": "RU확인주기", "default": "5", "hint": "초 · SSH up/down 검사 주기", "wide": False},
+                {"key": "down_detect_sec", "label": "Down감지 초", "default": "180", "hint": "", "wide": False},
+            ],
+        },
+        "netconf_capability": {
+            "title": "NETCONF capability discovery",
+            "settings_key": "netconf_capability",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_RU_SSH_FIELDS) + [
+                {
+                    "key": "note",
+                    "label": "상태",
+                    "default": "추후 구현 (목록 등록만)",
+                    "hint": "Conformance 외 capability 세부 검증 예정",
+                    "wide": True,
+                },
+            ],
+        },
+        "config_states": {
+            "title": "admin/oper/availability/usage-state",
+            "settings_key": "config_states",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_RU_SSH_FIELDS) + [
+                {
+                    "key": "note",
+                    "label": "상태",
+                    "default": "추후 구현 (목록 등록만)",
+                    "hint": "상태 전이 검증 예정",
+                    "wide": True,
+                },
+            ],
+        },
+        "performance_mgmt": {
+            "title": "Performance Management",
+            "settings_key": "performance_mgmt",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_RU_SSH_FIELDS) + [
+                {
+                    "key": "note",
+                    "label": "상태",
+                    "default": "추후 구현 (목록 등록만)",
+                    "hint": "PM activation/reporting 예정",
+                    "wide": True,
+                },
+            ],
+        },
+    }
+
+    def _guardrails_catalog(self) -> list[dict[str, str]]:
+        """M-Plane Test items (TLS/CCM/802.1X/Management-8 제외)."""
+        items: list[dict[str, str]] = [
+            {
+                "id": "dhcp_v4",
+                "scope": "DHCP",
+                "ref": "MP-DHCPv4-Boot",
+                "title": "DHCP v4 Boot (재시작 후 IPv4 재수신)",
+                "detail": "재부팅→IPv4 복구 + Option 60 tcpdump. 연속 시험 가능.",
+            },
+            {
+                "id": "dhcp_v4_vlan",
+                "scope": "DHCP",
+                "ref": "MP-DHCPv4-VLAN",
+                "title": "DHCP v4 VLAN Discovery (L2SW trunk/ACL)",
+                "detail": "ACL + vlan DB/trunk → Discovery → renew/원복. 연속 시험 가능.",
+            },
+            {
+                "id": "dhcp_v6",
+                "scope": "DHCP",
+                "ref": "MP-DHCPv6-Boot",
+                "title": "DHCP v6 Boot (재시작 후 IPv6 재수신)",
+                "detail": "재부팅→inet6 복구 + Option 16·IA_NA. 연속 시험 가능.",
+            },
+            {
+                "id": "dhcp_v6_vlan",
+                "scope": "DHCP",
+                "ref": "MP-DHCPv6-VLAN",
+                "title": "DHCP v6 VLAN Discovery (L2SW trunk/ACL)",
+                "detail": "ACL + vlan DB/trunk → Discovery → renew/원복. 연속 시험 가능.",
+            },
+            {
+                "id": "vlan_discovery",
+                "scope": "VLAN",
+                "ref": "MP-VLAN-1",
+                "title": "M-Plane VLAN Discovery (legacy)",
+                "detail": "MP-DHCPv4-VLAN / MP-DHCPv6-VLAN 항목으로 분리됨. 단독 항목은 SKIP.",
+            },
+            {
+                "id": "netconf_capability",
+                "scope": "NETCONF",
+                "ref": "MP-CAP-1",
+                "title": "NETCONF capability (세부)",
+                "detail": "목록 등록. 실행은 추후 (yang-library/xpath/rollback 등).",
+            },
+            {
+                "id": "config_states",
+                "scope": "Config",
+                "ref": "MP-STATE-1",
+                "title": "admin/oper/availability/usage-state",
+                "detail": "목록 등록. 실행은 추후.",
+            },
+            {
+                "id": "performance_mgmt",
+                "scope": "PM",
+                "ref": "MP-PM-1",
+                "title": "Performance Management",
+                "detail": "목록 등록. 실행은 추후.",
+            },
+        ]
+        items.extend(getattr(self, "_guardrails_user_items", None) or [])
+        return items
+
+    def _guardrails_store_key(self, item_id: str) -> str:
+        schema = self._GUARDRAILS_PER_TEST_SCHEMA.get(item_id) or {}
+        return str(schema.get("settings_key") or item_id)
+
+    def _guardrails_item_family(self, item_id: str) -> str:
+        schema = self._GUARDRAILS_PER_TEST_SCHEMA.get(item_id) or {}
+        return str(schema.get("family") or "v6").lower()
+
+    def _guardrails_item_mode(self, item_id: str) -> str:
+        """boot = L2SW 없이 재시작+IP / vlan = L2SW VLAN Discovery."""
+        schema = self._GUARDRAILS_PER_TEST_SCHEMA.get(item_id) or {}
+        mode = str(schema.get("mode") or "").strip().lower()
+        if mode in ("boot", "vlan"):
+            return mode
+        if str(item_id or "").endswith("_vlan"):
+            return "vlan"
+        return "boot"
+
+    _GUARDRAILS_DHCP_ITEM_IDS: tuple[str, ...] = (
+        "dhcp_v4",
+        "dhcp_v4_vlan",
+        "dhcp_v6",
+        "dhcp_v6_vlan",
+    )
+
+    def _guardrails_ssh_exec(self, command: str, timeout: int = 25) -> tuple[bool, str]:
+        ssh_user = self.remote_user.get().strip()
+        ssh_host = self.remote_host.get().strip()
+        ssh_port = self.remote_port.get().strip() or "22"
+        ssh_password = self.remote_password.get()
+        if not ssh_user or not ssh_host:
+            return False, "Settings SSH_USER/SSH_HOST 필요"
+        try:
+            import paramiko  # type: ignore
+        except Exception as exc:
+            return False, f"paramiko 필요: {exc}"
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            client.connect(
+                hostname=ssh_host,
+                port=int(ssh_port),
+                username=ssh_user,
+                password=ssh_password or None,
+                timeout=12,
+                allow_agent=True,
+                look_for_keys=True,
+            )
+            _stdin, stdout, stderr = client.exec_command(command, timeout=timeout)
+            out = (stdout.read() or b"").decode(errors="replace")
+            err = (stderr.read() or b"").decode(errors="replace")
+            rc = stdout.channel.recv_exit_status()
+            text = (out + (("\n" + err) if err.strip() else "")).strip()
+            return rc == 0, text or f"(exit {rc})"
+        except Exception as exc:
+            return False, str(exc)
+        finally:
+            try:
+                client.close()
+            except Exception:
+                pass
+
+    # Keys that must stay family-specific (v4 Option60 vs v6 Option16 / IA_NA 등)
+    _GUARDRAILS_DHCP_FAMILY_LOCAL_KEYS = frozenset(
+        {
+            "option_regex",
+            "discovery_regex",
+            "healthy_regex",
+            "healthy_regex_v4",
+            "enable_ia_na",
+            "ia_na_regex",
+            "enable_discovery",
+            "expected_controllers",
+        }
+    )
+
+    def _guardrails_dhcp_sibling_key(self, item_id: str) -> str:
+        """Opposite-family primary key (boot) — UI note용. 미러는 peer_keys 사용."""
+        fam = self._guardrails_item_family(item_id)
+        return "dhcp_v6" if fam == "v4" else "dhcp_v4"
+
+    def _guardrails_dhcp_peer_keys(self, item_id: str) -> list[str]:
+        """All other DHCP store keys for shared-field mirroring."""
+        sk = self._guardrails_store_key(item_id)
+        peers: list[str] = []
+        for iid in self._GUARDRAILS_DHCP_ITEM_IDS:
+            psk = self._guardrails_store_key(iid)
+            if psk and psk != sk and psk not in peers:
+                peers.append(psk)
+        return peers
+
+    def _guardrails_dhcp_same_family_keys(self, item_id: str) -> list[str]:
+        fam = self._guardrails_item_family(item_id)
+        sk = self._guardrails_store_key(item_id)
+        out: list[str] = []
+        for iid in self._GUARDRAILS_DHCP_ITEM_IDS:
+            if self._guardrails_item_family(iid) != fam:
+                continue
+            psk = self._guardrails_store_key(iid)
+            if psk and psk != sk and psk not in out:
+                out.append(psk)
+        return out
+
+    def _guardrails_get_val(self, item_id: str, key: str, default: str = "") -> str:
+        store = getattr(self, "_guardrails_per_test_settings", None) or {}
+        sk = self._guardrails_store_key(item_id)
+        family_local = key in self._GUARDRAILS_DHCP_FAMILY_LOCAL_KEYS
+        candidates: tuple[str, ...] = (sk, item_id)
+        if family_local:
+            # same-family boot↔vlan 공유 (Option regex 등)
+            extra_f = self._guardrails_dhcp_same_family_keys(item_id)
+            if extra_f:
+                candidates = (sk, item_id, *extra_f)
+        else:
+            peers = self._guardrails_dhcp_peer_keys(item_id)
+            extra = [*peers, "dhcp_capture_shared", "dhcp_boot_shared", "dhcp_v4", "dhcp_v6"]
+            # de-dupe preserve order
+            seen: set[str] = set()
+            ordered: list[str] = []
+            for c in (sk, item_id, *extra):
+                if c and c not in seen:
+                    seen.add(c)
+                    ordered.append(c)
+            candidates = tuple(ordered)
+        for candidate in candidates:
+            if not candidate:
+                continue
+            cur = store.get(candidate) or {}
+            raw = cur.get(key)
+            if raw is not None and str(raw).strip() != "":
+                return str(raw).strip()
+        schema = self._GUARDRAILS_PER_TEST_SCHEMA.get(item_id) or {}
+        for field in schema.get("fields") or []:
+            if field.get("key") == key:
+                return str(field.get("default") or default).strip() or default
+        return default
+
+    def _guardrails_set_vals(self, item_id: str, vals: dict[str, str]) -> None:
+        if not hasattr(self, "_guardrails_per_test_settings") or self._guardrails_per_test_settings is None:
+            self._guardrails_per_test_settings = {}
+        clean = {str(k): str(v) for k, v in vals.items() if str(v).strip() != ""}
+        sk = self._guardrails_store_key(item_id)
+        self._guardrails_per_test_settings[sk] = clean
+        # keep legacy key in sync for older configs
+        if sk != item_id:
+            self._guardrails_per_test_settings[item_id] = dict(clean)
+        # DHCP 4항목: shared → 전체 peer / family-local → 같은 family boot↔vlan
+        for peer in self._guardrails_dhcp_peer_keys(item_id):
+            peer_blob = dict(self._guardrails_per_test_settings.get(peer) or {})
+            for k, v in clean.items():
+                if k in self._GUARDRAILS_DHCP_FAMILY_LOCAL_KEYS:
+                    continue
+                peer_blob[k] = v
+            self._guardrails_per_test_settings[peer] = {
+                kk: vv for kk, vv in peer_blob.items() if str(vv).strip() != ""
+            }
+        for peer in self._guardrails_dhcp_same_family_keys(item_id):
+            peer_blob = dict(self._guardrails_per_test_settings.get(peer) or {})
+            for k, v in clean.items():
+                if k not in self._GUARDRAILS_DHCP_FAMILY_LOCAL_KEYS:
+                    continue
+                peer_blob[k] = v
+            self._guardrails_per_test_settings[peer] = {
+                kk: vv for kk, vv in peer_blob.items() if str(vv).strip() != ""
+            }
+        # Settings ALLOWED_IP* / CLI-ID·PW 가 SSOT — ⚙ 로 Settings 를 덮지 않음
+        try:
+            self._guardrails_sync_probe_from_settings(item_id)
+        except Exception:
+            pass
+        try:
+            self._guardrails_sync_oru_cli_from_settings(item_id)
+        except Exception:
+            pass
+        try:
+            self._on_any_setting_changed()
+        except Exception:
+            pass
+        try:
+            self._save_current_config()
+        except Exception:
+            pass
+
+    def _guardrails_sync_probe_from_settings(self, item_id: str | None = None) -> None:
+        """Settings ALLOWED_IP* → 내부 probe (항상 Settings 우선)."""
+        iid = item_id or getattr(self, "_guardrails_settings_item_id", None) or "dhcp_v4"
+        sk = self._guardrails_store_key(iid)
+        if not hasattr(self, "_guardrails_per_test_settings") or self._guardrails_per_test_settings is None:
+            self._guardrails_per_test_settings = {}
+        cur = dict(self._guardrails_per_test_settings.get(sk) or {})
+        try:
+            a4 = self._guardrails_strip_ip_cidr(
+                (self.fields.get("ALLOWED_IP").get() or "").strip()  # type: ignore[union-attr]
+            )
+        except Exception:
+            a4 = ""
+        try:
+            a6 = self._guardrails_strip_ip_cidr(
+                (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+            )
+        except Exception:
+            a6 = ""
+        if a4:
+            old = self._guardrails_strip_ip_cidr(cur.get("probe_v4") or "")
+            cur["probe_v4"] = a4
+            if old != a4:
+                self._guardrails_log(
+                    f"{iid}: RU IPv4 ← Settings ALLOWED_IP ({old or '-'} → {a4})"
+                )
+        if a6 and ":" in a6:
+            old = self._guardrails_strip_ip_cidr(cur.get("probe_v6") or "")
+            cur["probe_v6"] = a6
+            if old != a6:
+                self._guardrails_log(
+                    f"{iid}: RU IPv6 ← Settings ALLOWED_IP_V6 ({old or '-'} → {a6})"
+                )
+        if not (a4 or (a6 and ":" in a6)):
+            return
+        self._guardrails_per_test_settings[sk] = {
+            k: v for k, v in cur.items() if str(v).strip()
+        }
+        sib = self._guardrails_dhcp_sibling_key(iid)
+        if sib:
+            sib_blob = dict(self._guardrails_per_test_settings.get(sib) or {})
+            if a4:
+                sib_blob["probe_v4"] = a4
+            if a6 and ":" in a6:
+                sib_blob["probe_v6"] = a6
+            self._guardrails_per_test_settings[sib] = {
+                k: v for k, v in sib_blob.items() if str(v).strip()
+            }
+
+    def _guardrails_sync_oru_cli_from_settings(self, item_id: str | None = None) -> None:
+        """Settings ★ RU SSH ID/PW (CLI-ID/CLI-PW) → 내부 oru_cli_* (전 시험 공용 SSOT)."""
+        iid = item_id or getattr(self, "_guardrails_settings_item_id", None) or "dhcp_v4"
+        sk = self._guardrails_store_key(iid)
+        if not hasattr(self, "_guardrails_per_test_settings") or self._guardrails_per_test_settings is None:
+            self._guardrails_per_test_settings = {}
+        cur = dict(self._guardrails_per_test_settings.get(sk) or {})
+        try:
+            cid = (self.fields.get("CLI-ID").get() or "").strip()  # type: ignore[union-attr]
+        except Exception:
+            cid = ""
+        try:
+            cpw = (self.fields.get("CLI-PW").get() or "").strip()  # type: ignore[union-attr]
+        except Exception:
+            cpw = ""
+        if not cid and not cpw:
+            return
+        if cid:
+            old = (cur.get("oru_cli_id") or "").strip()
+            cur["oru_cli_id"] = cid
+            if old != cid:
+                self._guardrails_log(
+                    f"{iid}: RU SSH ID ← Settings CLI-ID ({old or '-'} → {cid})"
+                )
+        if cpw:
+            old = (cur.get("oru_cli_pw") or "").strip()
+            cur["oru_cli_pw"] = cpw
+            if old != cpw:
+                self._guardrails_log(f"{iid}: RU SSH PW ← Settings CLI-PW (updated)")
+        self._guardrails_per_test_settings[sk] = {
+            k: v for k, v in cur.items() if str(v).strip()
+        }
+        sib = self._guardrails_dhcp_sibling_key(iid)
+        if sib:
+            sib_blob = dict(self._guardrails_per_test_settings.get(sib) or {})
+            if cid:
+                sib_blob["oru_cli_id"] = cid
+            if cpw:
+                sib_blob["oru_cli_pw"] = cpw
+            self._guardrails_per_test_settings[sib] = {
+                k: v for k, v in sib_blob.items() if str(v).strip()
+            }
+
+    def _guardrails_gf(self, key: str, default: str = "") -> str:
+        iid = getattr(self, "_guardrails_settings_item_id", None) or "dhcp_v4"
+        return self._guardrails_get_val(iid, key, default)
+
+    def _guardrails_int(self, key: str, default: int) -> int:
+        raw = self._guardrails_gf(key, str(default))
+        try:
+            return max(1, int(raw))
+        except ValueError:
+            return default
+
+    def _guardrails_fill_defaults_from_context(self, item_id: str | None = None) -> None:
+        """Prefill empty per-test fields from Settings / Conformance 3151 (in memory only)."""
+        iid = item_id or getattr(self, "_guardrails_settings_item_id", None) or "dhcp_v4"
+        if not hasattr(self, "_guardrails_per_test_settings") or self._guardrails_per_test_settings is None:
+            self._guardrails_per_test_settings = {}
+        sk = self._guardrails_store_key(iid)
+        # migrate old per-item blob → shared / merged keys
+        if sk not in self._guardrails_per_test_settings:
+            for legacy_key in ("dhcp_v6_only_boot", "dhcp_v4_only_boot", "dhcp_boot_shared"):
+                legacy = self._guardrails_per_test_settings.get(legacy_key)
+                if isinstance(legacy, dict) and legacy and sk == "dhcp_boot_shared":
+                    self._guardrails_per_test_settings[sk] = dict(legacy)
+                    break
+            if sk in ("dhcp_v4", "dhcp_v6", "dhcp_v4_vlan", "dhcp_v6_vlan", "dhcp_capture_shared"):
+                merged: dict[str, str] = {}
+                for legacy_key in (
+                    "dhcp_capture_shared",
+                    "dhcp_v4",
+                    "dhcp_v6",
+                    "dhcp_v4_vlan",
+                    "dhcp_v6_vlan",
+                    "dhcp_options",
+                    "dhcp_option_identity",
+                    "dhcp_controller_discovery",
+                ):
+                    if legacy_key == sk:
+                        continue
+                    legacy = self._guardrails_per_test_settings.get(legacy_key)
+                    if isinstance(legacy, dict):
+                        for k, v in legacy.items():
+                            if v is not None and k not in merged:
+                                merged[str(k)] = str(v)
+                if merged.get("identity_regex") and not merged.get("option_regex"):
+                    merged["option_regex"] = merged["identity_regex"]
+                if merged.get("expect_regex") and not merged.get("option_regex"):
+                    merged["option_regex"] = merged["expect_regex"]
+                if merged.get("controller_regex") and not merged.get("discovery_regex"):
+                    merged["discovery_regex"] = merged["controller_regex"]
+                if merged and sk not in self._guardrails_per_test_settings:
+                    self._guardrails_per_test_settings[sk] = merged
+        cur = dict(self._guardrails_per_test_settings.get(sk) or {})
+        changed = False
+
+        def _field(name: str) -> str:
+            try:
+                return (self.fields.get(name).get() or "").strip()  # type: ignore[union-attr]
+            except Exception:
+                return ""
+
+        # sync capture/L2SW/VLAN/timing across dhcp_* items (+ legacy blobs)
+        if sk in self._GUARDRAILS_DHCP_ITEM_IDS or sk in ("dhcp_v4", "dhcp_v6", "dhcp_v4_vlan", "dhcp_v6_vlan"):
+            srcs = list(self._GUARDRAILS_DHCP_ITEM_IDS) + [
+                "dhcp_capture_shared",
+                "dhcp_boot_shared",
+                "dhcp_v4_only_boot",
+                "dhcp_v6_only_boot",
+            ]
+            for src in srcs:
+                if src == sk:
+                    continue
+                other = dict(self._guardrails_per_test_settings.get(src) or {})
+                for k in (
+                    "dhcp_host",
+                    "dhcp_id",
+                    "dhcp_pw",
+                    "dhcp_port",
+                    "dhcp_if",
+                    "use_sudo",
+                    "capture_sec",
+                    "require_reboot",
+                    "ru_mac",
+                    "l2sw_ip",
+                    "l2sw_id",
+                    "l2sw_pw",
+                    "l2sw_if",
+                    "acl_num",
+                    "vlan_discovery_vid",
+                    "vlan_discovery_base_vid",
+                    "vlan_discovery_solid_parent",
+                    "vlan_discovery_solid_cidr",
+                    "vlan_discovery_solid_cidr_v6",
+                    "vlan_discovery_name",
+                    "dhcp_renew_cmd",
+                    "oru_cli_id",
+                    "oru_cli_pw",
+                    "probe_v4",
+                    "probe_v6",
+                    "mplane_if",
+                    "pass_sec",
+                    "timeout_sec",
+                    "poll_sec",
+                    "stable_sec",
+                    "down_detect_sec",
+                    "healthy_regex",
+                    "healthy_regex_v4",
+                ):
+                    if not (cur.get(k) or "").strip() and (other.get(k) or "").strip():
+                        cur[k] = other[k]
+                        changed = True
+
+        if sk in ("dhcp_v4_vlan", "dhcp_v6_vlan") and (cur.get("acl_num") or "").strip() != "110":
+            cur["acl_num"] = "110"
+            changed = True
+        if not (cur.get("dhcp_if") or "").strip():
+            lif = _field("LOCAL_IF")
+            if lif:
+                cur["dhcp_if"] = lif
+                changed = True
+        if not (cur.get("mplane_if") or "").strip():
+            lif = _field("LOCAL_IF")
+            if lif:
+                cur["mplane_if"] = lif
+                changed = True
+        # Settings ALLOWED_IP* 가 SSOT — 비어 있을 때만이 아니라 항상 Settings 로 probe 맞춤
+        allowed = self._guardrails_strip_ip_cidr(_field("ALLOWED_IP"))
+        if allowed:
+            old = self._guardrails_strip_ip_cidr(cur.get("probe_v4") or "")
+            if old != allowed:
+                cur["probe_v4"] = allowed
+                changed = True
+            else:
+                cur["probe_v4"] = allowed
+        allowed6 = self._guardrails_strip_ip_cidr(_field("ALLOWED_IP_V6"))
+        if allowed6 and ":" in allowed6:
+            old = self._guardrails_strip_ip_cidr(cur.get("probe_v6") or "")
+            if old != allowed6:
+                cur["probe_v6"] = allowed6
+                changed = True
+            else:
+                cur["probe_v6"] = allowed6
+        # dhcp_v6: never keep DHCPv4 Option 60/43 regex (common after v4↔v6 ⚙ 공유)
+        fam_now = ""
+        try:
+            fam_now = str((self._GUARDRAILS_PER_TEST_SCHEMA.get(iid) or {}).get("family") or "")
+        except Exception:
+            fam_now = ""
+        if fam_now == "v6" or sk in ("dhcp_v6", "dhcp_v6_vlan") or iid in ("dhcp_v6", "dhcp_v6_vlan"):
+            ore = (cur.get("option_regex") or "").strip()
+            looks_v4_opt = bool(re.search(r"Option\s*60", ore, re.I)) or (
+                bool(ore) and bool(re.search(r"Vendor-Class", ore, re.I)) and not re.search(r"Option\s*16", ore, re.I)
+            )
+            if (not ore) or looks_v4_opt:
+                cur["option_regex"] = r"(?i)(Option\s*16|vendor.class|Vendor Class|VENDOR_CLASS)"
+                changed = True
+            dre = (cur.get("discovery_regex") or "").strip()
+            if (not dre) or re.search(r"Option\s*43", dre, re.I):
+                cur["discovery_regex"] = r"(?i)(Option\s*17|vendor.opts|Vendor-opts|vendor.options)"
+                changed = True
+            pv6 = (cur.get("probe_v6") or "").strip()
+            if pv6 and "/" in pv6:
+                cur["probe_v6"] = self._guardrails_strip_ip_cidr(pv6)
+                changed = True
+        # Settings CLI-ID/PW 가 SSOT — 항상 Settings 로 oru_cli 맞춤
+        cid = _field("CLI-ID")
+        if cid:
+            old = (cur.get("oru_cli_id") or "").strip()
+            if old != cid:
+                cur["oru_cli_id"] = cid
+                changed = True
+            else:
+                cur["oru_cli_id"] = cid
+        cpw = _field("CLI-PW")
+        if cpw:
+            old = (cur.get("oru_cli_pw") or "").strip()
+            if old != cpw:
+                cur["oru_cli_pw"] = cpw
+                changed = True
+            else:
+                cur["oru_cli_pw"] = cpw
+        # pull common SSH fields from dhcp_boot_shared if empty
+        shared = dict(self._guardrails_per_test_settings.get("dhcp_boot_shared") or {})
+        for k in ("ru_mac", "mplane_if"):
+            if not (cur.get(k) or "").strip() and (shared.get(k) or "").strip():
+                cur[k] = shared[k]
+                changed = True
+        for src_key in ("l2sw_ip", "l2sw_id", "l2sw_pw"):
+            if (cur.get(src_key) or "").strip():
+                continue
+            val = ""
+            try:
+                val = (self._conformance_get_per_test_val("conformance_3151.sh", src_key) or "").strip()
+            except Exception:
+                val = ""
+            if val:
+                cur[src_key] = val
+                changed = True
+        if changed:
+            self._guardrails_per_test_settings[sk] = cur
+
+    def _guardrails_resolve_ssh_family(self, item_id: str | None = None) -> str:
+        iid = item_id or getattr(self, "_guardrails_settings_item_id", None) or "dhcp_v4"
+        if iid in ("dhcp_v4", "dhcp_v4_vlan", "dhcp_v4_only_boot"):
+            return "v4"
+        if iid in ("dhcp_v6", "dhcp_v6_vlan", "dhcp_v6_only_boot"):
+            return "v6"
+        fam = (self._guardrails_gf("ssh_family") or self._guardrails_item_family(iid) or "v4").lower()
+        return "v6" if fam.startswith("v6") else "v4"
+
+    def _guardrails_ru_ssh_run(
+        self,
+        command: str,
+        family: str | None = None,
+        timeout: int = 40,
+        host_override: str | None = None,
+    ) -> tuple[bool, str, str]:
+        """Run command on RU via solid→ssh. Returns (ok, text, how)."""
+        fam = (family or self._guardrails_resolve_ssh_family()).lower()
+        if host_override:
+            host = self._guardrails_strip_ip_cidr(host_override)
+            how = f"override {host}"
+        else:
+            host, how = self._guardrails_ru_ssh_target(fam)
+        if not host:
+            return False, how, how
+        user = self._guardrails_gf("oru_cli_id")
+        pw = self._guardrails_gf("oru_cli_pw")
+        if not user:
+            return False, "RU SSH ID 필요", how
+        # support multiple cmds separated by ;
+        parts = [c.strip() for c in re.split(r"\s*;\s*", command or "") if c.strip()]
+        if not parts:
+            return False, "check_cmd 비어 있음", how
+        remote_body = " ; ".join(parts)
+        ssh_flag = "-4" if fam == "v4" else "-6"
+        remote = (
+            "export SSHPASS=" + shlex.quote(pw) + "; "
+            f"sshpass -e ssh {ssh_flag} -n "
+            "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "
+            "-o ConnectTimeout=8 -o BatchMode=no "
+            + shlex.quote(f"{user}@{host}")
+            + " "
+            + shlex.quote(f"bash -lc {shlex.quote(remote_body)} || ({remote_body})")
+        )
+        ok, text = self._guardrails_ssh_exec(f"bash -lc {shlex.quote(remote)}", timeout=timeout)
+        return ok, text, how
+
+    @staticmethod
+    def _guardrails_parse_dhcp_assigned_ips(
+        decode: str, family: str = "v4", mac_colon: str = ""
+    ) -> list[str]:
+        """Extract leased addresses from tcpdump -vv -e decode (Your-IP / IAADDR).
+
+        mac_colon 이 있으면 해당 MAC 이 등장한 패킷(청크)의 lease 만 채택.
+        (pcap 에 다른 클라/서버 IAADDR 가 섞여 ::456 고아 IP 잡히는 것 방지)
+        """
+        text = decode or ""
+        found: list[str] = []
+        fam = (family or "v4").lower()
+        mac = (mac_colon or "").strip().lower()
+        mac_flex = ""
+        if mac:
+            mac_flex = mac.replace(":", "[-:]")
+            # tcpdump -e 패킷 단위로 나눠 MAC 없는 청크 제외
+            chunks = re.split(r"(?=^\d{2}:\d{2}:\d{2}\.\d+)", text, flags=re.M)
+            if len(chunks) <= 1:
+                chunks = [text]
+            text = "\n".join(
+                c for c in chunks if c and re.search(mac_flex, c, re.I)
+            )
+            if not text.strip():
+                return []
+        if fam == "v4":
+            pats = (
+                r"Your-IP\s+(\d{1,3}(?:\.\d{1,3}){3})",
+                r"yiaddr[=:\s]+(\d{1,3}(?:\.\d{1,3}){3})",
+                r"Client-IP\s+(\d{1,3}(?:\.\d{1,3}){3})",
+                r"Requested-IP(?:\s+Address)?\s+(\d{1,3}(?:\.\d{1,3}){3})",
+                r"(?:ACK|OFFER)[^\n]{0,80}?(\d{1,3}(?:\.\d{1,3}){3})",
+            )
+            for pat in pats:
+                for m in re.finditer(pat, text, re.I):
+                    ip = m.group(1)
+                    if ip.startswith("0.") or ip.startswith("255.") or ip.startswith("127."):
+                        continue
+                    if ip not in found:
+                        found.append(ip)
+            return found
+        pats = (
+            r"IAADDR\s+([0-9a-fA-F:]+)",
+            r"(?i)iaaddr[=:\s]+([0-9a-fA-F:]+)",
+            r"Identity Association.*?address[:\s]+([0-9a-fA-F:]+)",
+            r"(?i)(?:IA_NA|iaprefix|address)\s+([0-9a-fA-F]{0,4}(?::[0-9a-fA-F]{0,4}){2,})",
+            r"\b((?:2001|240|fc00|fd[0-9a-f]{0,2})[0-9a-fA-F:]*)\b",
+        )
+        for pat in pats:
+            for m in re.finditer(pat, text, re.I | re.S):
+                ip = m.group(1).rstrip(",.;")
+                if not ip:
+                    continue
+                ip = re.split(r"[^\w:]", ip, maxsplit=1)[0]
+                if not CallhomeGUI._guardrails_is_plausible_ip(ip, "v6"):
+                    continue
+                if ip not in found:
+                    found.append(ip)
+        return found
+
+    @staticmethod
+    def _guardrails_is_plausible_ip(ip: str, family: str = "v4") -> bool:
+        """MAC(dc:c1:…) / link-local 등을 lease IP 후보에서 제외."""
+        s = (ip or "").strip().split("%")[0].split("/")[0]
+        if not s:
+            return False
+        fam = "v6" if str(family).lower().startswith("v6") else "v4"
+        if fam == "v4":
+            return bool(re.fullmatch(r"\d{1,3}(?:\.\d{1,3}){3}", s))
+        # Ethernet MAC 오인 방지
+        if re.fullmatch(r"(?i)[0-9a-f]{2}(?::[0-9a-f]{2}){5}", s):
+            return False
+        try:
+            import ipaddress
+
+            a = ipaddress.IPv6Address(s)
+            if a.is_link_local or a.is_multicast or a.is_loopback or a.is_unspecified:
+                return False
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
+    def _guardrails_v6_local_cidr_for_target(target: str) -> str:
+        """Same /64 as target, host ::252 (for vlan100 ping6)."""
+        try:
+            import ipaddress
+
+            t = (target or "").strip().split("%")[0]
+            # MAC 형태는 IPv6 로 파싱하지 않음
+            if re.fullmatch(r"(?i)[0-9a-f]{2}(?::[0-9a-f]{2}){5}", t.split("/")[0]):
+                return ""
+            if "/" in t:
+                iface = ipaddress.IPv6Interface(t)
+            else:
+                iface = ipaddress.IPv6Interface(f"{t}/64")
+            local = iface.network.network_address + 0x252
+            if local == iface.ip:
+                local = iface.network.network_address + 0x253
+            return f"{local}/64"
+        except Exception:
+            return ""
+
+    def _lab_controller_listen_ip(self, family: str = "v4", plane: str = "untag") -> str:
+        """Lab CallHome/Controller listen IP (Settings LOCAL_IP* 대체).
+
+        untag: v4 10.0.60.253 / v6 2001:1200:1100:1000::253
+        tag:   v4 10.0.61.253 / v6 2001:1300:1100:1000::253
+        """
+        fam = "v6" if str(family or "").lower().startswith("v6") else "v4"
+        pl = str(plane or "untag").strip().lower()
+        if pl in ("tag", "vlan", "discovery", "1300", "61"):
+            return "10.0.61.253" if fam == "v4" else "2001:1300:1100:1000::253"
+        return "10.0.60.253" if fam == "v4" else "2001:1200:1100:1000::253"
+
+    def _apply_lab_controller_listen_ips(self, plane: str = "untag") -> None:
+        """Settings LOCAL_IP / LOCAL_IP_V6 를 lab untag|tag 값으로 강제."""
+        v4 = self._lab_controller_listen_ip("v4", plane)
+        v6 = self._lab_controller_listen_ip("v6", plane)
+        try:
+            if "LOCAL_IP" in self.fields:
+                self.fields["LOCAL_IP"].set(v4)
+        except Exception:
+            pass
+        try:
+            if "LOCAL_IP_V6" in self.fields:
+                self.fields["LOCAL_IP_V6"].set(v6)
+        except Exception:
+            pass
+
+    def _guardrails_v6_solid_cidr(self, target: str = "", *, plane: str = "") -> str:
+        """dhcp_host IF에 올릴 IPv6 CIDR — UI 없이 시험 상황별 자동.
+
+        - target 있으면 그 /64 의 ::252
+        - plane=untag → 2001:1200:1100:1000::252/64 (parent enx 임시)
+        - plane=tag/빈값 → 2001:1300:1100:1000::252/64 (vlan IF)
+        """
+        t = self._guardrails_strip_ip_cidr(target)
+        if t and self._guardrails_is_plausible_ip(t, "v6"):
+            derived = self._guardrails_v6_local_cidr_for_target(t)
+            if derived:
+                return derived
+        pl = (plane or "").strip().lower()
+        if pl in ("untag", "pre", "parent", "1200"):
+            return "2001:1200:1100:1000::252/64"
+        # tag / vlan Discovery IF (기본)
+        if pl in ("tag", "vlan", "discovery", "1300", ""):
+            # probe 가 이미 tag(1300) 이면 그 /64, 아니면 lab tag 기본
+            probe6 = self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v6"))
+            if not probe6 or ":" not in probe6:
+                try:
+                    probe6 = self._guardrails_strip_ip_cidr(
+                        (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+                    )
+                except Exception:
+                    probe6 = ""
+            if (
+                probe6
+                and self._guardrails_is_plausible_ip(probe6, "v6")
+                and not self._guardrails_is_pre_discovery_ip(probe6, "v6")
+            ):
+                derived = self._guardrails_v6_local_cidr_for_target(probe6)
+                if derived:
+                    return derived
+            return "2001:1300:1100:1000::252/64"
+        return "2001:1300:1100:1000::252/64"
+
+    def _guardrails_dhcp_host_ensure_v6_addr(
+        self, ifname: str, cidr6: str
+    ) -> tuple[bool, str, bool]:
+        """dhcp_host IF에 IPv6 부여 + connected /64 라우트.
+
+        Returns (ok, detail, newly_added). newly_added=True 이면 시험 후 del 대상.
+        """
+        name = (ifname or "").strip()
+        cidr = (cidr6 or "").strip()
+        if not name or not cidr or ":" not in cidr:
+            return False, "no if/cidr6", False
+        if "/" not in cidr:
+            cidr = f"{cidr}/64"
+        lip = cidr.split("/")[0].strip()
+        try:
+            import ipaddress
+
+            net6 = str(ipaddress.IPv6Interface(cidr).network)
+        except Exception:
+            return False, f"bad cidr6 {cidr}", False
+        s = self._guardrails_dhcp_host_sudo_line
+        script = "\n".join(
+            [
+                "set +e",
+                f"{s(f'ip link set {name} up')} 2>/dev/null || true",
+                f"{s(f'sysctl -w net.ipv6.conf.{name}.disable_ipv6=0')} 2>/dev/null || true",
+                f"{s('sysctl -w net.ipv6.conf.all.disable_ipv6=0')} 2>/dev/null || true",
+                f"if ! ip -6 -o addr show dev {shlex.quote(name)} 2>/dev/null "
+                f"| grep -Fq {shlex.quote(lip)}; then",
+                f"  {s(f'ip -6 addr add {cidr} dev {name} nodad')} 2>&1 || "
+                f"  {s(f'ip -6 addr add {cidr} dev {name}')} 2>&1 || true",
+                "  echo CAP_V6_ADD",
+                "else",
+                "  echo CAP_V6_EXISTS",
+                "fi",
+                f"{s(f'ip -6 route replace {net6} dev {name} metric 0')} 2>&1 || true",
+                f"echo ADDR6=$(ip -6 -o addr show dev {shlex.quote(name)} 2>&1 | tr ' ' '_' | head -c 200)",
+                f"if ip -6 -o addr show dev {shlex.quote(name)} 2>/dev/null "
+                f"| grep -Fq {shlex.quote(lip)}; then echo CAP_V6_OK; else echo CAP_V6_FAIL; fi",
+            ]
+        )
+        _ok, text = self._guardrails_dhcp_server_run(script, timeout=25)
+        out = text or ""
+        if "CAP_V6_OK" in out:
+            # EXISTS여도 시험용 임시주소면 종료 시 삭제(과거 잔존 포함)
+            return True, f"{name} {cidr}", True
+        return False, out.replace("\n", " | ")[:220], False
+
+    def _guardrails_arm_parent_v6_cleanup(self, ifname: str, cidr6: str) -> None:
+        """Deprecated no-op — v6 untag ::252 는 netplan 고정. 시험 후 삭제하지 않음."""
+        return
+
+    def _guardrails_cleanup_parent_v6_pending(self) -> None:
+        """Deprecated no-op — parent enx 임시 IPv6 삭제 안 함 (netplan 고정)."""
+        self._guardrails_parent_v6_pending = None
+        return
+
+    def _guardrails_dhcp_host_del_v6_addr(
+        self, ifname: str, cidr6: str
+    ) -> tuple[bool, str]:
+        """시험이 parent(enx)에만 임시로 올린 IPv6 제거 (vlan IF 삭제는 teardown)."""
+        name = (ifname or "").strip()
+        cidr = (cidr6 or "").strip()
+        if not name or not cidr:
+            return True, "skip"
+        lip = cidr.split("/")[0].strip()
+        s = self._guardrails_dhcp_host_sudo_line
+        script = "\n".join(
+            [
+                "set +e",
+                f"{s(f'ip -6 addr del {cidr} dev {name}')} 2>/dev/null || "
+                f"{s(f'ip -6 addr del {lip}/64 dev {name}')} 2>/dev/null || true",
+                "echo CAP_V6_DEL",
+            ]
+        )
+        self._guardrails_dhcp_server_run(script, timeout=15)
+        return True, f"del {lip}@{name}"
+
+    def _guardrails_find_ip_by_ru_mac(
+        self, mac_colon: str, vlan_if: str = "", family: str = "v4"
+    ) -> list[str]:
+        """Find RU IP via neigh / leases (pcap miss 보완). v4/v6."""
+        mac = (mac_colon or "").strip().lower()
+        if not mac:
+            return []
+        fam = "v6" if str(family).lower().startswith("v6") else "v4"
+        mac_flex = mac.replace(":", "[-:]")
+        if fam == "v6":
+            parts = [
+                f"ip -6 neigh show 2>/dev/null | grep -iE {shlex.quote(mac_flex)} || true",
+            ]
+            if vlan_if:
+                # MAC 매칭 실패해도 vlan IF 의 global neigh 후보를 본다
+                parts.append(
+                    f"ip -6 neigh show dev {shlex.quote(vlan_if)} 2>/dev/null || true"
+                )
+                parts.append(
+                    f"ip -6 neigh show dev {shlex.quote(vlan_if)} 2>/dev/null "
+                    f"| grep -iE {shlex.quote(mac_flex)} || true"
+                )
+            parts.append(
+                "for f in /var/lib/dhcp/dhcpd6.leases /var/lib/dhcp/dhcpd.leases "
+                "/var/lib/dhcpd/dhcpd6.leases; do "
+                f"test -r \"$f\" && grep -iE {shlex.quote(mac_flex)} -A8 \"$f\" 2>/dev/null; "
+                "done || true"
+            )
+            cmd = "; ".join(parts)
+            _ok, text = self._guardrails_dhcp_server_run(cmd, timeout=15)
+            found: list[str] = []
+            # MAC 매칭 줄 우선
+            prefer: list[str] = []
+            for line in (text or "").splitlines():
+                ips_on = re.findall(
+                    r"\b([0-9a-fA-F]{0,4}(?::[0-9a-fA-F]{0,4}){2,})\b", line
+                )
+                hit_mac = bool(re.search(mac_flex, line, re.I))
+                for ip in ips_on:
+                    if not self._guardrails_is_plausible_ip(ip, "v6"):
+                        continue
+                    # dhcp_host 자기주소(::252/::253) 제외
+                    if re.search(r":(0*252|0*253)$", ip, re.I):
+                        continue
+                    if hit_mac:
+                        if ip not in prefer:
+                            prefer.append(ip)
+                    elif ip not in found:
+                        found.append(ip)
+            return prefer + [ip for ip in found if ip not in prefer]
+        parts = [
+            f"ip -4 neigh show 2>/dev/null | grep -iE {shlex.quote(mac_flex)} || true",
+        ]
+        if vlan_if:
+            parts.append(
+                f"ip -4 neigh show dev {shlex.quote(vlan_if)} 2>/dev/null || true"
+            )
+            parts.append(
+                f"ip -4 addr show dev {shlex.quote(vlan_if)} 2>/dev/null | head -5 || true"
+            )
+        parts.append(
+            "for f in /var/lib/dhcp/dhcpd.leases /var/lib/dhcp/dhcpd6.leases "
+            "/var/lib/kea/kea-leases4.csv; do "
+            f"test -r \"$f\" && grep -iE {shlex.quote(mac_flex)} -A20 \"$f\" 2>/dev/null; "
+            "done | head -c 12000 || true"
+        )
+        ok, text = self._guardrails_dhcp_server_run("; ".join(parts), timeout=25)
+        if not (text or "").strip():
+            return []
+        found: list[str] = []
+        for m in re.finditer(r"\b(10\.\d{1,3}\.\d{1,3}\.\d{1,3})\b", text or ""):
+            ip = m.group(1)
+            if ip.endswith((".0", ".255", ".252", ".253")):
+                continue  # skip net/bcast/likely server
+            if ip not in found:
+                found.append(ip)
+        for m in re.finditer(
+            r"lease\s+(\d{1,3}(?:\.\d{1,3}){3})\s*\{", text or "", re.I
+        ):
+            ip = m.group(1)
+            if ip not in found:
+                found.append(ip)
+        return found
+
+    def _guardrails_peek_pcap_assigned_ips(
+        self,
+        remote_pcap: str,
+        family: str = "v4",
+        timeout: int = 12,
+        mac_colon: str = "",
+    ) -> list[str]:
+        """Best-effort read of growing pcap; leased IPs (MAC 있으면 해당 프레임만)."""
+        fam = "v6" if str(family).lower().startswith("v6") else "v4"
+        mac = (mac_colon or "").strip().lower()
+        # offline filter: RU MAC 프레임만 decode → 다른 클라 IAADDR 혼입 방지
+        ether = ""
+        if mac and re.fullmatch(r"(?i)[0-9a-f]{2}(?::[0-9a-f]{2}){5}", mac):
+            ether = f" ether host {mac}"
+        if fam == "v6":
+            gre = (
+                "IAADDR|iaaddr|IA_NA|Advertise|Reply|Request|"
+                "2001:|240:|fc00:|fd|"
+                + (mac.replace(":", "|") if mac else "ether")
+            )
+        else:
+            gre = (
+                "Your-IP|yiaddr|Client-IP|Requested-IP|IAADDR|iaaddr|ACK|OFFER|"
+                + (mac.replace(":", "|") if mac else "ether")
+            )
+        cmd = (
+            f"tcpdump -nn -vv -e -r {shlex.quote(remote_pcap)}{ether} 2>/dev/null "
+            f"| grep -iE {shlex.quote(gre)} "
+            f"| tail -n 240 || true"
+        )
+        ok, text = self._guardrails_dhcp_server_run(cmd, timeout=max(5, int(timeout)))
+        if not ok and not (text or "").strip():
+            return []
+        return self._guardrails_parse_dhcp_assigned_ips(
+            text or "", family, mac_colon=mac
+        )
+
+    def _guardrails_peek_pcap_assigned_ip(
+        self, remote_pcap: str, family: str = "v4", mac_colon: str = ""
+    ) -> str:
+        """Newest leased IP in pcap (MAC 필터 권장)."""
+        ips = self._guardrails_peek_pcap_assigned_ips(
+            remote_pcap, family, mac_colon=mac_colon
+        )
+        return ips[-1] if ips else ""
+
+    @staticmethod
+    def _guardrails_same_v4_slash24(a: str, b: str) -> bool:
+        try:
+            pa = [int(x) for x in a.split(".")]
+            pb = [int(x) for x in b.split(".")]
+            return len(pa) == 4 and len(pb) == 4 and pa[:3] == pb[:3]
+        except Exception:
+            return False
+
+    def _guardrails_is_pre_discovery_ip(self, ip: str, family: str = "v4") -> bool:
+        """True if IP is still on untag plane — not Discovery(tag) lease.
+
+        Lab mapping:
+          v4 untag 10.0.60.x  → tag 10.0.61.x
+          v6 untag 2001:1200:1100:1000::/64 → tag 2001:1300:1100:1000::/64
+        """
+        ip = self._guardrails_strip_ip_cidr(ip)
+        if not ip:
+            return False
+        fam = "v6" if str(family).lower().startswith("v6") else "v4"
+        if fam == "v4":
+            probe = ""
+            try:
+                probe = self._guardrails_strip_ip_cidr(
+                    (self.fields.get("ALLOWED_IP").get() or "").strip()  # type: ignore[union-attr]
+                )
+            except Exception:
+                probe = ""
+            if not probe:
+                probe = self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v4"))
+            if probe and self._guardrails_same_v4_slash24(ip, probe):
+                return True
+            # lab default untag plane (.60); tag 는 .61
+            if ip.startswith("10.0.60."):
+                return True
+            return False
+        # lab default untag /64 (1200); tag 는 1300
+        if ip.lower().startswith("2001:1200:1100:1000:"):
+            return True
+        probe6 = ""
+        try:
+            probe6 = self._guardrails_strip_ip_cidr(
+                (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+            )
+        except Exception:
+            probe6 = ""
+        if not probe6:
+            probe6 = self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v6"))
+        if not (probe6 and ":" in ip and ":" in probe6):
+            return False
+        try:
+            import ipaddress
+
+            a = ipaddress.IPv6Address(ip)
+            b = ipaddress.IPv6Address(probe6)
+            # same /64 as Settings/probe_v6 → still untag/pre-Discovery
+            return (int(a) >> 64) == (int(b) >> 64)
+        except Exception:
+            return False
+
+    def _guardrails_pick_discovery_ip(self, ips: list[str], family: str = "v4") -> str:
+        """Newest leased IP that is NOT the pre-Discovery subnet."""
+        for ip in reversed(ips or []):
+            if ip and not self._guardrails_is_pre_discovery_ip(ip, family):
+                return ip
+        return ""
+
+    def _guardrails_ru_force_dhcp_renew(
+        self,
+        host: str,
+        family: str = "v4",
+        command: str | None = None,
+        *,
+        via_dhcp_host: bool = False,
+        vlan_bind: bool | None = None,
+    ) -> tuple[bool, str]:
+        """Run renew CLI on RU over SSH. Empty command → 'dhcp renew force'.
+
+        via_dhcp_host=True: SSH from 9.249 (dhcp_host).
+        vlan_bind=True: -b 10.0.61.252 (Discovery .61).
+        vlan_bind=False: 수동 untag 와 동일 — enx(.60) 기본경로로 admin@10.0.60.x.
+        vlan_bind=None: 대상이 pre-discovery(.60)면 False, 아니면 True.
+        """
+        host = self._guardrails_strip_ip_cidr(host)
+        if not host:
+            return False, "renew: no host"
+        fam = (family or "v4").lower()
+        primary = (command if command is not None else self._guardrails_gf("dhcp_renew_cmd") or "").strip()
+        if not primary:
+            primary = "dhcp renew force"
+        primary = primary.lower()
+        # VLAN Discovery 원복: vlan-discovery renew 가 거절되면 일반 renew 도 시도
+        cmd_candidates: list[str] = []
+        for c in (
+            primary,
+            "dhcp vlan-discovery renew force",
+            "dhcp renew force",
+        ):
+            c = (c or "").strip().lower()
+            if c and c not in cmd_candidates:
+                cmd_candidates.append(c)
+        if via_dhcp_host:
+            user = self._guardrails_gf("oru_cli_id")
+            pw = self._guardrails_gf("oru_cli_pw")
+            if not user:
+                return False, "renew: RU SSH ID 필요"
+            if not (pw or "").strip():
+                return False, "renew: RU SSH PW(oru_cli_pw) 비어 있음 — 로그인 실패 가능"
+            if vlan_bind is None:
+                vlan_bind = not self._guardrails_is_pre_discovery_ip(host, fam)
+            # fe80::…%if → link-local renew (GUA 타이밍 실패 폴백)
+            host_bare = host.split("%", 1)[0].strip()
+            scope_if = host.split("%", 1)[1].strip() if "%" in host else ""
+            is_ll = host_bare.lower().startswith("fe80:")
+            bind_ip = ""
+            ifname = "dhcp_host"
+            if is_ll and scope_if:
+                ifname = scope_if
+                vlan_bind = bool(vlan_bind) if vlan_bind is not None else ("vlan" in scope_if.lower())
+            elif vlan_bind:
+                # Discovery VLAN IF (v4=.61 / v6=같은 /64 ::252)
+                st_if, det_if, _owned, ifname = self._guardrails_solid_vlan_if_prepare()
+                if st_if != "PASS":
+                    return False, f"renew: dhcp_host IF 준비 실패 ({det_if})"
+                _p, _n, cidr = self._guardrails_capture_host_vlan_if_names()
+                bind_ip = (cidr.split("/")[0] or "").strip()
+                if fam == "v6":
+                    local6 = self._guardrails_v6_solid_cidr(host_bare, plane="tag")
+                    if local6:
+                        ok6, det6, _added = self._guardrails_dhcp_host_ensure_v6_addr(
+                            ifname, local6
+                        )
+                        bind_ip = local6.split("/")[0]
+                        if not ok6:
+                            return False, f"renew: vlan IF IPv6 부여 실패 ({det6})"
+            else:
+                # 수동 캡처와 동일: ssh admin@10.0.60.167 (vlan bind 없음)
+                ifname = (self._guardrails_gf("dhcp_if") or "enx").strip() or "enx"
+                if fam == "v6":
+                    local6 = self._guardrails_v6_solid_cidr(host_bare, plane="untag")
+                    if local6:
+                        ok6, det6, added = self._guardrails_dhcp_host_ensure_v6_addr(
+                            ifname, local6
+                        )
+                        bind_ip = local6.split("/")[0] if ok6 else ""
+                        if not ok6:
+                            return False, f"renew: parent IPv6 부여 실패 ({det6})"
+                        if added:
+                            self._guardrails_arm_parent_v6_cleanup(ifname, local6)
+            # 죽은 tag IP 에 40s SSH 낭비 방지 (untag=enx / tag=vlan IF)
+            # LL 은 GUA ping 대신 L2 ND 만 — ping 사전검사 생략(타이밍 목적)
+            if not is_ll:
+                try:
+                    up_p, det_p = self._guardrails_probe_from_dhcp_host(
+                        host_bare, via_if=ifname, family=fam
+                    )
+                    if not up_p:
+                        return (
+                            False,
+                            f"renew-fail unreachable {host} "
+                            f"({'tag' if vlan_bind else 'untag'} ping FAIL: {det_p[:120]})",
+                        )
+                except Exception as exc:
+                    self._guardrails_log(f"dhcp renew: ping 사전검사 스킵 ({exc})")
+            else:
+                self._guardrails_log(
+                    f"dhcp renew: link-local 경로 — ping 생략, ssh {user}@{host}"
+                )
+            ssh_flag = "-6" if (is_ll or fam != "v4") else "-4"
+            bind_opt = ""
+            if is_ll:
+                # scope 는 user@fe80::x%if 에 포함 — -B 중복 불필요
+                bind_opt = ""
+            elif fam == "v6" and bind_ip:
+                bind_opt = f"-b {shlex.quote(bind_ip)} "
+            elif vlan_bind and bind_ip and fam == "v4":
+                bind_opt = f"-b {shlex.quote(bind_ip)} "
+            elif vlan_bind and fam == "v6" and ifname:
+                bind_opt = f"-B {shlex.quote(ifname)} "
+            how = f"dhcp_host/{ifname}→{host}"
+            ssh_dest = host  # fe80::…%vlan100 유지
+            last_fail = ""
+            for cmd in cmd_candidates:
+                # 수동과 동일: 로그인 후 프롬프트에 명령 입력.
+                # 금지: sshpass + ssh -tt + '원격argv명령' — stdin 충돌로 로그인/명령 둘 다 실패.
+                self._guardrails_log(
+                    f"dhcp renew SSH 시도 중… {user}@{ssh_dest} "
+                    f"({'LL' if is_ll else ('vlan_bind '+bind_ip if vlan_bind else 'untag '+ifname)}) "
+                    f"cmd=`{cmd}` — 대화형 CLI 주입 (최대 ~40s)"
+                )
+                feeder = (
+                    "sleep 2.5; "
+                    f"printf '%s\\r\\n' {shlex.quote(cmd)}; "
+                    "sleep 2.5; "
+                    "printf 'exit\\r\\n'; "
+                    "sleep 0.5"
+                )
+                remote = (
+                    "export SSHPASS=" + shlex.quote(pw) + "; "
+                    "command -v sshpass >/dev/null 2>&1 || { echo RENEW_NO_SSHPASS; exit 41; }; "
+                    f"echo RENEW_TRY user={shlex.quote(user)} cmd={shlex.quote(cmd)} "
+                    f"bind={shlex.quote(bind_ip or '-')} to {shlex.quote(ssh_dest)}; "
+                    "set +e; "
+                    f"sout=$( ( {feeder} ) | sshpass -e ssh {ssh_flag} {bind_opt}-tt "
+                    "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "
+                    "-o PreferredAuthentications=password -o PubkeyAuthentication=no "
+                    "-o ConnectTimeout=12 -o ConnectionAttempts=1 "
+                    + shlex.quote(f"{user}@{ssh_dest}")
+                    + " 2>&1 ); rc=$?; "
+                    'echo "RENEW_SSH_OUT=$(echo \"$sout\" | tr \'\\n\' \'|\' | head -c 500)"; '
+                    "echo RENEW_SSH_RC=$rc; "
+                    "if echo \"$sout\" | grep -Eqi "
+                    "'Connection refused|No route to host|Connection timed out|"
+                    "Could not resolve|Name or service not known|Network is unreachable'; then "
+                    "echo RENEW_FAIL_CONNECT; exit 43; fi; "
+                    "if echo \"$sout\" | grep -Eqi "
+                    "'Permission denied|Authentication failed|access denied|"
+                    "sshpass:.*denied'; then "
+                    "echo RENEW_FAIL_AUTH; exit 42; fi; "
+                    "login_ok=0; "
+                    "if echo \"$sout\" | grep -Eqi "
+                    "'O-RAN\\.MP\\.DAEMON|mplane#|Developer mode|oru1-mplane|"
+                    "Welcome|login successful'; then "
+                    "echo RENEW_LOGIN_OK; login_ok=1; fi; "
+                    "if echo \"$sout\" | grep -Eqi "
+                    "'Connection reset|closed by remote|Broken pipe|Connection to .* closed'; then "
+                    "echo RENEW_OK_DROPPED; exit 0; fi; "
+                    "if [ \"$login_ok\" -eq 1 ]; then echo RENEW_OK; exit 0; fi; "
+                    "if [ \"$rc\" -eq 0 ]; then echo RENEW_OK; exit 0; fi; "
+                    "echo RENEW_FAIL; exit \"$rc\""
+                )
+                _ok, text = self._guardrails_dhcp_server_run(remote, timeout=45)
+                out = text or ""
+                snippet = out.replace("\n", " | ")[:400]
+                self._guardrails_log(f"dhcp renew SSH 결과: {snippet[:320]}")
+                if "RENEW_NO_SSHPASS" in out:
+                    return False, f"renew-fail `{cmd}` via {how}: sshpass 없음 on dhcp_host"
+                if "RENEW_FAIL_CONNECT" in out:
+                    # IP/경로 문제 — 다른 CLI 명령 재시도 무의미
+                    return (
+                        False,
+                        f"renew-fail `{cmd}` via {how}: SSH 연결 실패 "
+                        f"(대상 IP/경로): {snippet}",
+                    )
+                if "RENEW_FAIL_AUTH" in out:
+                    return (
+                        False,
+                        f"renew-fail `{cmd}` via {how}: SSH 로그인 실패 "
+                        f"(CLI-ID/PW 확인): {snippet}",
+                    )
+                if (
+                    "RENEW_OK" in out
+                    or "RENEW_OK_DROPPED" in out
+                    or "RENEW_LOGIN_OK" in out
+                    or re.search(
+                        r"(?i)O-RAN\.MP\.DAEMON|mplane#|oru1-mplane|Welcome", out
+                    )
+                ):
+                    tag = "dropped-ok" if "RENEW_OK_DROPPED" in out else "ok"
+                    return True, f"renew `{cmd}` via {how} ({tag}): {snippet}"
+                last_fail = f"renew-fail `{cmd}` via {how}: {snippet}"
+                # 로그인/연결은 됐는데 판정 실패 → 다음 후보 명령 시도
+                if len(cmd_candidates) > 1:
+                    self._guardrails_log(
+                        f"dhcp renew: `{cmd}` 미확인 — 다음 명령 후보 시도"
+                    )
+            return False, last_fail or f"renew-fail via {how}"
+        cmd = primary
+        ok, text, how = self._guardrails_ru_ssh_run(cmd, family=fam, timeout=60, host_override=host)
+        snippet = (text or "").replace("\n", " | ")[:220]
+        if ok:
+            return True, f"renew `{cmd}` via {how}: {snippet}"
+        # renew 직후 세션 끊김도 성공 후보
+        low = (text or "").lower()
+        if any(
+            x in low
+            for x in (
+                "connection reset",
+                "connection closed",
+                "broken pipe",
+                "closed by remote",
+            )
+        ):
+            return True, f"renew `{cmd}` via {how} (dropped-ok): {snippet}"
+        return False, f"renew-fail `{cmd}` via {how}: {snippet}"
+
+    def _guardrails_match_output(self, text: str, expect_regex: str, required_ips: list[str] | None = None) -> tuple[bool, str]:
+        notes: list[str] = []
+        if expect_regex:
+            try:
+                if not re.search(expect_regex, text or "", re.I | re.M):
+                    return False, f"expect_regex 미일치: {expect_regex[:60]}"
+                notes.append("regex OK")
+            except re.error as exc:
+                return False, f"regex 오류: {exc}"
+        for ip in required_ips or []:
+            if ip and ip not in (text or ""):
+                return False, f"IP 미검출: {ip}"
+            if ip:
+                notes.append(f"ip {ip}")
+        return True, ", ".join(notes) if notes else "OK"
+
+    def _guardrails_extract_dhcp_option_lines(
+        self, decode: str, family: str = "v4", limit: int = 16
+    ) -> list[str]:
+        """pcap decode 에서 옵션/벤더 관련 줄을 중복 없이 정리."""
+        text = decode or ""
+        fam = "v6" if str(family).lower().startswith("v6") else "v4"
+        if fam == "v4":
+            pats = (
+                r"(?i)Option\s*60[^\n]{0,160}",
+                r"(?i)Vendor-Class[^\n]{0,160}",
+                r"(?i)Option\s*43[^\n]{0,160}",
+                r"(?i)Vendor-Specific[^\n]{0,120}",
+                r"(?i)Your-IP\s+\d{1,3}(?:\.\d{1,3}){3}",
+            )
+        else:
+            pats = (
+                r"(?i)Option\s*16[^\n]{0,160}",
+                r"(?i)Vendor Class[^\n]{0,160}",
+                r"(?i)Option\s*17[^\n]{0,160}",
+                r"(?i)vendor[- ]?opts[^\n]{0,140}",
+                r"(?i)IA[_-]?NA[^\n]{0,100}",
+                r"(?i)IAADDR\s+[0-9a-fA-F:]+",
+            )
+        out: list[str] = []
+        seen: set[str] = set()
+        for pat in pats:
+            for m in re.finditer(pat, text):
+                s = " ".join(m.group(0).split())
+                if len(s) > 180:
+                    s = s[:177] + "..."
+                key = s.lower()
+                if key in seen:
+                    continue
+                seen.add(key)
+                out.append(s)
+                if len(out) >= limit:
+                    return out
+        return out
+
+    def _guardrails_format_dhcp_options_detail(
+        self,
+        *,
+        item_id: str,
+        status: str,
+        fam: str,
+        boot_ok: bool,
+        opt_ok: bool,
+        disc_ok: bool,
+        ia_na_ok: bool,
+        learned_ip: str,
+        decode: str,
+        opt_re: str,
+        notes: list[str],
+        sec_reset_to_down: float | None,
+        sec_reset_to_ip: float | None,
+        sec_reset_to_boot: float | None,
+        sec_down_to_boot: float | None,
+    ) -> str:
+        """상세 결과용 줄별 요약 (옵션 / 수신 IP / reset 후 시간)."""
+        lines: list[str] = [
+            f"{status}  {item_id}",
+            "",
+            "[판정]",
+            f"  boot(ping)     : {'OK' if boot_ok else 'FAIL'}",
+            f"  option(pcap)   : {'OK' if opt_ok else 'FAIL'}",
+            f"  discovery      : {'OK' if disc_ok else 'FAIL'}",
+        ]
+        if fam == "v6":
+            lines.append(f"  ia_na          : {'OK' if ia_na_ok else 'FAIL'}")
+        lines.extend(["", "[타이밍]  (reset 기준)"])
+        def _sec(v: float | None) -> str:
+            if v is None:
+                return "-"
+            return f"{v:.0f}s"
+
+        lines.append(f"  reset → SSH down     : {_sec(sec_reset_to_down)}")
+        lines.append(f"  reset → IP 수신      : {_sec(sec_reset_to_ip)}")
+        lines.append(f"  reset → ping 복구    : {_sec(sec_reset_to_boot)}")
+        if sec_down_to_boot is not None:
+            lines.append(f"  SSH down → ping 복구 : {_sec(sec_down_to_boot)}")
+
+        lines.extend(["", "[수신 IP]"])
+        lip = (learned_ip or "").strip()
+        if lip:
+            lines.append(f"  Discovery/lease : {lip}")
+        else:
+            lines.append("  Discovery/lease : (미검출)")
+        # 상세: MAC 필터 없이 전체 lease 도 보여 주되, 사용 IP 는 별도 표기
+        leased = self._guardrails_parse_dhcp_assigned_ips(decode or "", fam)
+        uniq: list[str] = []
+        for ip in leased:
+            if ip and ip not in uniq:
+                uniq.append(ip)
+        if uniq:
+            label = "Your-IP" if fam == "v4" else "IAADDR"
+            lines.append(f"  pcap {label} (전체):")
+            for ip in uniq[-8:]:
+                mark = "  ← 사용" if lip and ip == lip else ""
+                lines.append(f"    - {ip}{mark}")
+
+        lines.extend(["", "[옵션]"])
+        opt_lines = self._guardrails_extract_dhcp_option_lines(decode or "", fam)
+        if opt_re:
+            lines.append(f"  expect_regex : {opt_re[:100]}")
+        if opt_lines:
+            for ol in opt_lines:
+                lines.append(f"  · {ol}")
+        else:
+            lines.append("  (pcap에서 옵션 문자열 미추출)")
+
+        # notes 중 핵심만 (한 줄짜리 잡음 축소)
+        key_notes: list[str] = []
+        for n in notes or []:
+            ns = str(n).strip()
+            if not ns:
+                continue
+            if ns.startswith(("family=", "ssh=", "if=", "bpf=", "dhcp_host=")):
+                continue
+            if ns.startswith(("pcap_ip:", "boot:", "option:", "discovery:", "ia_na")):
+                continue
+            key_notes.append(ns)
+        if key_notes:
+            lines.extend(["", "[기타]"])
+            for n in key_notes[-20:]:
+                lines.append(f"  · {n}")
+
+        lines.extend(
+            [
+                "",
+                "[환경]",
+                f"  family={fam}",
+            ]
+        )
+        for n in notes or []:
+            ns = str(n).strip()
+            if ns.startswith(("if=", "bpf=", "dhcp_host=", "ssh=")):
+                lines.append(f"  {ns}")
+        return "\n".join(lines)
+
+    def _guardrails_check_dhcpv6_ia_na(self, decode: str, regex: str) -> tuple[bool, str]:
+        """Require IA_NA (Option 3) in DHCPv6 Solicit — field issue: missing → no IPv6 lease."""
+        text = decode or ""
+        if not text.strip():
+            return False, "ia_na: decode 없음"
+        pat = (regex or "").strip() or r"(?i)(IA[_-]?NA|Identity Association for Non-temporary)"
+        try:
+            re.compile(pat)
+        except re.error as exc:
+            return False, f"ia_na regex 오류: {exc}"
+
+        # Prefer Solicit-scoped: at least one Solicit must include IA_NA
+        solicit_iter = list(re.finditer(r"(?i)\bdhcp6\s+solicit\b|\bsolicit\s*\(", text))
+        msg_pat = re.compile(
+            r"(?i)\bdhcp6\s+(solicit|advertise|request|reply|confirm|renew|rebind|"
+            r"release|decline|information-request)\b"
+        )
+        if solicit_iter:
+            ok_any = False
+            missing_n = 0
+            for m in solicit_iter:
+                nxt = msg_pat.search(text, m.end())
+                end = nxt.start() if nxt else min(len(text), m.start() + 3000)
+                chunk = text[m.start() : end]
+                if re.search(pat, chunk, re.I | re.M):
+                    ok_any = True
+                else:
+                    missing_n += 1
+            if ok_any:
+                note = "ia_na OK (Solicit)"
+                if missing_n:
+                    note += f"; other_solicit_missing={missing_n}"
+                return True, note
+            return False, (
+                "ia_na FAIL: Solicit에 IA_NA(Option 3) 없음 "
+                "(현장 IPv6 미할당과 동일 패턴)"
+            )
+
+        if re.search(pat, text, re.I | re.M):
+            return True, "ia_na OK (decode, no Solicit label)"
+        return False, "ia_na FAIL: IA_NA/Option3 미검출"
+
+    def _guardrails_log(self, msg: str) -> None:
+        """Thread-safe GUI log for M-Plane Test.
+
+        Important: write to log_buffer on the calling thread (worker OK).
+        Only schedule UI open/paint on the Tk main thread — after() from a
+        worker is unreliable on Windows and was dropping all M-Plane lines.
+        """
+        line = msg if msg.endswith("\n") else msg + "\n"
+        if not line.startswith("[M-Plane Test]"):
+            line = f"[M-Plane Test] {line}"
+        # 1) Always enqueue immediately (works from worker threads).
+        try:
+            with self.log_lock:
+                self.log_buffer.append(line)
+                self._recent_log_for_session += line
+                if len(self._recent_log_for_session) > 128_000:
+                    self._recent_log_for_session = self._recent_log_for_session[-128_000:]
+        except Exception:
+            pass
+
+        # 2) Ask main thread to show Logs + paint.
+        def _ui() -> None:
+            try:
+                if self.log is None or self.log_window is None or not self.log_window.winfo_exists():
+                    self.open_log_window()
+            except Exception:
+                try:
+                    self.open_log_window()
+                except Exception:
+                    return
+            try:
+                if self.log is None or not self.log.winfo_exists():
+                    return
+                chunk = ""
+                with self.log_lock:
+                    if self.hidden_log_chunks:
+                        chunk = "".join(self.hidden_log_chunks)
+                        self.hidden_log_chunks.clear()
+                    if self.log_buffer:
+                        chunk += "".join(self.log_buffer)
+                        self.log_buffer.clear()
+                if not chunk:
+                    return
+                self.log.configure(state="normal")
+                self.log.insert("end", chunk)
+                self.log.see("end")
+                self.log.configure(state="disabled")
+            except Exception:
+                pass
+
+        try:
+            self.after(0, _ui)
+        except Exception:
+            pass
+
+    def _guardrails_trigger_oru_reboot_v6(self) -> tuple[bool, str]:
+        """IPv6 CallHome reset via copied helper (conformance_oru_reboot_v6.sh). v4 helper untouched."""
+        helper = "conformance_oru_reboot_v6.sh"
+        # reset 시점 RU 는 아직 untag — CallHome listen = untag controller
+        try:
+            self._apply_lab_controller_listen_ips("untag")
+        except Exception:
+            pass
+        local_v6 = ""
+        allowed_v6 = ""
+        try:
+            local_v6 = self._guardrails_strip_ip_cidr(
+                (self.fields.get("LOCAL_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+            )
+            allowed_v6 = self._guardrails_strip_ip_cidr(
+                (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+            )
+        except Exception:
+            pass
+        if not local_v6:
+            local_v6 = self._lab_controller_listen_ip("v6", "untag")
+        # Settings ALLOWED_IP_V6 가 SSOT (⚙ probe 는 Settings 미러만)
+        if not local_v6 or not allowed_v6:
+            self._guardrails_log(
+                "ORU reset(v6) 실패: Settings LOCAL_IP_V6 / ALLOWED_IP_V6 필요"
+            )
+            return False, "no-v6-settings"
+        if ":" not in local_v6 or ":" not in allowed_v6:
+            self._guardrails_log("ORU reset(v6) 실패: LOCAL_IP_V6/ALLOWED_IP_V6 가 IPv6 형식이 아님")
+            return False, "bad-v6-settings"
+
+        ssh_user = self.remote_user.get().strip()
+        ssh_host = self.remote_host.get().strip()
+        ssh_port = self.remote_port.get().strip() or "22"
+        ssh_password = self.remote_password.get()
+        key_path = (self.remote_key_path.get() or "").strip()
+        if not ssh_user or not ssh_host:
+            self._guardrails_log("ORU reset(v6) 실패: Settings SSH_USER/SSH_HOST 필요")
+            return False, "no-ssh"
+
+        try:
+            import paramiko  # type: ignore
+        except Exception as exc:
+            self._guardrails_log(f"ORU reset(v6) 실패: paramiko 필요 ({exc})")
+            return False, "no-paramiko"
+
+        opts = self._conformance_default_run_options()
+        remote_dir = opts.remote_dir.rstrip("/")
+        cfg_remote = f"{remote_dir}/{_conf_manifest.CONFORMANCE_REMOTE_GUI_CONFIG_NAME}"
+        lp = self._conformance_script_local_path(helper)
+        if lp is None:
+            cand = self._conformance_local_dir() / helper
+            if cand.is_file():
+                lp = cand
+        if lp is None:
+            self._guardrails_log(f"ORU reset(v6) 실패: 로컬 헬퍼 없음 {helper}")
+            return False, "no-helper"
+
+        def log_line(msg: str) -> None:
+            self._guardrails_log(msg)
+
+        client: Any = None
+        try:
+            try:
+                self._conformance_cancel_event.clear()
+            except Exception:
+                pass
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(
+                hostname=ssh_host,
+                port=int(ssh_port),
+                username=ssh_user,
+                password=ssh_password if ssh_password else None,
+                key_filename=key_path if key_path else None,
+                timeout=20,
+                auth_timeout=20,
+                banner_timeout=20,
+                look_for_keys=not bool(ssh_password),
+                allow_agent=True,
+            )
+            _stdin, _stdout, _stderr = client.exec_command(f"mkdir -p {shlex.quote(remote_dir)}")
+            _stdout.channel.recv_exit_status()
+            sftp = client.open_sftp()
+            rp = f"{remote_dir}/{helper}"
+            try:
+                # Windows checkout may be CRLF — normalize to LF before upload
+                raw = lp.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+                sftp.putfo(io.BytesIO(raw), rp, len(raw))
+                try:
+                    sftp.chmod(rp, 0o755)
+                except OSError:
+                    pass
+                log_line(f"uploaded {helper} (LF normalized)")
+            except Exception as exc:
+                log_line(f"[ERROR] {helper} 업로드 실패: {exc}")
+                return False, "upload-fail"
+            try:
+                cfg_payload = self._conformance_effective_config_json_text()
+                cfg_bytes = cfg_payload.encode("utf-8")
+                sftp.putfo(io.BytesIO(cfg_bytes), cfg_remote, len(cfg_bytes))
+            except Exception as exc:
+                log_line(f"[WARN] 재부팅용 config 갱신 실패(기존 config 사용): {exc}")
+
+            envp = self._conformance_bash_env_exports(opts, None)
+            host_log = self._conformance_host_run_log_path(helper)
+            dir_q = shlex.quote(str(PurePosixPath(host_log).parent))
+            log_q = shlex.quote(host_log)
+            rp_q = shlex.quote(rp)
+            cfg_q = shlex.quote(cfg_remote)
+            # listen 기본 300s → M-Plane 은 90s (중지/타임아웃 반응)
+            listen_to = 90
+            try:
+                listen_to = max(30, int(self._guardrails_gf("reset_listen_sec", "90") or "90"))
+            except Exception:
+                listen_to = 90
+            runner = (
+                f"{envp}"
+                f"export CONFORMANCE_SCRIPT_BASENAME={shlex.quote(helper)} ; "
+                f"export CALLHOME_LISTEN_TIMEOUT={int(listen_to)} ; "
+                f"chmod +x {rp_q} 2>/dev/null ; bash {rp_q} --config {cfg_q}"
+            )
+            wrapped = (
+                f"set -o pipefail; "
+                f"mkdir -p {dir_q} && : > {log_q} && chmod 0644 {log_q} || exit 1; "
+                f"( {runner} ) 2>&1 | tee -a {log_q}; "
+                "_cf_rc=${PIPESTATUS[0]}; "
+                'exit "${_cf_rc:-0}"'
+            )
+            cmd_remote = "bash -lc " + shlex.quote(wrapped)
+            log_line(f"---- START {helper} (ORU reset IPv6) ----")
+            log_line(f"remote host log file: {host_log}")
+            log_line(
+                f"[INFO] IPv6 CallHome listen LOCAL_IP_V6={local_v6} "
+                f"ALLOWED_IP_V6={allowed_v6} listen≤{listen_to}s "
+                f"(v4 헬퍼/스크립트 미사용)"
+            )
+            log_line(
+                "[INFO] 순서: CallHome 로그인 성공 → "
+                "<reset xmlns=\"urn:o-ran:operations:1.0\"/> 전송. "
+                "이 단계에서는 dhcp renew force 를 보내지 않음 "
+                "(renew 는 VLAN 원복/정리 때만)"
+            )
+            _stdin, stdout, stderr = client.exec_command(cmd_remote, get_pty=True)
+            ch = stdout.channel
+            with self._conformance_run_transport_lock:
+                self._conformance_run_script_channel = ch
+            t_listen0 = time.monotonic()
+            # GUI 측 하드캡 (스크립트 listen + 여유)
+            hard_cap = float(listen_to) + 45.0
+            while not ch.exit_status_ready():
+                if (
+                    self._guardrails_cancel.is_set()
+                    or self._conformance_cancel_event.is_set()
+                ):
+                    try:
+                        ch.close()
+                    except Exception:
+                        pass
+                    try:
+                        # 원격 listen/netopeer 잔여 정리 (best-effort)
+                        client.exec_command(
+                            f"pkill -f {shlex.quote(helper)} 2>/dev/null; "
+                            f"fuser -k 4334/tcp 2>/dev/null || true"
+                        )
+                    except Exception:
+                        pass
+                    log_line("재부팅 헬퍼(v6) 실행 중 사용자 중지")
+                    with self._conformance_run_transport_lock:
+                        self._conformance_run_script_channel = None
+                    return False, "cancelled"
+                if time.monotonic() - t_listen0 > hard_cap:
+                    try:
+                        ch.close()
+                    except Exception:
+                        pass
+                    log_line(
+                        f"재부팅 헬퍼(v6) 타임아웃 ({hard_cap:.0f}s) — "
+                        "CallHome 미수신. ALLOWED_IP_V6/LOCAL_IP_V6·ip6tables 확인"
+                    )
+                    with self._conformance_run_transport_lock:
+                        self._conformance_run_script_channel = None
+                    return False, "listen-timeout"
+                if ch.recv_ready():
+                    chunk = ch.recv(4096).decode(errors="ignore")
+                    if chunk:
+                        for line in chunk.splitlines():
+                            log_line(line)
+                else:
+                    time.sleep(0.1)
+            try:
+                rem = stdout.read().decode(errors="ignore")
+                for line in rem.splitlines():
+                    log_line(line)
+            except Exception:
+                pass
+            rc = ch.recv_exit_status()
+            log_line(f"---- END {helper} exit={rc} ----")
+            with self._conformance_run_transport_lock:
+                self._conformance_run_script_channel = None
+            try:
+                sftp.close()
+            except Exception:
+                pass
+            if rc == 0:
+                log_line("ORU reset RPC 전송 완료 (IPv6 Call Home helper)")
+                return True, "conformance_oru_reboot_v6"
+            log_line(f"[WARN] 재부팅 헬퍼(v6) 실패 exit={rc}")
+            return False, "conformance_oru_reboot_v6-fail"
+        except Exception as exc:
+            self._guardrails_log(f"ORU reset(v6) 예외: {exc}")
+            return False, f"exception:{exc}"
+        finally:
+            if client is not None:
+                try:
+                    client.close()
+                except Exception:
+                    pass
+
+    def _guardrails_trigger_ru_reset(self, fam: str) -> tuple[bool, str]:
+        """RU reset: v4 → existing conformance_oru_reboot.sh; v6 → copied v6 helper."""
+        mode = (self._guardrails_gf("reset_mode", "auto") or "auto").strip().lower()
+        if mode in ("0", "manual", "prompt", "none", "off"):
+            self._guardrails_log("Reset mode=manual — RU를 직접 재부팅하세요")
+            return True, "manual"
+
+        if (fam or "").lower().startswith("v6"):
+            return self._guardrails_trigger_oru_reboot_v6()
+
+        # reset 시점 RU 는 아직 untag — CallHome listen = untag controller
+        try:
+            self._apply_lab_controller_listen_ips("untag")
+        except Exception:
+            pass
+
+        ssh_user = self.remote_user.get().strip()
+        ssh_host = self.remote_host.get().strip()
+        ssh_port = self.remote_port.get().strip() or "22"
+        ssh_password = self.remote_password.get()
+        key_path = (self.remote_key_path.get() or "").strip()
+        if not ssh_user or not ssh_host:
+            self._guardrails_log("ORU reset 실패: Settings SSH_USER/SSH_HOST 필요")
+            return False, "no-ssh"
+
+        try:
+            import paramiko  # type: ignore
+        except Exception as exc:
+            self._guardrails_log(f"ORU reset 실패: paramiko 필요 ({exc})")
+            return False, "no-paramiko"
+
+        opts = self._conformance_default_run_options()
+        remote_dir = opts.remote_dir.rstrip("/")
+        cfg_remote = f"{remote_dir}/{_conf_manifest.CONFORMANCE_REMOTE_GUI_CONFIG_NAME}"
+
+        def log_line(msg: str) -> None:
+            self._guardrails_log(msg)
+
+        client: Any = None
+        try:
+            try:
+                self._conformance_cancel_event.clear()
+            except Exception:
+                pass
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(
+                hostname=ssh_host,
+                port=int(ssh_port),
+                username=ssh_user,
+                password=ssh_password if ssh_password else None,
+                key_filename=key_path if key_path else None,
+                timeout=20,
+                auth_timeout=20,
+                banner_timeout=20,
+                look_for_keys=not bool(ssh_password),
+                allow_agent=True,
+            )
+            _stdin, _stdout, _stderr = client.exec_command(f"mkdir -p {shlex.quote(remote_dir)}")
+            _stdout.channel.recv_exit_status()
+            ok_lip, det_lip = self._guardrails_verify_local_ip_on_remote(client)
+            self._guardrails_log(f"ORU reset(v4) LOCAL_IP 검사 → {'OK' if ok_lip else 'FAIL'}: {det_lip}")
+            if not ok_lip:
+                return False, f"local-ip-missing:{det_lip}"
+            sftp = client.open_sftp()
+            self._guardrails_log(
+                "ORU reset: Conformance 헬퍼 호출 "
+                "(_conformance_trigger_oru_reboot → conformance_oru_reboot.sh)"
+            )
+            ok = bool(
+                self._conformance_trigger_oru_reboot(
+                    client, sftp, opts, remote_dir, cfg_remote, log_line
+                )
+            )
+            try:
+                sftp.close()
+            except Exception:
+                pass
+            if ok:
+                return True, "conformance_oru_reboot"
+            return False, "conformance_oru_reboot-fail"
+        except Exception as exc:
+            self._guardrails_log(f"ORU reset 예외: {exc}")
+            return False, f"exception:{exc}"
+        finally:
+            if client is not None:
+                try:
+                    client.close()
+                except Exception:
+                    pass
+
+    def _guardrails_run_dhcp_options_family(self, item_id: str) -> tuple[str, str]:
+        """Boot(L2SW없음) 또는 VLAN Discovery(L2SW/ACL) + tcpdump option + pcap."""
+        self._guardrails_settings_item_id = item_id
+        self._guardrails_fill_defaults_from_context(item_id)
+        self._guardrails_sync_probe_from_settings(item_id)
+        self._guardrails_sync_oru_cli_from_settings(item_id)
+        fam = self._guardrails_resolve_ssh_family(item_id)
+        enable_vlan_disc = self._guardrails_item_mode(item_id) == "vlan"
+        self._guardrails_log(
+            f"{item_id}: mode={'vlan' if enable_vlan_disc else 'boot'} — Settings/probe "
+            f"v4={self._guardrails_gf('probe_v4') or '-'} "
+            f"v6={self._guardrails_gf('probe_v6') or '-'} "
+            f"l2sw={self._guardrails_gf('l2sw_ip') or '-'}"
+        )
+
+        if enable_vlan_disc:
+            if not self._guardrails_gf("l2sw_ip") or not self._guardrails_gf("l2sw_id"):
+                return "FAIL", "⚙ L2SW IP/ID 필요 (VLAN Discovery)"
+
+            # 1) RU MAC (ALLOWED_IP → dhcp_host ping → ip neigh)
+            st_mac, det_mac = self._guardrails_ensure_ru_mac(item_id, force=True)
+            if st_mac == "FAIL":
+                return "FAIL", f"RU MAC 자동 조회 실패: {det_mac}"
+            if st_mac == "WARN":
+                self._guardrails_log(f"{item_id}: RU MAC WARN — {det_mac}")
+
+            # 2) L2SW IF (enable → show mac → 해당 MAC 포트)
+            st_if, det_if = self._guardrails_ensure_l2sw_if_from_mac(item_id, force=True)
+            if st_if == "FAIL":
+                return "FAIL", f"L2SW IF 자동 조회 실패: {det_if}"
+            if st_if == "WARN":
+                self._guardrails_log(f"{item_id}: L2SW IF 조회 WARN — {det_if}")
+            if not self._guardrails_l2sw_normalize_if():
+                return "FAIL", "L2SW IF 없음 (RU MAC show mac 조회 실패)"
+            ll0, how_ll0 = self._guardrails_ru_linklocal_scoped(tag=False)
+            if ll0:
+                self._guardrails_log(f"{item_id}: 사전 LL(계산) — {how_ll0}")
+        else:
+            self._guardrails_log(f"{item_id}: Boot 모드 — L2SW/ACL/MAC 조회 생략")
+
+        # Capture IF (dhcp_host ifconfig → 10.0.60.x)
+        st_cap, det_cap = self._guardrails_ensure_capture_if(item_id, prefer_tag=False)
+        if st_cap == "FAIL":
+            return "FAIL", f"Capture IF 자동 조회 실패: {det_cap}"
+        if st_cap == "WARN":
+            self._guardrails_log(f"{item_id}: Capture IF WARN — {det_cap}")
+        iface = (self._guardrails_gf("dhcp_if") or "").strip()
+        if not iface:
+            return "FAIL", "Capture IF 없음 (dhcp_host ifconfig 10.0.60.x 확인)"
+        # v6 untag: parent enx 에 2001:1200:…::252 임시 부여 → 시험 종료 시 삭제
+        if fam == "v6":
+            tgt6 = self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v6"))
+            if not tgt6:
+                try:
+                    tgt6 = self._guardrails_strip_ip_cidr(
+                        (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+                    )
+                except Exception:
+                    tgt6 = ""
+            cidr6_untag = self._guardrails_v6_solid_cidr(tgt6, plane="untag") or (
+                "2001:1200:1100:1000::252/64"
+            )
+            ok6, det6, _added = self._guardrails_dhcp_host_ensure_v6_addr(iface, cidr6_untag)
+            if not ok6:
+                return "FAIL", f"Capture IF IPv6 임시 부여 실패: {det6}"
+            self._guardrails_arm_parent_v6_cleanup(iface, cidr6_untag)
+            self._guardrails_log(
+                f"{item_id}: v6 untag Capture IF → {iface} {cidr6_untag} "
+                "(netplan 고정 유지 · 시험 후 삭제 안 함)"
+            )
+        host, how = self._guardrails_ru_ssh_target(fam)
+        if not host:
+            need = "Settings ALLOWED_IP" if fam == "v4" else "Settings ALLOWED_IP_V6 또는 RU MAC+M-Plane NIC"
+            return "FAIL", f"SSH 대상 불가: {how} ({need})"
+        if not self._guardrails_gf("oru_cli_id"):
+            return "FAIL", "RU SSH ID 필요 (Settings ★ RU SSH ID)"
+
+        use_sudo = (self._guardrails_gf("use_sudo", "1") or "1").strip().lower() not in ("0", "false", "no", "n")
+        sudo = "sudo -n " if use_sudo else ""
+        # Re-apply family regex fix right before match (saved ⚙ may still hold v4 Option 60)
+        self._guardrails_fill_defaults_from_context(item_id)
+        opt_re = self._guardrails_gf("option_regex")
+        if fam == "v6" and (
+            not opt_re
+            or re.search(r"Option\s*60", opt_re, re.I)
+            or not re.search(r"Option\s*16", opt_re, re.I)
+        ):
+            opt_re = r"(?i)(Option\s*16|vendor.class|Vendor Class|VENDOR_CLASS)"
+            try:
+                sk = self._guardrails_store_key(item_id)
+                blob = dict(self._guardrails_per_test_settings.get(sk) or {})
+                blob["option_regex"] = opt_re
+                self._guardrails_per_test_settings[sk] = blob
+            except Exception:
+                pass
+            self._guardrails_log(f"{item_id}: option_regex → Option 16 강제 (v4 Option60 잔존 방지)")
+        enable_disc = (self._guardrails_gf("enable_discovery", "0") or "0").strip().lower() not in (
+            "0", "false", "no", "n", "",
+        )
+        enable_ia_na = fam == "v6"  # IA_NA(Opt3) 필수 — 설정 UI 숨김, 항상 검사
+        ia_na_re = self._guardrails_gf(
+            "ia_na_regex",
+            r"(?i)(IA[_-]?NA|Identity Association for Non-temporary)",
+        )
+        # enable_vlan_disc: item mode == vlan (체크박스 제거)
+        vlan_vid = (self._guardrails_gf("vlan_discovery_vid", "61") or "61").strip() or "61"
+        vlan_name = (self._guardrails_gf("vlan_discovery_name") or "").strip()
+        renew_cmd_cfg = (self._guardrails_gf("dhcp_renew_cmd") or "").strip()
+        renew_cmd = renew_cmd_cfg.lower() if renew_cmd_cfg else "dhcp renew force"
+        learned_ip = ""  # from pcap when VLAN Discovery moves RU to new subnet (e.g. .61)
+        # prepare PASS뿐 아니라 FAIL(부분 적용: vlan만 생성 등)에도 종료 시 remove 시도
+        vlan_needs_cleanup = False
+        solid_vlan_owned = False  # GUI가 solid에 임시 만든 IF만 종료 시 삭제
+        solid_vlan_if = ""
+        pass_sec = self._guardrails_int("pass_sec", 240)
+        timeout_sec = self._guardrails_int("timeout_sec", 540)
+        poll_sec = self._guardrails_int("poll_sec", 5)
+        stable_sec = self._guardrails_int("stable_sec", 10)
+        down_detect_sec = self._guardrails_int("down_detect_sec", 180)
+
+        def _maybe_force_dhcp_renew() -> None:
+            """Renew via SSH. ⚙ 빈칸 → 'dhcp renew force', 설정 시 그 명령(소문자).
+
+            VLAN Discovery 중에는 기존 .60 probe 로 renew 하지 않음(경로 끊김).
+            learned_ip 또는 pcap의 Discovery(.61) IP 만 시도.
+            """
+            nonlocal learned_ip
+            if not enable_vlan_disc and not renew_cmd_cfg:
+                notes.append("dhcp_renew:SKIP")
+                return
+            targets: list[str] = []
+            if enable_vlan_disc:
+                if learned_ip and not self._guardrails_is_pre_discovery_ip(learned_ip, fam):
+                    targets.append(learned_ip.strip())
+                try:
+                    for ip in _collect_discovery_candidate_ips():
+                        if ip not in targets:
+                            targets.append(ip)
+                except Exception:
+                    pass
+                if not targets:
+                    notes.append("dhcp_renew:SKIP (Discovery IP 없음, .60 probe 생략)")
+                    self._guardrails_log(
+                        f"{item_id}: DHCP renew 생략 — 시험 VLAN IP 없음 "
+                        "(기존 probe .60 은 VLAN Discovery 중 사용 안 함)"
+                    )
+                    return
+            else:
+                for cand in (
+                    learned_ip,
+                    self._guardrails_strip_ip_cidr(
+                        self._guardrails_gf("probe_v4" if fam == "v4" else "probe_v6")
+                    ),
+                ):
+                    c = (cand or "").strip()
+                    if c and c not in targets:
+                        targets.append(c)
+                if not targets:
+                    notes.append("dhcp_renew:SKIP no ip")
+                    self._guardrails_log(f"{item_id}: DHCP renew — 대상 IP 없음, 생략")
+                    return
+            for target in targets:
+                self._guardrails_log(
+                    f"{item_id}: DHCP renew `{renew_cmd}` → {target}"
+                    + (" (via dhcp_host)" if enable_vlan_disc else "")
+                )
+                ok_r, det_r = self._guardrails_ru_force_dhcp_renew(
+                    target, fam, command=renew_cmd, via_dhcp_host=enable_vlan_disc
+                )
+                notes.append(f"dhcp_renew:{'OK' if ok_r else 'WARN'}@{target} {det_r}")
+                self._guardrails_log(
+                    f"{item_id}: dhcp renew → {'OK' if ok_r else 'WARN'}: {det_r[:200]}"
+                )
+                if ok_r:
+                    break
+
+        def _teardown_solid_vlan_if() -> None:
+            """시험 종료 시 dhcp_host 임시 vlan IF 삭제 (reuse 포함)."""
+            nonlocal solid_vlan_owned, solid_vlan_if
+            if not (solid_vlan_if or "").strip():
+                solid_vlan_owned = False
+                return
+            st_s, det_s = self._guardrails_solid_vlan_if_teardown(solid_vlan_if)
+            notes.append(f"solid_if:{det_s}")
+            self._guardrails_log(f"{item_id}: solid 임시 IF 삭제 → {st_s}: {det_s}")
+            solid_vlan_owned = False
+            solid_vlan_if = ""
+
+        def _defer_solid_vlan_to_pending(pending: dict[str, Any]) -> None:
+            """버튼 원복까지 solid IF 유지 — ownership을 pending으로 이전."""
+            nonlocal solid_vlan_owned, solid_vlan_if
+            pending["solid_vlan_owned"] = True  # 원복 시 반드시 삭제
+            pending["solid_vlan_if"] = solid_vlan_if
+            solid_vlan_owned = False
+            solid_vlan_if = ""
+
+        def _renew_via_targets(targets: list[str], *, tag: bool) -> bool:
+            """tag=True: pcap IP + vlan100. tag=False: probe(.60) untag 경로. 성공 시 True."""
+            label = "tag/pcap" if tag else "untag/probe"
+            any_target = False
+            for target in targets:
+                c = (target or "").strip()
+                if not c:
+                    continue
+                any_target = True
+                self._guardrails_log(
+                    f"{item_id}: DHCP renew `{renew_cmd}` → {c} ({label}, "
+                    f"ssh {self._guardrails_gf('oru_cli_id') or 'admin'}@{c})"
+                )
+                ok_r, det_r = self._guardrails_ru_force_dhcp_renew(
+                    c,
+                    fam,
+                    command=renew_cmd,
+                    via_dhcp_host=True,
+                    vlan_bind=tag,
+                )
+                notes.append(f"dhcp_renew:{'OK' if ok_r else 'WARN'}@{c}/{label} {det_r}")
+                self._guardrails_log(
+                    f"{item_id}: dhcp renew → {'OK' if ok_r else 'WARN'}: {det_r[:200]}"
+                )
+                if ok_r:
+                    return True
+            if not any_target:
+                notes.append(f"dhcp_renew:SKIP no {label} ip")
+            return False
+
+        def _cleanup_vlan_discovery() -> None:
+            """정리: add base(1) → renew → 즉시 remove 시험VLAN(100).
+
+            remove 가 늦으면 RU 가 다시 tag(.61) 로 IP 를 받음.
+            renew: tag → untag probe → neigh(현재 IP) 순 폴백
+            (reset 후 RU 가 이미 untag 새 IP(::141)면 옛 tag SSH 실패함).
+            """
+            nonlocal vlan_needs_cleanup
+            if not vlan_needs_cleanup:
+                _teardown_solid_vlan_if()
+                return
+            probe = self._guardrails_strip_ip_cidr(
+                self._guardrails_gf("probe_v4" if fam == "v4" else "probe_v6")
+            )
+            base = self._guardrails_vlan_discovery_base_vid()
+            tag_ip = ""
+            if learned_ip and not self._guardrails_is_pre_discovery_ip(learned_ip, fam):
+                tag_ip = learned_ip.strip()
+            if not tag_ip:
+                try:
+                    for ip in _collect_discovery_candidate_ips():
+                        if ip and not self._guardrails_is_pre_discovery_ip(ip, fam):
+                            tag_ip = ip
+                            break
+                except Exception:
+                    pass
+
+            self._guardrails_log(
+                f"{item_id}: VLAN Discovery 정리 — "
+                f"① add {base} → ② renew → ③ 즉시 remove {vlan_vid}"
+            )
+            # 1) base add (시험 VLAN 100 은 아직 trunk에 유지 → tag SSH 가능)
+            st_a, det_a = self._guardrails_l2sw_vlan_discovery_add_base(base)
+            notes.append(f"vlan_base_add:{det_a}")
+            self._guardrails_log(f"{item_id}: L2 base add → {st_a}: {det_a}")
+            time.sleep(1.0)
+            # 2) renew: tag → untag probe → neigh 현재 IP
+            renewed = False
+            if tag_ip:
+                renewed = _renew_via_targets([tag_ip], tag=True)
+            if (not renewed) and probe and probe != tag_ip:
+                if tag_ip:
+                    self._guardrails_log(
+                        f"{item_id}: tag renew 실패 — untag probe 로 재시도 ({probe})"
+                    )
+                renewed = _renew_via_targets([probe], tag=False)
+            if (not renewed) and mac_colon:
+                try:
+                    live = self._guardrails_find_ip_by_ru_mac(
+                        mac_colon, solid_vlan_if or "", fam
+                    )
+                except Exception:
+                    live = []
+                seen = {x for x in (tag_ip, probe) if x}
+                tag_live = [
+                    ip
+                    for ip in live
+                    if ip
+                    and ip not in seen
+                    and not self._guardrails_is_pre_discovery_ip(ip, fam)
+                ]
+                untag_live = [
+                    ip
+                    for ip in live
+                    if ip
+                    and ip not in seen
+                    and self._guardrails_is_pre_discovery_ip(ip, fam)
+                ]
+                if tag_live or untag_live:
+                    self._guardrails_log(
+                        f"{item_id}: renew 폴백 — neigh 현재 IP "
+                        f"tag={tag_live or '-'} untag={untag_live or '-'}"
+                    )
+                if (not renewed) and tag_live:
+                    renewed = _renew_via_targets(tag_live, tag=True)
+                if (not renewed) and untag_live:
+                    renewed = _renew_via_targets(untag_live, tag=False)
+            # GUA 타이밍 실패 시: MAC→EUI-64 link-local (사전 확정) 폴백
+            if not renewed:
+                ll_tag, how_ll = self._guardrails_ru_linklocal_scoped(tag=True)
+                if ll_tag:
+                    self._guardrails_log(
+                        f"{item_id}: renew 폴백 — link-local(tag) {how_ll}"
+                    )
+                    renewed = _renew_via_targets([ll_tag], tag=True)
+                if not renewed:
+                    ll_u, how_u = self._guardrails_ru_linklocal_scoped(tag=False)
+                    if ll_u:
+                        self._guardrails_log(
+                            f"{item_id}: renew 폴백 — link-local(untag) {how_u}"
+                        )
+                        renewed = _renew_via_targets([ll_u], tag=False)
+            if not renewed:
+                notes.append("dhcp_renew:WARN all-targets-failed")
+                self._guardrails_log(
+                    f"{item_id}: ⚠ renew 전부 실패 — L2 vlan remove 는 계속 "
+                    f"(tag={tag_ip or '-'} probe={probe or '-'})"
+                )
+            # 3) 즉시 remove 100 (대기 없음 — 다시 tag lease 받는 것 방지)
+            self._guardrails_log(
+                f"{item_id}: renew 직후 즉시 trunk remove vlan {vlan_vid}"
+            )
+            st_r, det_r = self._guardrails_l2sw_vlan_discovery_remove_test(vlan_vid)
+            notes.append(f"vlan_remove:{det_r}")
+            self._guardrails_log(f"{item_id}: L2 vlan remove → {st_r}: {det_r}")
+            vlan_needs_cleanup = False
+            _teardown_solid_vlan_if()
+
+        ru_mac = self._guardrails_gf("ru_mac")
+        mac_norm = self._guardrails_normalize_mac(ru_mac)
+        mac_colon = ":".join(mac_norm[i : i + 2] for i in range(0, 12, 2)) if mac_norm else ""
+        if fam == "v4":
+            dhcp_ports = "udp port 67 or udp port 68"
+        else:
+            dhcp_ports = "udp port 546 or udp port 547"
+        # 802.1Q: BPF 'udp port 67' alone misses VLAN-tagged DHCP on parent USB.
+        # Manual: tcpdump -i enx… -e 'vlan or port 67 or port 68' 는 잡히는데
+        # GUI 예전 필터는 untag만 잡아 .61 Your-IP 분석 실패했음.
+        if enable_vlan_disc:
+            bpf = (
+                f"({dhcp_ports}) or "
+                f"(vlan {vlan_vid} and ({dhcp_ports})) or "
+                f"(vlan and ({dhcp_ports}))"
+            )
+        else:
+            bpf = dhcp_ports
+        if mac_colon:
+            bpf = f"ether host {mac_colon} and ({bpf})"
+
+        stamp = time.strftime("%Y%m%d_%H%M%S")
+        base = f"mplane_{item_id}_{stamp}"
+        remote_pcap = f"/tmp/{base}.pcap"
+        remote_pid = f"/tmp/{base}.pid"
+        remote_log = f"/tmp/{base}.td.log"
+        try:
+            log_path = (self.fields.get("LOG_PATH").get() or "").strip()  # type: ignore[union-attr]
+        except Exception:
+            log_path = ""
+        if not log_path:
+            log_path = "/var/tmp/log"
+        log_path = log_path.rstrip("/")
+        dest_pcap = f"{log_path}/{base}.pcap"
+        dest_txt = f"{log_path}/{base}_decode.txt"
+
+        notes: list[str] = [f"family={fam}", f"ssh={how}", f"if={iface}", f"bpf={bpf}"]
+        notes.append(f"dhcp_host={self._guardrails_gf('dhcp_host') or 'solid'}")
+
+        def _collect_discovery_candidate_ips(*, with_lease: bool = False) -> list[str]:
+            """USB pcap(RU MAC 프레임의 lease) + optional neigh. Discovery 대역만."""
+            if self._guardrails_cancel.is_set():
+                return []
+            merged: list[str] = []
+            try:
+                for ip in self._guardrails_peek_pcap_assigned_ips(
+                    remote_pcap, fam, timeout=10, mac_colon=mac_colon
+                ):
+                    if ip not in merged:
+                        merged.append(ip)
+            except Exception:
+                pass
+            if with_lease and mac_colon and not self._guardrails_cancel.is_set():
+                try:
+                    vif = solid_vlan_if or ""
+                    for ip in self._guardrails_find_ip_by_ru_mac(mac_colon, vif, fam):
+                        if ip not in merged:
+                            merged.append(ip)
+                except Exception:
+                    pass
+            return [
+                ip
+                for ip in merged
+                if ip
+                and self._guardrails_is_plausible_ip(ip, fam)
+                and not self._guardrails_is_pre_discovery_ip(ip, fam)
+            ]
+
+        def _sleep_poll(sec: float) -> None:
+            """poll sleep that wakes quickly on 중지."""
+            end = time.monotonic() + max(0.0, float(sec))
+            while time.monotonic() < end:
+                if self._guardrails_cancel.is_set():
+                    return
+                time.sleep(min(0.2, end - time.monotonic()))
+
+        def _abort_fast(msg: str) -> tuple[str, str]:
+            """사용자 중지: renew/긴 VLAN cleanup 생략 → tcpdump+ACL만 짧게, VLAN은 버튼 원복."""
+            nonlocal vlan_needs_cleanup, learned_ip
+            self._guardrails_log(f"{item_id}: {msg} — 빠른 정리 (renew 생략)")
+            try:
+                _stop_tcpdump()
+            except Exception:
+                pass
+            if enable_vlan_disc and vlan_needs_cleanup:
+                # 버튼 원복 때 renew 하려면 Discovery IP 가 필요 — 중지 직전 한 번 더 수집
+                if not (learned_ip or "").strip() or self._guardrails_is_pre_discovery_ip(
+                    learned_ip, fam
+                ):
+                    try:
+                        for ip in _collect_discovery_candidate_ips(with_lease=True):
+                            if ip and not self._guardrails_is_pre_discovery_ip(ip, fam):
+                                learned_ip = ip
+                                self._guardrails_log(
+                                    f"{item_id}: 중지 직전 Discovery IP 확보 → {learned_ip}"
+                                )
+                                break
+                    except Exception:
+                        pass
+                    if not (learned_ip or "").strip():
+                        try:
+                            raw = self._guardrails_peek_pcap_assigned_ips(
+                                remote_pcap,
+                                fam,
+                                timeout=10,
+                                mac_colon=mac_colon,
+                            )
+                            pick = self._guardrails_pick_discovery_ip(raw, fam)
+                            if pick:
+                                learned_ip = pick
+                                self._guardrails_log(
+                                    f"{item_id}: 중지 직전 pcap Discovery IP → {learned_ip}"
+                                )
+                        except Exception:
+                            pass
+                pending = {
+                    "item_id": item_id,
+                    "fam": fam,
+                    "vid": vlan_vid,
+                    "base_vid": self._guardrails_vlan_discovery_base_vid(),
+                    "learned_ip": (learned_ip or "").strip(),
+                    "probe": self._guardrails_strip_ip_cidr(
+                        self._guardrails_gf("probe_v4" if fam == "v4" else "probe_v6")
+                    ),
+                    "renew_cmd": renew_cmd,
+                    "ru_mac": mac_colon,
+                }
+                _defer_solid_vlan_to_pending(pending)  # Discovery SSH용 IF는 버튼 원복까지 유지
+                self.after(0, lambda p=pending: self._guardrails_arm_vlan_restore(p))
+                notes.append("vlan_cleanup:DEFERRED(중지—버튼원복)")
+                vlan_needs_cleanup = False
+                lip = (learned_ip or "").strip() or "-"
+                self._guardrails_log(
+                    f"{item_id}: VLAN/solid IF 원복은 「VLAN untag 원복」 버튼으로 "
+                    f"(중지 시 renew 생략, 저장 IP={lip})"
+                )
+                if lip == "-":
+                    self._guardrails_log(
+                        f"{item_id}: ⚠ Discovery IP 미저장 — 원복 시 tag renew 실패 가능 "
+                        "(RU show dhcp IP를 ⚙에 없으므로 neigh/pcap 재시도는 버튼에서)"
+                    )
+            else:
+                _teardown_solid_vlan_if()
+            if enable_vlan_disc:
+                try:
+                    rm_st, rm_detail = self._guardrails_remove_acl(timeout=40)
+                    notes.append(f"acl_abort:{rm_st}:{rm_detail[:80]}")
+                except Exception as exc:
+                    notes.append(f"acl_abort:ERR:{exc}")
+            else:
+                notes.append("acl_abort:SKIP(boot)")
+            return "INFO", f"{msg} | " + " | ".join(notes)
+
+        def _stop_tcpdump() -> tuple[bool, str]:
+            stop_cmd = (
+                f"pid=$(cat {shlex.quote(remote_pid)} 2>/dev/null); "
+                f"test -n \"$pid\" && kill \"$pid\" 2>/dev/null; "
+                f"pkill -f {shlex.quote(base + '.pcap')} 2>/dev/null; sleep 0.3; "
+                f"ls -la {shlex.quote(remote_pcap)} 2>/dev/null || echo NO_PCAP"
+            )
+            return self._guardrails_dhcp_server_run(stop_cmd, timeout=12)
+
+        start_cmd = (
+            f"{sudo}tcpdump -n -i {shlex.quote(iface)} -U -w {shlex.quote(remote_pcap)} "
+            f"{shlex.quote(bpf)} >{shlex.quote(remote_log)} 2>&1 & "
+            f"echo $! >{shlex.quote(remote_pid)}; sleep 0.5; "
+            f"test -s {shlex.quote(remote_pid)} && echo START_OK || "
+            f"(echo START_FAIL; cat {shlex.quote(remote_log)} 2>/dev/null | tail -20)"
+        )
+        ok, text = self._guardrails_dhcp_server_run(start_cmd, timeout=30)
+        if not ok or "START_OK" not in (text or ""):
+            self._guardrails_log(f"{item_id}: tcpdump 시작 실패: {(text or '')[:200]}")
+            return "FAIL", f"tcpdump 시작 실패: {(text or '')[:240]} | " + " | ".join(notes)
+        notes.append("tcpdump started")
+        self._guardrails_log(f"{item_id}: tcpdump 시작 OK (if={iface}, bpf={bpf})")
+
+        if enable_vlan_disc:
+            self._guardrails_log(f"{item_id}: L2SW ACL 적용 중 ({fam})…")
+            st, detail = self._guardrails_apply_acl(fam)
+            if st != "PASS":
+                _stop_tcpdump()
+                self._guardrails_log(f"{item_id}: ACL 실패 — {detail}")
+                return st, detail + " | " + " | ".join(notes)
+            notes.append(detail)
+        else:
+            notes.append("acl:SKIP(boot)")
+            self._guardrails_log(f"{item_id}: Boot — ACL 적용 생략")
+
+        # VLAN Discovery 초반: vlan 생성 + trunk add 만 (base remove는 reset 직후)
+        if enable_vlan_disc:
+            self._guardrails_log(
+                f"{item_id}: VLAN Discovery — vlan {vlan_vid}"
+                + (f" ({vlan_name})" if vlan_name else "")
+                + " trunk add (base remove는 reset 직후)"
+            )
+            st_v, det_v = self._guardrails_l2sw_vlan_discovery_prepare(vlan_vid, vlan_name)
+            notes.append(f"vlan_prepare:{det_v}")
+            self._guardrails_log(f"{item_id}: VLAN prepare → {st_v}: {det_v}")
+            vlan_needs_cleanup = True  # PASS/FAIL 무관 — 종료/원복 시 vlan100 삭제
+            if st_v != "PASS":
+                notes.append("vlan_prepare:WARN (시험은 계속, 종료 시 remove 시도)")
+            # 9.249(dhcp_host) Capture IF에 임시 .VID IF (v4 .61 + v6 ::252)
+            st_sf, det_sf, solid_vlan_owned, solid_vlan_if = (
+                self._guardrails_solid_vlan_if_prepare(vlan_vid, primary_if=iface)
+            )
+            notes.append(f"cap_if:{det_sf}")
+            self._guardrails_log(f"{item_id}: dhcp_host 임시 IF → {st_sf}: {det_sf}")
+            if st_sf != "PASS":
+                _stop_tcpdump()
+                _cleanup_vlan_discovery()
+                self._guardrails_remove_acl()
+                return (
+                    "FAIL",
+                    f"dhcp_host vlan IF 주소 부여 실패 — ⚙ dhcp_pw(sudo) / "
+                    f"vlan_discovery_solid_cidr_v6 확인. {det_sf} | "
+                    + " | ".join(notes),
+                )
+            if fam == "v6":
+                self._guardrails_log(
+                    f"{item_id}: v6 tag 경로용 IF={solid_vlan_if} "
+                    f"cidr6={self._guardrails_v6_solid_cidr(plane='tag') or '-'} "
+                    "(종료/원복 시 IF 삭제)"
+                )
+
+        expect = "IPv4 inet" if fam == "v4" else "global inet6"
+        rst_ok, rst_how = self._guardrails_trigger_ru_reset(fam)
+        t_reset = time.monotonic()
+        notes.append(f"reset:{rst_how}")
+        mode = (self._guardrails_gf("reset_mode", "auto") or "auto").strip().lower()
+        if not rst_ok and mode in ("auto", "mplane"):
+            if mode == "mplane":
+                _stop_tcpdump()
+                _cleanup_vlan_discovery()
+                if enable_vlan_disc:
+                    self._guardrails_remove_acl()
+                return "FAIL", f"ORU reset 실패 ({rst_how}) | " + " | ".join(notes)
+            self._guardrails_log(
+                f"자동 reset 실패({rst_how}) — 수동 재부팅 후 복구 감시 계속"
+            )
+            rst_how = "manual-fallback"
+            t_reset = time.monotonic()
+
+        # reset 직후 바로 base(vlan1) remove — Discovery 강제
+        if enable_vlan_disc and vlan_needs_cleanup:
+            base_vid = self._guardrails_vlan_discovery_base_vid()
+            self._guardrails_log(
+                f"{item_id}: reset 직후 — trunk vlan {base_vid} remove (Discovery 강제)"
+            )
+            st_rb, det_rb = self._guardrails_l2sw_vlan_discovery_remove_base(base_vid)
+            notes.append(f"vlan_base_remove:{det_rb}")
+            self._guardrails_log(f"{item_id}: VLAN base remove → {st_rb}: {det_rb}")
+            if st_rb != "PASS":
+                notes.append("vlan_base_remove:WARN")
+
+        if (rst_how or "").startswith("manual"):
+            self._guardrails_log(
+                f"{item_id}: ACL({fam})+tcpdump 준비됨. 지금 RU를 재부팅하세요 → "
+                f"{expect} 복구 감시. pcap→{dest_pcap}"
+            )
+        else:
+            self._guardrails_log(
+                f"{item_id}: reset 전송({rst_how}). SSH down→{expect} 복구 감시 "
+                f"(down≤{down_detect_sec}s / up≤{timeout_sec}s). pcap→{dest_pcap}"
+            )
+
+        t_acl = time.monotonic()
+        saw_down = False
+        last_tick = -30
+        while time.monotonic() - t_acl < down_detect_sec:
+            if self._guardrails_cancel.is_set():
+                return _abort_fast("사용자 중지")
+            elapsed_w = int(time.monotonic() - t_acl)
+            if elapsed_w - last_tick >= 30:
+                last_tick = elapsed_w
+                self._guardrails_log(f"{item_id}: 재부팅(SSH down) 대기 중… {elapsed_w}s/{down_detect_sec}s")
+            up, pdetail = self._guardrails_probe_once(fam)
+            if not up:
+                saw_down = True
+                notes.append(f"down:{pdetail}")
+                self._guardrails_log(f"{item_id}: SSH down 감지 ({elapsed_w}s) — 복구 대기 시작")
+                break
+            _sleep_poll(poll_sec)
+        if not saw_down:
+            if self._guardrails_cancel.is_set():
+                return _abort_fast("사용자 중지")
+            _stop_tcpdump()
+            _cleanup_vlan_discovery()
+            if enable_vlan_disc:
+                self._guardrails_remove_acl()
+            self._guardrails_log(f"{item_id}: FAIL — 재부팅(SSH down) 미감지")
+            return "FAIL", "재부팅(SSH unhealthy) 미감지. ACL/tcpdump 정리. | " + " | ".join(notes)
+
+        t_down = time.monotonic()
+        t0 = t_down
+        t_ip_learned: float | None = None
+        t_boot_ok: float | None = None
+        recovered = False
+        last = ""
+        last_tick = -30
+        ignore_old_ip_logged = ""
+        lease_tick = -30
+        healthy_since: float | None = None
+        if enable_vlan_disc:
+            if fam == "v6":
+                self._guardrails_log(
+                    f"{item_id}: 복구 감시 = DHCPv6 IAADDR / ping6 "
+                    f"(vlan {vlan_vid}, IF={solid_vlan_if or '-'}) — v4/.61 대기 안 함"
+                )
+            else:
+                self._guardrails_log(
+                    f"{item_id}: 복구 감시 = DHCPv4 Your-IP / ping "
+                    f"(vlan {vlan_vid}, IF={solid_vlan_if or '-'})"
+                )
+        self._guardrails_log(
+            f"{item_id}: 복구 PASS 조건 = SSH healthy {stable_sec}s 연속 유지 "
+            f"(poll={poll_sec}s, 한 번 성공만으로 PASS 안 함)"
+        )
+        while time.monotonic() - t0 < timeout_sec:
+            if self._guardrails_cancel.is_set():
+                return _abort_fast("사용자 중지")
+            elapsed_w = int(time.monotonic() - t0)
+            if elapsed_w - last_tick >= 30:
+                last_tick = elapsed_w
+                hold = ""
+                if healthy_since is not None:
+                    hold = f" hold={time.monotonic() - healthy_since:.0f}/{stable_sec}s"
+                self._guardrails_log(
+                    f"{item_id}: 주소 복구 대기 중… {elapsed_w}s/{timeout_sec}s "
+                    f"pcap_ip={learned_ip or '-'}{hold} last={last[:60]}"
+                )
+            # VLAN Discovery: USB pcap(vlan BPF)
+            # v6: neigh(RU MAC) 우선 — pcap 마지막 IAADDR(::456) 고아 방지
+            if enable_vlan_disc:
+                lease_every = 10 if fam == "v6" else 30
+                use_lease = elapsed_w - lease_tick >= lease_every
+                if use_lease:
+                    lease_tick = elapsed_w
+                cand = _collect_discovery_candidate_ips(with_lease=use_lease)
+                if self._guardrails_cancel.is_set():
+                    return _abort_fast("사용자 중지")
+                neigh_ips: list[str] = []
+                # v6: 매 poll neigh (use_lease 가 아니어도) — ping fail 고착 방지
+                if fam == "v6" and solid_vlan_if:
+                    try:
+                        neigh_ips = [
+                            ip
+                            for ip in self._guardrails_find_ip_by_ru_mac(
+                                mac_colon, solid_vlan_if, "v6"
+                            )
+                            if ip
+                            and self._guardrails_is_plausible_ip(ip, "v6")
+                            and not self._guardrails_is_pre_discovery_ip(ip, "v6")
+                        ]
+                    except Exception:
+                        neigh_ips = []
+                # 시도 순서: neigh → pcap(최신부터). ::456 만 붙잡고 재시도하지 않음
+                try_ips: list[str] = []
+                for ip in neigh_ips + list(reversed(cand or [])):
+                    if (
+                        ip
+                        and self._guardrails_is_plausible_ip(ip, fam)
+                        and not self._guardrails_is_pre_discovery_ip(ip, fam)
+                        and ip not in try_ips
+                    ):
+                        try_ips.append(ip)
+                if not try_ips and not (cand or neigh_ips):
+                    raw = self._guardrails_peek_pcap_assigned_ips(
+                        remote_pcap, fam, timeout=8, mac_colon=mac_colon
+                    )
+                    if raw and raw[-1] != ignore_old_ip_logged:
+                        ignore_old_ip_logged = raw[-1]
+                        probe_now = self._guardrails_strip_ip_cidr(
+                            self._guardrails_gf("probe_v4" if fam == "v4" else "probe_v6")
+                        )
+                        hint = ""
+                        last_raw = raw[-1]
+                        if last_raw and self._guardrails_is_pre_discovery_ip(
+                            last_raw, fam
+                        ):
+                            if probe_now and last_raw != probe_now:
+                                hint = (
+                                    f" — untag {last_raw}≠probe {probe_now}: "
+                                    "동일 RU MAC이면 DHCP 재할당 가능 "
+                                    "(다른 장비 아님일 수 있음). Discovery(.61/tag) 대기"
+                                )
+                            else:
+                                hint = (
+                                    " — untag(.60/1200) IP라 Discovery 미인정 "
+                                    "(.61/1300 tag lease 대기)"
+                                )
+                        self._guardrails_log(
+                            f"{item_id}: Discovery IP 미검출 — raw_pcap={','.join(raw[-5:])}"
+                            f"{hint} (재시도 중)"
+                        )
+                    for ip in reversed(raw or []):
+                        if (
+                            ip
+                            and self._guardrails_is_plausible_ip(ip, fam)
+                            and not self._guardrails_is_pre_discovery_ip(ip, fam)
+                            and ip not in try_ips
+                        ):
+                            try_ips.append(ip)
+                up = False
+                if not try_ips:
+                    if fam == "v6":
+                        last = "Discovery IPv6(IAADDR/neigh) 대기 — v4(.61) 미사용"
+                    else:
+                        last = "Discovery IP(서브넷 10.0.61.x) 대기 중"
+                else:
+                    # learned 가 try 목록에 있으면 먼저, 실패 시 나머지 전부 ping
+                    order = []
+                    if learned_ip and learned_ip in try_ips:
+                        order.append(learned_ip)
+                    for ip in try_ips:
+                        if ip not in order:
+                            order.append(ip)
+                    for tip in order:
+                        if fam == "v6" and solid_vlan_if:
+                            c6 = self._guardrails_v6_local_cidr_for_target(tip)
+                            if c6:
+                                self._guardrails_dhcp_host_ensure_v6_addr(
+                                    solid_vlan_if, c6
+                                )
+                        up, last = self._guardrails_probe_from_dhcp_host(
+                            tip, via_if=solid_vlan_if or None, family=fam
+                        )
+                        if tip != learned_ip:
+                            src = "neigh" if tip in neigh_ips else "pcap"
+                            self._guardrails_log(
+                                f"{item_id}: Discovery IP 시도 → {tip} ({src}, "
+                                f"try={','.join(order[:6])}, ping={'OK' if up else 'FAIL'})"
+                            )
+                        if up:
+                            if tip != learned_ip:
+                                learned_ip = tip
+                                if t_ip_learned is None:
+                                    t_ip_learned = time.monotonic()
+                                notes.append(f"pcap_ip:{learned_ip}")
+                                self._guardrails_log(
+                                    f"{item_id}: Discovery IP 확정 → {learned_ip} "
+                                    f"(reset+{t_ip_learned - t_reset:.0f}s)"
+                                )
+                            break
+                    if not up:
+                        # 표시용: neigh 우선, 없으면 첫 후보 (고아 ::456 단독 고착 방지)
+                        prefer = (neigh_ips[0] if neigh_ips else order[0])
+                        if prefer != learned_ip:
+                            self._guardrails_log(
+                                f"{item_id}: ping 미복구 — 후보 갱신 "
+                                f"{learned_ip or '-'} → {prefer} (try={','.join(order[:6])})"
+                            )
+                            learned_ip = prefer
+                            if t_ip_learned is None:
+                                t_ip_learned = time.monotonic()
+                            notes.append(f"pcap_ip:{learned_ip}")
+            else:
+                up, last = self._guardrails_probe_once(fam)
+            if up:
+                now_h = time.monotonic()
+                if healthy_since is None:
+                    healthy_since = now_h
+                    self._guardrails_log(
+                        f"{item_id}: 주소 복구 1차 OK — {stable_sec}s 유지 확인 중… "
+                        f"(down+{elapsed_w}s) {last[:100]}"
+                    )
+                held = now_h - healthy_since
+                if held >= float(stable_sec):
+                    recovered = True
+                    t_boot_ok = now_h
+                    if t_ip_learned is None and (learned_ip or "").strip():
+                        t_ip_learned = t_boot_ok
+                    self._guardrails_log(
+                        f"{item_id}: 주소 복구 OK (유지 {held:.0f}s≥{stable_sec}s, "
+                        f"down+{elapsed_w}s, reset+{t_boot_ok - t_reset:.0f}s) {last[:120]}"
+                    )
+                    notes.append(f"stable:{stable_sec}s")
+                    break
+            else:
+                if healthy_since is not None:
+                    dropped = time.monotonic() - healthy_since
+                    self._guardrails_log(
+                        f"{item_id}: 복구 유지 실패 ({dropped:.0f}s/{stable_sec}s) — 재대기 "
+                        f"last={last[:80]}"
+                    )
+                healthy_since = None
+            # 유지 확인 중에는 poll 을 조금 더 촘촘히 (최대 3s)
+            wait_s = min(poll_sec, 3) if healthy_since is not None else poll_sec
+            _sleep_poll(wait_s)
+        elapsed = time.monotonic() - t0
+        boot_ok = recovered and elapsed <= pass_sec
+        if not recovered:
+            notes.append(f"boot:FAIL timeout {elapsed:.0f}s last={last}")
+            self._guardrails_log(f"{item_id}: boot FAIL — 복구 타임아웃 {elapsed:.0f}s")
+        elif not boot_ok:
+            notes.append(f"boot:FAIL slow {elapsed:.0f}s>PASS≤{pass_sec} {last}")
+            self._guardrails_log(f"{item_id}: boot FAIL — 복구 느림 {elapsed:.0f}s > PASS≤{pass_sec}")
+        else:
+            notes.append(f"boot:OK {elapsed:.0f}s {last}")
+
+        self._guardrails_log(f"{item_id}: tcpdump 중지·pcap 디코드 중…")
+        ok_stop, stop_text = _stop_tcpdump()
+        notes.append(f"tcpdump_stop:{'OK' if ok_stop else 'WARN'}")
+        decode = ""
+        opt_ok = False
+        disc_ok = True
+        ia_na_ok = True
+        if "NO_PCAP" in (stop_text or ""):
+            notes.append("option:FAIL no pcap")
+            if enable_ia_na:
+                ia_na_ok = False
+                notes.append("ia_na:FAIL no pcap")
+            self._guardrails_log(f"{item_id}: pcap 파일 없음")
+        else:
+            decode_cmd = (
+                f"tcpdump -nn -vv -e -r {shlex.quote(remote_pcap)} 2>/dev/null | head -c 400000; "
+                f"echo; echo DECODE_BYTES=$(wc -c <{shlex.quote(remote_pcap)} 2>/dev/null || echo 0)"
+            )
+            _ok_dec, decode = self._guardrails_dhcp_server_run(decode_cmd, timeout=90)
+            m_bytes = re.search(r"DECODE_BYTES\s*=\s*(\d+)", decode or "")
+            pcap_bytes = int(m_bytes.group(1)) if m_bytes else -1
+            if pcap_bytes >= 0 and pcap_bytes <= 24:
+                self._guardrails_log(
+                    f"{item_id}: pcap 비어 있음 (DECODE_BYTES={pcap_bytes}) — "
+                    "DHCP 패킷 미캡처. IF/BPF/재부팅 타이밍 확인"
+                )
+                notes.append(f"pcap:EMPTY bytes={pcap_bytes}")
+            else:
+                self._guardrails_log(
+                    f"{item_id}: pcap decode OK size≈{pcap_bytes if pcap_bytes >= 0 else '?'}B"
+                )
+            if enable_vlan_disc and not learned_ip:
+                cand = _collect_discovery_candidate_ips()
+                if not cand:
+                    ips_found = self._guardrails_parse_dhcp_assigned_ips(
+                        decode or "", fam, mac_colon=mac_colon
+                    )
+                    cand = [
+                        ip
+                        for ip in ips_found
+                        if self._guardrails_is_plausible_ip(ip, fam)
+                        and not self._guardrails_is_pre_discovery_ip(ip, fam)
+                    ]
+                if cand:
+                    learned_ip = cand[-1]
+                    if t_ip_learned is None:
+                        t_ip_learned = time.monotonic()
+                    notes.append(f"pcap_ip:{learned_ip}")
+                    self._guardrails_log(f"{item_id}: 최종 Discovery IP → {learned_ip}")
+                else:
+                    self._guardrails_log(
+                        f"{item_id}: Discovery IP 분석 실패 — USB pcap(vlan BPF)·neigh·lease 확인"
+                    )
+            persist = self._guardrails_dhcp_persist_pcap(
+                remote_pcap=remote_pcap,
+                decode_text=decode or "",
+                dest_pcap=dest_pcap,
+                dest_txt=dest_txt,
+                log_path=log_path,
+            )
+            notes.append(persist)
+            local_path = self._guardrails_dhcp_download_pcap(dest_pcap, f"{base}.pcap")
+            if local_path:
+                notes.append(f"local={local_path}")
+                self._guardrails_log(f"pcap saved: remote={dest_pcap} local={local_path}")
+                try:
+                    if not hasattr(self, "_guardrails_detail_by_id") or self._guardrails_detail_by_id is None:
+                        self._guardrails_detail_by_id = {}
+                    # stash latest local pcap path for detail view
+                    self._guardrails_detail_by_id[f"{item_id}__pcap"] = local_path
+                except Exception:
+                    pass
+            else:
+                self._guardrails_log(f"pcap on remote LOG: {dest_pcap}")
+
+            # Empty pcap cannot match option
+            if pcap_bytes >= 0 and pcap_bytes <= 24:
+                opt_ok, opt_detail = False, f"expect_regex 미검사(pcap empty): {opt_re}"
+            else:
+                opt_ok, opt_detail = self._guardrails_match_output(decode or "", opt_re, None)
+            notes.append(f"option:{'OK' if opt_ok else opt_detail}")
+            self._guardrails_log(f"{item_id}: option → {'OK' if opt_ok else opt_detail}")
+            if enable_ia_na:
+                if pcap_bytes >= 0 and pcap_bytes <= 24:
+                    ia_na_ok, ia_na_detail = False, "ia_na FAIL: pcap empty"
+                else:
+                    ia_na_ok, ia_na_detail = self._guardrails_check_dhcpv6_ia_na(decode or "", ia_na_re)
+                notes.append(ia_na_detail)
+                self._guardrails_log(f"{item_id}: {ia_na_detail}")
+            else:
+                notes.append("ia_na:SKIP")
+            if enable_disc:
+                disc_re = self._guardrails_gf("discovery_regex")
+                ctrls = self._guardrails_gf("expected_controllers")
+                if not ctrls:
+                    # VLAN Discovery 시험 중이면 tag controller, 아니면 untag
+                    plane = "tag" if enable_vlan_disc else "untag"
+                    try:
+                        self._apply_lab_controller_listen_ips(plane)
+                    except Exception:
+                        pass
+                    try:
+                        if fam == "v6":
+                            ctrls = self._lab_controller_listen_ip("v6", plane)
+                        else:
+                            ctrls = self._lab_controller_listen_ip("v4", plane)
+                    except Exception:
+                        ctrls = ""
+                ips = [x.strip() for x in re.split(r"[,;\s]+", ctrls) if x.strip()]
+                if pcap_bytes >= 0 and pcap_bytes <= 24:
+                    disc_ok, disc_detail = False, "pcap empty"
+                else:
+                    disc_ok, disc_detail = self._guardrails_match_output(decode or "", disc_re, ips)
+                notes.append(f"discovery:{'OK' if disc_ok else disc_detail}")
+                self._guardrails_log(f"{item_id}: discovery → {'OK' if disc_ok else disc_detail}")
+            else:
+                notes.append("discovery:SKIP")
+
+        # ping 재확인은 원복(renew/vlan remove) 전에 — 원복 후 .112 ping FAIL 은 정상
+        if enable_vlan_disc and boot_ok and (learned_ip or "").strip():
+            up2, last2 = self._guardrails_probe_from_dhcp_host(
+                learned_ip, via_if=solid_vlan_if or None, family=fam
+            )
+            self._guardrails_log(
+                f"{item_id}: 원복 전 ping 재확인 → {'OK' if up2 else 'FAIL'}: {last2[:160]}"
+            )
+            if not up2:
+                boot_ok = False
+                notes.append(f"boot:FAIL recheck {last2}")
+                self._guardrails_log(
+                    f"{item_id}: ping 재확인 실패 — Discovery 구간 L3 미달로 FAIL"
+                )
+
+        # 시험 VLAN 서브넷 IP를 받았을 때만 원복 팝업 (기존 .60 은 제외)
+        if (
+            enable_vlan_disc
+            and vlan_needs_cleanup
+            and (learned_ip or "").strip()
+            and not self._guardrails_is_pre_discovery_ip(learned_ip, fam)
+        ):
+            self._guardrails_log(
+                f"{item_id}: VLAN Discovery IP 수신({learned_ip}) — untag 원복 여부 확인"
+            )
+            restore_now = self._guardrails_ask_vlan_untag_restore(
+                vid=vlan_vid,
+                learned_ip=learned_ip,
+                item_id=item_id,
+            )
+            if restore_now:
+                _cleanup_vlan_discovery()
+                self._guardrails_log(
+                    f"{item_id}: 원복 후 {learned_ip} ping 실패는 정상 "
+                    "(renew/trunk 원복으로 Discovery 서브넷 경로 종료)"
+                )
+            else:
+                pending = {
+                    "item_id": item_id,
+                    "fam": fam,
+                    "vid": vlan_vid,
+                    "base_vid": self._guardrails_vlan_discovery_base_vid(),
+                    "learned_ip": (learned_ip or "").strip(),
+                    "probe": self._guardrails_strip_ip_cidr(
+                        self._guardrails_gf("probe_v4" if fam == "v4" else "probe_v6")
+                    ),
+                    "renew_cmd": renew_cmd,
+                    "ru_mac": mac_colon,
+                }
+                _defer_solid_vlan_to_pending(pending)
+                self.after(0, lambda p=pending: self._guardrails_arm_vlan_restore(p))
+                notes.append("vlan_cleanup:DEFERRED(유지—버튼으로 원복)")
+                self._guardrails_log(
+                    f"{item_id}: VLAN 유지 선택 — renew/L2SW 원복 생략 "
+                    "(「VLAN untag 원복」 누를 때 renew 전송)"
+                )
+                vlan_needs_cleanup = False
+        else:
+            _cleanup_vlan_discovery()
+        if enable_vlan_disc:
+            rm_st, rm_detail = self._guardrails_remove_acl()
+            # ACL 잔존은 시험 결과에 반영 (v4 leasefail 등 현장 장애의 대표 원인)
+            if rm_st == "PASS":
+                notes.append(rm_detail)
+            else:
+                notes.append(f"ACL원복FAIL:{rm_detail}")
+            self._guardrails_log(f"{item_id}: ACL 원복 → {rm_st}: {rm_detail[:160]}")
+        else:
+            rm_st, rm_detail = "PASS", "acl:SKIP(boot)"
+            notes.append(rm_detail)
+            self._guardrails_log(f"{item_id}: Boot — ACL 원복 생략")
+
+        self._guardrails_log(
+            f"{item_id}: 최종판정 boot(ping)={'OK' if boot_ok else 'FAIL'} "
+            f"option(pcap)={'OK' if opt_ok else 'FAIL'} "
+            f"discovery={'OK' if disc_ok else 'FAIL'} ia_na={'OK' if ia_na_ok else 'FAIL'} "
+            f"acl_restore={'OK' if rm_st == 'PASS' else 'FAIL'}"
+        )
+        st_final = (
+            "PASS"
+            if (boot_ok and opt_ok and disc_ok and ia_na_ok and rm_st == "PASS")
+            else "FAIL"
+        )
+        sec_reset_to_down = (t_down - t_reset) if t_down and t_reset else None
+        sec_reset_to_ip = (
+            (t_ip_learned - t_reset) if t_ip_learned is not None else None
+        )
+        sec_reset_to_boot = (t_boot_ok - t_reset) if t_boot_ok is not None else None
+        sec_down_to_boot = (t_boot_ok - t_down) if t_boot_ok is not None else None
+        detail_fmt = self._guardrails_format_dhcp_options_detail(
+            item_id=item_id,
+            status=st_final,
+            fam=fam,
+            boot_ok=boot_ok,
+            opt_ok=opt_ok,
+            disc_ok=disc_ok,
+            ia_na_ok=ia_na_ok,
+            learned_ip=learned_ip or "",
+            decode=decode or "",
+            opt_re=opt_re or "",
+            notes=notes,
+            sec_reset_to_down=sec_reset_to_down,
+            sec_reset_to_ip=sec_reset_to_ip,
+            sec_reset_to_boot=sec_reset_to_boot,
+            sec_down_to_boot=sec_down_to_boot,
+        )
+        return st_final, detail_fmt
+
+    def _guardrails_dhcp_server_run(self, remote_body: str, timeout: int = 60) -> tuple[bool, str]:
+        """Run bash on DHCP server (direct on solid if dhcp_host empty).
+
+        solid→sshpass→dhcp_host 로 중첩 quote 되면 `sudo -S` / `ip addr add` 가 깨짐.
+        본문은 base64 로 실어 보내 원격에서만 decode|bash.
+        """
+        import base64
+
+        b64 = base64.b64encode((remote_body or "").encode("utf-8")).decode("ascii")
+        # wrapper 는 안전 charset 만. 파일로 풀어 stdin 파이프가 ssh/sshpass 를 먹지 않게 함
+        wrapped = (
+            f"f=/tmp/ds_run_$$.sh; echo {b64} | base64 -d >\"$f\" && bash \"$f\"; "
+            f"ec=$?; rm -f \"$f\"; exit $ec"
+        )
+        host = self._guardrails_gf("dhcp_host")
+        if not host:
+            return self._guardrails_ssh_exec(f"bash -lc {shlex.quote(wrapped)}", timeout=timeout)
+        user = self._guardrails_gf("dhcp_id")
+        pw = self._guardrails_gf("dhcp_pw")
+        port = "22"
+        if not user:
+            return False, "DHCP SSH ID 필요 (dhcp_host 지정 시)"
+        inner = f"bash -lc {shlex.quote(wrapped)}"
+        jump = (
+            "export SSHPASS=" + shlex.quote(pw) + "; "
+            "sshpass -e ssh -n "
+            f"-p {shlex.quote(port)} "
+            "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "
+            "-o ConnectTimeout=10 -o BatchMode=no "
+            + shlex.quote(f"{user}@{host}")
+            + " "
+            + shlex.quote(inner)
+        )
+        return self._guardrails_ssh_exec(f"bash -lc {shlex.quote(jump)}", timeout=timeout)
+
+    def _guardrails_dhcp_persist_pcap(
+        self,
+        *,
+        remote_pcap: str,
+        decode_text: str,
+        dest_pcap: str,
+        dest_txt: str,
+        log_path: str,
+    ) -> str:
+        """Copy pcap into solid LOG_PATH and write decode txt beside it."""
+        host = self._guardrails_gf("dhcp_host")
+        b64 = ""
+        try:
+            import base64
+
+            b64 = base64.b64encode((decode_text or "")[:350000].encode("utf-8", errors="replace")).decode("ascii")
+        except Exception:
+            b64 = ""
+        if b64:
+            write_txt = (
+                f"mkdir -p {shlex.quote(log_path)}; "
+                "python3 -c "
+                + shlex.quote(
+                    "import base64,pathlib; pathlib.Path(%r).write_bytes(base64.b64decode(%r)); print('TXT_OK')"
+                    % (dest_txt, b64)
+                )
+            )
+        else:
+            write_txt = f"mkdir -p {shlex.quote(log_path)}; echo NO_DECODE >{shlex.quote(dest_txt)}"
+
+        if not host:
+            cmd = (
+                f"mkdir -p {shlex.quote(log_path)}; "
+                f"cp -f {shlex.quote(remote_pcap)} {shlex.quote(dest_pcap)}; "
+                f"{write_txt}; "
+                f"ls -la {shlex.quote(dest_pcap)}"
+            )
+            ok, text = self._guardrails_ssh_exec(f"bash -lc {shlex.quote(cmd)}", timeout=60)
+            return f"persist solid:{'OK' if ok else text[:80]}"
+
+        user = self._guardrails_gf("dhcp_id")
+        pw = self._guardrails_gf("dhcp_pw")
+        port = "22"
+        cmd = (
+            f"mkdir -p {shlex.quote(log_path)}; "
+            "export SSHPASS=" + shlex.quote(pw) + "; "
+            f"sshpass -e scp -P {shlex.quote(port)} "
+            "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "
+            + shlex.quote(f"{user}@{host}:{remote_pcap}")
+            + " "
+            + shlex.quote(dest_pcap)
+            + "; "
+            f"{write_txt}; "
+            f"ls -la {shlex.quote(dest_pcap)}"
+        )
+        ok, text = self._guardrails_ssh_exec(f"bash -lc {shlex.quote(cmd)}", timeout=90)
+        return f"persist scp:{'OK' if ok else (text or '')[:80]}"
+
+    def _guardrails_dhcp_download_pcap(self, remote_pcap: str, local_name: str) -> str:
+        """SFTP pcap from solid to local AppData O-RAN-Netconf/pcaps/."""
+        ssh_user = self.remote_user.get().strip()
+        ssh_host = self.remote_host.get().strip()
+        ssh_port = self.remote_port.get().strip() or "22"
+        ssh_password = self.remote_password.get()
+        if not ssh_user or not ssh_host:
+            return ""
+        try:
+            local_dir = self.config_path.parent / "pcaps"
+            local_dir.mkdir(parents=True, exist_ok=True)
+            local_path = local_dir / local_name
+            import paramiko  # type: ignore
+
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(
+                hostname=ssh_host,
+                port=int(ssh_port),
+                username=ssh_user,
+                password=ssh_password or None,
+                timeout=12,
+                allow_agent=True,
+                look_for_keys=True,
+            )
+            try:
+                sftp = client.open_sftp()
+                try:
+                    sftp.get(remote_pcap, str(local_path))
+                finally:
+                    sftp.close()
+            finally:
+                client.close()
+            return str(local_path)
+        except Exception as exc:
+            self.after(0, self.append_log, f"[M-Plane Test] local pcap download 실패: {exc}\n")
+            return ""
+
+    def _guardrails_run_dhcp_boot(self) -> tuple[str, str]:
+        """Legacy combined entry — prefer selecting ACL v4/v6 items separately."""
+        return "SKIP", "ACL은 MP-DHCP-ACLv4 / MP-DHCP-ACLv6로 단독 실행하세요"
+
+    def _guardrails_run_vlan_discovery(self) -> tuple[str, str]:
+        """Standalone item retired — use dhcp_v4_vlan / dhcp_v6_vlan."""
+        return (
+            "SKIP",
+            "MP-VLAN-1은 MP-DHCPv4-VLAN / MP-DHCPv6-VLAN 항목으로 분리됨 "
+            "(Boot=L2SW없음 재시작, VLAN=L2SW trunk/ACL Discovery)",
+        )
+
+    @staticmethod
+    def _guardrails_normalize_mac(mac: str) -> str:
+        raw = re.sub(r"[^0-9A-Fa-f]", "", mac or "")
+        if len(raw) != 12:
+            return ""
+        return raw.lower()
+
+    @classmethod
+    def _guardrails_mac_to_linklocal(cls, mac: str) -> str:
+        """EUI-64 link-local (fe80::...) from MAC."""
+        raw = cls._guardrails_normalize_mac(mac)
+        if not raw:
+            return ""
+        b = [int(raw[i : i + 2], 16) for i in range(0, 12, 2)]
+        b[0] ^= 0x02
+        eui = b[0:3] + [0xFF, 0xFE] + b[3:6]
+        parts = [
+            f"{eui[0]:02x}{eui[1]:02x}",
+            f"{eui[2]:02x}{eui[3]:02x}",
+            f"{eui[4]:02x}{eui[5]:02x}",
+            f"{eui[6]:02x}{eui[7]:02x}",
+        ]
+        return "fe80::" + ":".join(parts)
+
+    def _guardrails_ru_linklocal_scoped(self, *, tag: bool) -> tuple[str, str]:
+        """사전 계산 가능한 RU link-local + dhcp_host scope IF.
+
+        Returns (fe80::…%ifname, detail). MAC 없으면 ("", reason).
+        tag=True → vlan<VID> (Discovery), tag=False → Capture IF(enx).
+        """
+        mac = (self._guardrails_gf("ru_mac") or "").strip()
+        ll = self._guardrails_mac_to_linklocal(mac)
+        if not ll:
+            return "", "RU MAC 없음 — LL 계산 불가"
+        parent, vlan_if, _cidr = self._guardrails_capture_host_vlan_if_names()
+        if tag:
+            ifname = (vlan_if or "").strip()
+            if not ifname:
+                return "", "tag scope IF(vlan) 없음"
+        else:
+            ifname = (self._guardrails_gf("dhcp_if") or parent or "").strip()
+            if not ifname:
+                return "", "untag scope IF(enx) 없음"
+        return f"{ll}%{ifname}", f"EUI-64 MAC={mac} → {ll}%{ifname}"
+
+    @staticmethod
+    def _guardrails_strip_ip_cidr(addr: str) -> str:
+        """Strip trailing /prefix from IPv4/IPv6 (SSH/CallHome host must be bare address)."""
+        a = (addr or "").strip()
+        if not a:
+            return ""
+        if "/" in a and not a.startswith("/"):
+            left, right = a.rsplit("/", 1)
+            if right.isdigit() and 0 <= int(right) <= 128:
+                return left.strip()
+        return a
+
+    def _guardrails_ru_ssh_target(self, family: str = "v6") -> tuple[str, str]:
+        """Return (ssh_host, detail). Settings ALLOWED_IP* SSOT → probe 미러 → LL."""
+        fam = (family or "v6").lower()
+        if fam == "v4":
+            v4 = ""
+            try:
+                v4 = self._guardrails_strip_ip_cidr(
+                    (self.fields.get("ALLOWED_IP").get() or "").strip()  # type: ignore[union-attr]
+                )
+            except Exception:
+                v4 = ""
+            if not v4:
+                v4 = self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v4"))
+            if not v4:
+                return "", "RU IPv4 없음 (Settings ALLOWED_IP)"
+            return v4, f"v4 {v4}"
+        # IPv6: Settings ALLOWED_IP_V6 → probe 미러 → LL last resort
+        override = ""
+        try:
+            override = self._guardrails_strip_ip_cidr(
+                (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+            )
+        except Exception:
+            override = ""
+        if not override:
+            override = self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v6"))
+        nic = self._guardrails_gf("mplane_if")
+        if override:
+            if override.lower().startswith("fe80:") and "%" not in override and nic:
+                return f"{override}%{nic}", f"override-ll {override}%{nic}"
+            return override, f"v6-global {override}"
+        mac = self._guardrails_gf("ru_mac")
+        ll = self._guardrails_mac_to_linklocal(mac)
+        if not ll:
+            return "", "RU IPv6 없음 (Settings ALLOWED_IP_V6 / RU MAC)"
+        if not nic:
+            return "", "M-Plane NIC 필요 (LL SSH scope) — global이면 ALLOWED_IP_V6 사용"
+        return f"{ll}%{nic}", f"ll {ll}%{nic}"
+
+    def _guardrails_ru_check_cmd(self, family: str = "v6") -> str:
+        """Command run on RU via SSH — PASS when healthy regex matches stdout."""
+        ru_if = self._guardrails_gf("ru_if_name")
+        fam = (family or "v6").lower()
+        if fam == "v4":
+            if ru_if:
+                return (
+                    f"ip -4 -o addr show dev {shlex.quote(ru_if)} 2>/dev/null; "
+                    f"ip -o link show dev {shlex.quote(ru_if)} 2>/dev/null | head -1"
+                )
+            return "ip -4 -o addr show 2>/dev/null | grep -v '127\\.0\\.0\\.1'"
+        if ru_if:
+            return (
+                f"ip -6 -o addr show dev {shlex.quote(ru_if)} scope global 2>/dev/null; "
+                f"ip -o link show dev {shlex.quote(ru_if)} 2>/dev/null | head -1"
+            )
+        return "ip -6 -o addr show scope global 2>/dev/null"
+
+    def _guardrails_probe_once(
+        self, family: str | None = None, host_override: str | None = None
+    ) -> tuple[bool, str]:
+        """SSH into RU and require family address — not LL/v4 ping alone."""
+        iid = getattr(self, "_guardrails_settings_item_id", None) or "dhcp_boot"
+        fam = (family or self._guardrails_item_family(iid)).lower()
+        if host_override:
+            host = self._guardrails_strip_ip_cidr(host_override)
+            how = f"pcap-ip {host}"
+        else:
+            host, how = self._guardrails_ru_ssh_target(fam)
+        if not host:
+            return False, how
+        user = self._guardrails_gf("oru_cli_id")
+        pw = self._guardrails_gf("oru_cli_pw")
+        if not user:
+            return False, "RU SSH ID 필요 (Settings ★ RU SSH ID)"
+        check = self._guardrails_ru_check_cmd(fam)
+        ssh_flag = "-4" if fam == "v4" else "-6"
+        remote = (
+            "export SSHPASS=" + shlex.quote(pw) + "; "
+            f"sshpass -e ssh {ssh_flag} -n "
+            "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "
+            "-o ConnectTimeout=5 -o BatchMode=no "
+            + shlex.quote(f"{user}@{host}")
+            + " "
+            + shlex.quote(check)
+        )
+        ok, text = self._guardrails_ssh_exec(f"bash -lc {shlex.quote(remote)}", timeout=20)
+        # OpenSSH host-key 안내 문구는 실패 원인 아님 — 로그 노이즈 제거
+        clean = re.sub(
+            r"(?im)^\s*Warning:\s*Permanently added[^\n]*\n?",
+            "",
+            text or "",
+        ).strip()
+        if not ok:
+            snip = re.sub(r"\s+", " ", clean)[:180]
+            return False, f"ssh-fail via {how}: {snip or 'connect/auth fail'}"
+        text = clean or text
+        if fam == "v4":
+            # Prefer inet/CIDR from RU output when present; otherwise SSH-to-IPv4 alone = healthy.
+            pat = (
+                self._guardrails_gf("healthy_regex_v4", r"inet\s+\d+\.\d+\.\d+\.\d+/")
+                or r"inet\s+\d+\.\d+\.\d+\.\d+/"
+            )
+            try:
+                matched = re.search(pat, text or "", re.I | re.M) is not None
+            except re.error as exc:
+                return False, f"healthy_regex_v4 오류: {exc}"
+            found = [
+                m.group(1)
+                for m in re.finditer(r"inet\s+(\d+\.\d+\.\d+\.\d+)/", text or "")
+                if not m.group(1).startswith("127.")
+            ]
+            if matched and found:
+                return True, f"healthy {found[0]} via {how}"
+            if matched:
+                return True, f"healthy(regex) via {how}"
+            return True, f"healthy ssh-ok via {how} (no inet/CIDR in RU output)"
+
+        pat = self._guardrails_gf("healthy_regex", r"inet6\s+[0-9a-fA-F:]+/") or r"inet6\s+[0-9a-fA-F:]+/"
+        try:
+            matched = re.search(pat, text or "", re.I | re.M) is not None
+        except re.error as exc:
+            return False, f"healthy_regex 오류: {exc}"
+        if matched:
+            globals_found = [
+                m.group(1)
+                for m in re.finditer(r"inet6\s+([0-9a-fA-F:]+)/", text or "", re.I)
+                if not m.group(1).lower().startswith("fe80:")
+            ]
+            if globals_found:
+                return True, f"healthy {globals_found[0]} via {how}"
+            if matched:
+                return True, f"healthy(regex) via {how}"
+        # SSH succeeded on v6 path (LL or global) — treat as recovered even without inet6 dump
+        return True, f"healthy ssh-ok via {how} (no inet6/CIDR in RU output)"
+
+    def _guardrails_l2sw_normalize_if(self, raw: str | None = None) -> str:
+        """Dasan: return 'ethernet 0/22' only (no leading 'interface')."""
+        ifc = (raw if raw is not None else self._guardrails_gf("l2sw_if", "")) or ""
+        ifc = ifc.strip()
+        if not ifc:
+            return ""
+        low = ifc.lower()
+        # ⚙에 'interface ethernet 0/22'로 넣으면 'interface interface …' 중복 방지
+        if low.startswith("interface "):
+            ifc = ifc.split(None, 1)[1].strip()
+            low = ifc.lower()
+        if low.startswith("ethernet"):
+            return "ethernet" + ifc[len("ethernet") :]
+        if low.startswith("eth ") or low == "eth":
+            return "ethernet" + ifc[3:]
+        if re.match(r"^\d+/\d+", ifc):
+            return f"ethernet {ifc}"
+        return ifc
+
+    @staticmethod
+    def _guardrails_mac_display_forms(mac_norm: str) -> tuple[str, str, str, str]:
+        """Return (colon, hyphen, dotted, bare) from 12-hex normalized MAC."""
+        n = (mac_norm or "").lower()
+        if len(n) != 12:
+            return "", "", "", ""
+        parts = [n[i : i + 2] for i in range(0, 12, 2)]
+        colon = ":".join(parts)
+        hyphen = "-".join(parts)
+        dotted = f"{n[0:4]}.{n[4:8]}.{n[8:12]}"
+        return colon, hyphen, dotted, n
+
+    def _guardrails_parse_mac_table_port(self, text: str, mac_norm: str) -> str:
+        """Parse Dasan/Cisco-like MAC table output → 'ethernet X/Y' for matching MAC."""
+        n = self._guardrails_normalize_mac(mac_norm) or self._guardrails_normalize_mac(
+            "".join(ch for ch in (mac_norm or "") if ch.isalnum())
+        )
+        if not text or len(n) != 12:
+            return ""
+        colon, hyphen, dotted, bare = self._guardrails_mac_display_forms(n)
+        mac_pat = re.compile(
+            rf"(?:{re.escape(colon)}|{re.escape(hyphen)}|{re.escape(dotted)}|{re.escape(bare)})",
+            re.I,
+        )
+        if_pat = re.compile(
+            r"(?:interface\s+)?(?:ethernet|eth)\s*(\d+\s*/\s*\d+)"
+            r"|(?:\bGi|\bTe|\bFa)\s*(\d+/\d+)"
+            r"|(?<![\d.])(\d+/\d+)(?![\d.])",
+            re.I,
+        )
+        hits: list[str] = []
+        for line in (text or "").splitlines():
+            if not mac_pat.search(line):
+                continue
+            if re.search(r"\bCPU\b", line, re.I):
+                continue
+            m = if_pat.search(line)
+            if not m:
+                continue
+            port = (m.group(1) or m.group(2) or m.group(3) or "").replace(" ", "")
+            if not port or not re.fullmatch(r"\d+/\d+", port):
+                continue
+            ifc = self._guardrails_l2sw_normalize_if(f"ethernet {port}")
+            if ifc and ifc not in hits:
+                hits.append(ifc)
+        if not hits:
+            return ""
+        # Prefer first physical ethernet hit (usually the RU access port)
+        return hits[0]
+
+    def _guardrails_l2sw_discover_if_by_ru_mac(
+        self, mac: str | None = None
+    ) -> tuple[bool, str, str]:
+        """enable → show mac* → parse port for RU MAC. Returns (ok, ifc, detail)."""
+        mac_raw = (mac if mac is not None else self._guardrails_gf("ru_mac") or "").strip()
+        mac_norm = self._guardrails_normalize_mac(mac_raw)
+        if not mac_norm:
+            return False, "", "RU MAC 없음"
+        colon, _hy, dotted, _bare = self._guardrails_mac_display_forms(mac_norm)
+        # Dasan M3500: enable 후 show mac / show mac address-table …
+        cmds = [
+            "enable",
+            "terminal length 0",
+            f"show mac address-table address {colon}",
+            f"show mac address-table address {dotted}",
+            "show mac address-table",
+            "show mac",
+        ]
+        ok, out = self._guardrails_l2sw_run_cmds(
+            cmds,
+            settle_s=1.2,
+            timeout=180,
+            require_config=False,
+            tolerate_invalid=True,
+        )
+        ifc = self._guardrails_parse_mac_table_port(out or "", mac_norm)
+        if ifc:
+            return True, ifc, f"show mac → {ifc} (MAC {colon})"
+        snippet = re.sub(r"\s+", " ", (out or "")[-280:]).strip()
+        if not ok and not snippet:
+            return False, "", "L2SW show mac 실패 (출력 없음)"
+        return False, "", f"MAC {colon} 포트 미발견 (show mac): {snippet or '(empty)'}"
+
+    def _guardrails_ensure_l2sw_if_from_mac(
+        self, item_id: str | None = None, *, force: bool = False
+    ) -> tuple[str, str]:
+        """Lookup RU MAC on L2SW and auto-set l2sw_if. PASS/WARN/FAIL."""
+        iid = item_id or getattr(self, "_guardrails_settings_item_id", None) or "dhcp_v4"
+        self._guardrails_fill_defaults_from_context(iid)
+        mac = (self._guardrails_gf("ru_mac") or "").strip()
+        mac_norm = self._guardrails_normalize_mac(mac)
+        if not mac_norm:
+            cur = self._guardrails_l2sw_normalize_if()
+            if cur:
+                return "WARN", f"RU MAC 없음 — 기존 L2SW IF 유지 ({cur})"
+            return "FAIL", "RU MAC 필요 (L2SW IF 자동 조회)"
+        if not self._guardrails_gf("l2sw_ip") or not self._guardrails_gf("l2sw_id"):
+            return "FAIL", "L2SW IP/ID 필요 (MAC→IF 조회)"
+        cache = getattr(self, "_guardrails_l2sw_if_cache", None)
+        now = time.monotonic()
+        if (
+            not force
+            and isinstance(cache, dict)
+            and cache.get("mac") == mac_norm
+            and (now - float(cache.get("ts") or 0)) < 90.0
+            and cache.get("ifc")
+        ):
+            ifc_c = self._guardrails_l2sw_normalize_if(str(cache.get("ifc") or ""))
+            if ifc_c:
+                old = self._guardrails_l2sw_normalize_if()
+                if old != ifc_c:
+                    sk = self._guardrails_store_key(iid)
+                    cur_blob = dict(
+                        (getattr(self, "_guardrails_per_test_settings", {}) or {}).get(sk) or {}
+                    )
+                    cur_blob["l2sw_if"] = ifc_c
+                    self._guardrails_set_vals(iid, cur_blob)
+                return "PASS", f"cached show mac → {ifc_c}"
+        self._guardrails_log(f"{iid}: L2SW IF 자동 조회 (enable → show mac, RU MAC={mac})…")
+        ok, ifc, detail = self._guardrails_l2sw_discover_if_by_ru_mac(mac)
+        if not ok or not ifc:
+            cur = self._guardrails_l2sw_normalize_if()
+            if cur and not force:
+                self._guardrails_log(f"{iid}: L2SW IF 조회 실패 — 기존 IF 유지 ({cur}): {detail}")
+                return "WARN", f"{detail} · 기존 IF={cur}"
+            return "FAIL", detail
+        self._guardrails_l2sw_if_cache = {"mac": mac_norm, "ifc": ifc, "ts": now}
+        old = self._guardrails_l2sw_normalize_if()
+        if old == ifc:
+            self._guardrails_log(f"{iid}: L2SW IF 확인 OK — {ifc}")
+            return "PASS", detail
+        sk = self._guardrails_store_key(iid)
+        cur_blob = dict((getattr(self, "_guardrails_per_test_settings", {}) or {}).get(sk) or {})
+        cur_blob["l2sw_if"] = ifc
+        self._guardrails_set_vals(iid, cur_blob)
+        self._guardrails_log(f"{iid}: L2SW IF 자동 설정 {old or '-'} → {ifc}")
+        return "PASS", f"{detail} · 설정 {old or '-'}→{ifc}"
+
+    def _guardrails_parse_lab_capture_if(
+        self, text: str, *, prefer_tag: bool = False
+    ) -> tuple[str, str]:
+        """Parse ifconfig / ip -o addr → (ifname, inet) on 10.0.60.x or 10.0.61.x."""
+        raw = text or ""
+        hits60: list[tuple[str, str]] = []
+        hits61: list[tuple[str, str]] = []
+        # ip -o -4 addr: "2: enx00e04c681c64    inet 10.0.60.99/8 ..."
+        for m in re.finditer(
+            r"(?m)^\d+:\s+(\S+?)(?:@\S+)?\s+inet\s+(10\.0\.(60|61)\.\d+)(?:/\d+)?",
+            raw,
+        ):
+            name, ip, plane = m.group(1), m.group(2), m.group(3)
+            name = name.split("@", 1)[0].strip().rstrip(":")
+            if plane == "61":
+                hits61.append((name, ip))
+            else:
+                hits60.append((name, ip))
+        # ifconfig blocks
+        cur_if = ""
+        for line in raw.splitlines():
+            m_if = re.match(r"^(\S+?):\s+flags=", line)
+            if m_if:
+                cur_if = m_if.group(1).strip()
+                continue
+            m_inet = re.search(r"\binet\s+(10\.0\.(60|61)\.\d+)\b", line)
+            if m_inet and cur_if:
+                ip, plane = m_inet.group(1), m_inet.group(2)
+                pair = (cur_if, ip)
+                if plane == "61":
+                    if pair not in hits61:
+                        hits61.append(pair)
+                else:
+                    if pair not in hits60:
+                        hits60.append(pair)
+        # Prefer parent USB NIC (enx…) over vlan subifs like enx….100
+        def _rank(name: str) -> tuple[int, str]:
+            n = name.lower()
+            if "." in n or "@" in n:
+                return (2, n)
+            if n.startswith("enx"):
+                return (0, n)
+            return (1, n)
+
+        if prefer_tag and hits61:
+            hits61.sort(key=lambda t: _rank(t[0]))
+            return hits61[0]
+        if hits60:
+            hits60.sort(key=lambda t: _rank(t[0]))
+            return hits60[0]
+        if hits61:
+            hits61.sort(key=lambda t: _rank(t[0]))
+            return hits61[0]
+        return "", ""
+
+    def _guardrails_ensure_capture_if(
+        self, item_id: str | None = None, *, prefer_tag: bool = False, force: bool = False
+    ) -> tuple[str, str]:
+        """dhcp_host ifconfig/ip addr → Capture IF (10.0.60/61) 자동 설정."""
+        iid = item_id or getattr(self, "_guardrails_settings_item_id", None) or "dhcp_v4"
+        self._guardrails_fill_defaults_from_context(iid)
+        cur = (self._guardrails_gf("dhcp_if") or "").strip()
+        cache = getattr(self, "_guardrails_capture_if_cache", None)
+        now = time.monotonic()
+        if (
+            not force
+            and isinstance(cache, dict)
+            and (now - float(cache.get("ts") or 0)) < 90.0
+            and cache.get("ifc")
+            and bool(cache.get("tag")) == bool(prefer_tag)
+        ):
+            ifc_c = str(cache.get("ifc") or "").strip()
+            if ifc_c:
+                if cur != ifc_c:
+                    sk = self._guardrails_store_key(iid)
+                    blob = dict(
+                        (getattr(self, "_guardrails_per_test_settings", {}) or {}).get(sk) or {}
+                    )
+                    blob["dhcp_if"] = ifc_c
+                    self._guardrails_set_vals(iid, blob)
+                return "PASS", f"cached capture IF={ifc_c}"
+        where = self._guardrails_gf("dhcp_host") or "solid"
+        self._guardrails_log(
+            f"{iid}: Capture IF 자동 조회 (dhcp_host={where} ifconfig/ip addr, "
+            f"prefer={'tag.61' if prefer_tag else 'untag.60'})…"
+        )
+        cmd = (
+            "echo '=== ip -o -4 addr ==='; "
+            "ip -o -4 addr show 2>/dev/null || true; "
+            "echo '=== ifconfig -a ==='; "
+            "ifconfig -a 2>/dev/null || true"
+        )
+        ok, out = self._guardrails_dhcp_server_run(cmd, timeout=30)
+        ifc, inet = self._guardrails_parse_lab_capture_if(out or "", prefer_tag=prefer_tag)
+        if not ifc:
+            if cur and not force:
+                self._guardrails_log(
+                    f"{iid}: Capture IF 미발견 — 기존 유지 ({cur})"
+                    + (f" ok={ok}" if not ok else "")
+                )
+                return "WARN", f"10.0.60/61 IF 미발견 · 기존={cur}"
+            snip = re.sub(r"\s+", " ", (out or "")[:220]).strip()
+            return "FAIL", f"Capture IF 미발견 (10.0.60.x/61.x): {snip or '(empty)'}"
+        self._guardrails_capture_if_cache = {
+            "ifc": ifc,
+            "inet": inet,
+            "tag": bool(prefer_tag),
+            "ts": now,
+        }
+        if cur == ifc:
+            self._guardrails_log(f"{iid}: Capture IF 확인 OK — {ifc} ({inet})")
+            return "PASS", f"{ifc} ({inet})"
+        sk = self._guardrails_store_key(iid)
+        blob = dict((getattr(self, "_guardrails_per_test_settings", {}) or {}).get(sk) or {})
+        blob["dhcp_if"] = ifc
+        self._guardrails_set_vals(iid, blob)
+        self._guardrails_log(f"{iid}: Capture IF 자동 설정 {cur or '-'} → {ifc} ({inet})")
+        return "PASS", f"{cur or '-'}→{ifc} ({inet})"
+
+    def _guardrails_ensure_ru_mac(
+        self, item_id: str | None = None, *, force: bool = True
+    ) -> tuple[str, str]:
+        """RU MAC 자동: Settings ALLOWED_IP → dhcp_host ping → ip neigh (UI 숨김)."""
+        iid = item_id or getattr(self, "_guardrails_settings_item_id", None) or "dhcp_v4"
+        self._guardrails_fill_defaults_from_context(iid)
+        cur = self._guardrails_normalize_mac(self._guardrails_gf("ru_mac"))
+
+        ru_ip = ""
+        try:
+            ru_ip = self._guardrails_strip_ip_cidr(
+                (self.fields.get("ALLOWED_IP").get() or "").strip()  # type: ignore[union-attr]
+            )
+        except Exception:
+            ru_ip = ""
+        if not ru_ip:
+            ru_ip = self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v4"))
+        if not ru_ip or ":" in ru_ip:
+            if cur and not force:
+                colon = ":".join(cur[i : i + 2] for i in range(0, 12, 2))
+                return "WARN", f"ALLOWED_IP 없음 · 기존 MAC={colon}"
+            return "FAIL", "RU MAC 조회용 Settings ★ RU IPv4(ALLOWED_IP) 필요"
+
+        cache = getattr(self, "_guardrails_ru_mac_cache", None)
+        now = time.monotonic()
+        if (
+            not force
+            and isinstance(cache, dict)
+            and cache.get("ip") == ru_ip
+            and cache.get("mac")
+            and (now - float(cache.get("ts") or 0)) < 90.0
+        ):
+            mac_c = self._guardrails_normalize_mac(str(cache.get("mac") or ""))
+            if mac_c:
+                colon = ":".join(mac_c[i : i + 2] for i in range(0, 12, 2))
+                if cur != mac_c:
+                    sk = self._guardrails_store_key(iid)
+                    blob = dict(
+                        (getattr(self, "_guardrails_per_test_settings", {}) or {}).get(sk) or {}
+                    )
+                    blob["ru_mac"] = colon
+                    self._guardrails_set_vals(iid, blob)
+                return "PASS", f"cached neigh {ru_ip}→{colon}"
+
+        self._guardrails_log(f"{iid}: RU MAC 자동 조회 (ping → ip neigh {ru_ip})…")
+        cmd = (
+            f"ping -c 2 -W 1 {shlex.quote(ru_ip)} >/dev/null 2>&1 || "
+            f"ping -c 1 -w 2 {shlex.quote(ru_ip)} >/dev/null 2>&1 || true; "
+            f"ip -4 neigh show {shlex.quote(ru_ip)} 2>/dev/null; "
+            f"ip neigh show {shlex.quote(ru_ip)} 2>/dev/null; "
+            f"arp -n {shlex.quote(ru_ip)} 2>/dev/null || true"
+        )
+        _ok, out = self._guardrails_dhcp_server_run(cmd, timeout=25)
+        mac_n = ""
+        for m in re.finditer(
+            r"([0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5})", out or "", re.I
+        ):
+            cand = self._guardrails_normalize_mac(m.group(1))
+            if cand and cand != "000000000000" and not cand.startswith("ffff"):
+                mac_n = cand
+                break
+        if not mac_n:
+            m2 = re.search(
+                rf"{re.escape(ru_ip)}\s+\S+\s+([0-9a-fA-F:]{{17}})", out or "", re.I
+            )
+            if m2:
+                mac_n = self._guardrails_normalize_mac(m2.group(1))
+        if not mac_n:
+            if cur and not force:
+                colon = ":".join(cur[i : i + 2] for i in range(0, 12, 2))
+                return "WARN", f"neigh MAC 미발견 · 기존={colon}"
+            snip = re.sub(r"\s+", " ", (out or "")[:180]).strip()
+            return (
+                "FAIL",
+                f"RU MAC neigh 미발견 ({ru_ip}) — dhcp_host에서 ping/reachability 확인"
+                + (f": {snip}" if snip else ""),
+            )
+
+        colon = ":".join(mac_n[i : i + 2] for i in range(0, 12, 2))
+        self._guardrails_ru_mac_cache = {"ip": ru_ip, "mac": mac_n, "ts": now}
+        sk = self._guardrails_store_key(iid)
+        blob = dict((getattr(self, "_guardrails_per_test_settings", {}) or {}).get(sk) or {})
+        blob["ru_mac"] = colon
+        self._guardrails_set_vals(iid, blob)
+        self._guardrails_log(f"{iid}: RU MAC ← ping/neigh {ru_ip} ({colon})")
+        return "PASS", f"neigh {ru_ip}→{colon}"
+
+    def _guardrails_acl_apply_cmds(self, family: str = "v6") -> list[str]:
+        """Dasan ACL — 포트에 access-group 만 적용 (ACL 본문은 스위치에 유지).
+
+        v4 시험: ipv6 access-group v6-dhcp-block (546/547 drop)
+        v6 시험: ip access-group <acl_num> (67/68 drop)
+        ACL list 생성/삭제 안 함 — 사전 등록된 list 가정.
+        """
+        acl = self._guardrails_gf("acl_num", "110") or "110"
+        ifc = self._guardrails_l2sw_normalize_if()
+        if not ifc:
+            ifc = "ethernet 0/0"  # placeholder — caller must ensure real IF first
+        fam = (family or "v6").lower()
+        v6_acl = "v6-dhcp-block"
+        cmds: list[str] = [
+            "enable",
+            "configure terminal",
+            f"interface {ifc}",
+            # 포트에 반대 계열/잔여 group 만 정리 (ACL 정의는 삭제하지 않음)
+            f"no ip access-group {acl} in",
+            f"no ipv6 access-group {v6_acl} in",
+        ]
+        if fam == "v4":
+            cmds.extend(
+                [
+                    f"ipv6 access-group {v6_acl} in",
+                    "exit",
+                    "exit",
+                ]
+            )
+        else:
+            cmds.extend(
+                [
+                    f"ip access-group {acl} in",
+                    "exit",
+                    "exit",
+                ]
+            )
+        return cmds
+
+    def _guardrails_acl_remove_cmds(self) -> list[str]:
+        """포트에서 access-group 만 제거 — ACL list(no access-list) 는 유지."""
+        acl = self._guardrails_gf("acl_num", "110") or "110"
+        ifc = self._guardrails_l2sw_normalize_if()
+        if not ifc:
+            ifc = "ethernet 0/0"
+        v6_acl = "v6-dhcp-block"
+        return [
+            "enable",
+            "configure terminal",
+            f"interface {ifc}",
+            f"no ip access-group {acl} in",
+            f"no ipv6 access-group {v6_acl} in",
+            "exit",
+            f"interface {ifc}",
+            f"no ip access-group {acl} in",
+            f"no ipv6 access-group {v6_acl} in",
+            "exit",
+            "exit",
+        ]
+
+    def _guardrails_apply_acl(self, family: str | None = None) -> tuple[str, str]:
+        iid = getattr(self, "_guardrails_settings_item_id", None) or "dhcp_boot"
+        fam = (family or self._guardrails_item_family(iid)).lower()
+        self._guardrails_fill_defaults_from_context(iid)
+        # MAC 먼저 → L2SW show mac 으로 IF
+        st_mac, det_mac = self._guardrails_ensure_ru_mac(iid, force=True)
+        if st_mac == "FAIL":
+            return "FAIL", f"RU MAC 조회 실패: {det_mac}"
+        st_if, det_if = self._guardrails_ensure_l2sw_if_from_mac(iid, force=True)
+        if st_if == "FAIL":
+            return "FAIL", f"L2SW IF 자동 조회 실패: {det_if}"
+        ifc = self._guardrails_l2sw_normalize_if()
+        if not ifc:
+            return "FAIL", "L2SW IF 없음 (RU MAC show mac 조회 실패)"
+        ok, detail = self._guardrails_l2sw_run_cmds(self._guardrails_acl_apply_cmds(fam), settle_s=0.8)
+        if not ok:
+            return "FAIL", f"ACL 포트 적용 실패: {detail}"
+        if fam == "v4":
+            return (
+                "PASS",
+                f"port {ifc}: ipv6 access-group v6-dhcp-block in "
+                f"(ACL 본문 유지, 포트만 적용; MAC={det_mac}; IF={det_if})",
+            )
+        acl = self._guardrails_gf("acl_num", "110")
+        return (
+            "PASS",
+            f"port {ifc}: ip access-group {acl} in "
+            f"(ACL 본문 유지, 포트만 적용; MAC={det_mac}; IF={det_if})",
+        )
+
+    def _guardrails_acl_still_on_if(self, show_out: str, acl: str, v6_acl: str) -> list[str]:
+        """show running-config interface 출력에서 남은 access-group 목록."""
+        text = show_out or ""
+        left: list[str] = []
+        if re.search(rf"(?im)^\s*ip\s+access-group\s+{re.escape(acl)}\s+in\b", text):
+            left.append(f"ip access-group {acl} in")
+        if re.search(
+            rf"(?im)^\s*ipv6\s+access-group\s+{re.escape(v6_acl)}\s+in\b", text
+        ):
+            left.append(f"ipv6 access-group {v6_acl} in")
+        return left
+
+    def _guardrails_remove_acl(self, timeout: int | None = None) -> tuple[str, str]:
+        """포트에서 access-group 만 detach (ACL list 는 스위치에 유지). show 로 확인."""
+        self._guardrails_fill_defaults_from_context()
+        acl = self._guardrails_gf("acl_num", "110") or "110"
+        v6_acl = "v6-dhcp-block"
+        ifc = self._guardrails_l2sw_normalize_if()
+        if not ifc:
+            st_if, det_if = self._guardrails_ensure_l2sw_if_from_mac()
+            ifc = self._guardrails_l2sw_normalize_if()
+            if not ifc:
+                return "FAIL", f"L2SW IF 없음 (ACL 해제 대상 포트 불명): {det_if}"
+            self._guardrails_log(f"ACL 해제 전 IF 조회: {st_if} {det_if}")
+        to = int(timeout) if timeout is not None else None
+
+        def _detach_port() -> tuple[bool, str]:
+            return self._guardrails_l2sw_run_cmds(
+                self._guardrails_acl_remove_cmds(), settle_s=1.0, timeout=to
+            )
+
+        def _show_if() -> str:
+            _ok_s, out_s = self._guardrails_l2sw_run_cmds(
+                [
+                    "enable",
+                    f"show running-config interface {ifc}",
+                    "exit",
+                ],
+                settle_s=0.6,
+                timeout=max(60, to or 60),
+                require_config=False,
+            )
+            return out_s or ""
+
+        ok, detail = _detach_port()
+        if not ok:
+            self._guardrails_log(f"ACL 포트 해제 CLI 실패: {detail[:200]}")
+            return "FAIL", f"ACL 포트 해제 실패: {detail}"
+
+        show1 = _show_if()
+        left = self._guardrails_acl_still_on_if(show1, acl, v6_acl)
+        if left:
+            self._guardrails_log(
+                f"ACL 포트 잔존 감지 → 재시도: {', '.join(left)} on {ifc}"
+            )
+            ok2, detail2 = _detach_port()
+            show2 = _show_if()
+            left2 = self._guardrails_acl_still_on_if(show2, acl, v6_acl)
+            if left2:
+                self._guardrails_log(
+                    f"ACL 포트 원복 FAIL — 여전히 적용 중: {', '.join(left2)} "
+                    f"(수동: interface {ifc} → no … access-group … in)"
+                )
+                return (
+                    "FAIL",
+                    f"ACL 포트 잔존: {', '.join(left2)} on {ifc} "
+                    f"(CLI={'OK' if ok2 else 'FAIL'})",
+                )
+            self._guardrails_log(f"ACL 포트 재시도 후 해제 확인 OK on {ifc}")
+            return "PASS", f"access-group removed from {ifc} (retry; ACL 본문 유지)"
+
+        self._guardrails_log(
+            f"ACL 포트 해제 확인 OK — {ifc} 에 access-group 없음 (ACL 본문 유지)"
+        )
+        return "PASS", f"access-group removed from {ifc} (ACL 본문 유지)"
+
+    def _guardrails_l2sw_trunk_vlan(self, action: str, vid: str | None = None) -> tuple[str, str]:
+        """Dasan: switchport trunk allowed vlan remove|add <vid> on configured L2SW IF."""
+        act = (action or "").strip().lower()
+        if act not in ("remove", "add"):
+            return "FAIL", f"vlan action 불가: {action!r} (remove|add)"
+        v = (vid if vid is not None else self._guardrails_gf("vlan_discovery_vid", "61")) or "61"
+        v = str(v).strip()
+        if not re.fullmatch(r"\d{1,4}", v) or not (1 <= int(v) <= 4094):
+            return "FAIL", f"VLAN ID 오류: {v!r}"
+        ifc = self._guardrails_l2sw_normalize_if()
+        cmds = [
+            "enable",
+            "configure terminal",
+            f"interface {ifc}",
+            f"switchport trunk allowed vlan {act} {v}",
+            "exit",
+            "exit",
+        ]
+        ok, detail = self._guardrails_l2sw_run_cmds(cmds, settle_s=0.8)
+        if not ok:
+            return "FAIL", f"trunk vlan {act} {v} 실패: {detail}"
+        return "PASS", f"trunk allowed vlan {act} {v} on {ifc}"
+
+    def _guardrails_sync_vlan_restore_btn(self) -> None:
+        btn = getattr(self, "guardrails_vlan_restore_btn", None)
+        if btn is None:
+            return
+        pending = getattr(self, "_guardrails_vlan_restore_pending", None)
+        try:
+            if pending:
+                vid = pending.get("vid") or "?"
+                btn.configure(state="normal", text=f"VLAN untag 원복 (vlan {vid})")
+            else:
+                btn.configure(state="disabled", text="VLAN untag 원복")
+        except tk.TclError:
+            pass
+
+    def _guardrails_arm_vlan_restore(self, pending: dict[str, Any]) -> None:
+        """Keep VLAN state; enable toolbar restore for later."""
+        self._guardrails_vlan_restore_pending = dict(pending or {})
+        self._guardrails_sync_vlan_restore_btn()
+        self._guardrails_log(
+            f"VLAN untag 원복 대기: vlan {pending.get('vid')} ip={pending.get('learned_ip') or '-'} "
+            f"({pending.get('item_id')})"
+        )
+
+    def _guardrails_disarm_vlan_restore(self) -> None:
+        self._guardrails_vlan_restore_pending = None
+        self._guardrails_sync_vlan_restore_btn()
+
+    def _guardrails_ask_vlan_untag_restore(
+        self, *, vid: str, learned_ip: str, item_id: str
+    ) -> bool:
+        """Worker-thread safe modal: True=지금 원복, False=유지(추후 버튼)."""
+        box: dict[str, bool | None] = {"restore": None}
+        done = threading.Event()
+
+        def _show() -> None:
+            win = tk.Toplevel(self)
+            win.title("VLAN Discovery — untag 원복")
+            try:
+                win.transient(self)
+            except tk.TclError:
+                pass
+            win.grab_set()
+            frm = ttk.Frame(win, padding=14)
+            frm.pack(fill="both", expand=True)
+            ttk.Label(
+                frm,
+                text=(
+                    f"[{item_id}] VLAN {vid} 에서 IP {learned_ip} 수신 — 시험을 종료합니다.\n\n"
+                    f"스위치에서 시험 vlan {vid} 을 삭제하고 untag(base)로 원복할까요?\n\n"
+                    f"· 원복 실행: add base → renew → 즉시 remove vlan {vid}\n"
+                    "· 현재 유지: renew/원복 안 함 — 나중에 「VLAN untag 원복」 버튼"
+                ),
+                justify="left",
+                wraplength=480,
+            ).pack(anchor="w", pady=(0, 12))
+            bf = ttk.Frame(frm)
+            bf.pack(fill="x")
+
+            def _choose(restore: bool) -> None:
+                box["restore"] = restore
+                try:
+                    win.grab_release()
+                except tk.TclError:
+                    pass
+                win.destroy()
+                done.set()
+
+            ttk.Button(bf, text="원복 실행", command=lambda: _choose(True)).pack(
+                side="left", padx=(0, 8)
+            )
+            ttk.Button(bf, text="현재 유지", command=lambda: _choose(False)).pack(side="left")
+            win.protocol("WM_DELETE_WINDOW", lambda: _choose(False))
+            try:
+                win.focus_force()
+            except tk.TclError:
+                pass
+
+        self.after(0, _show)
+        if not done.wait(timeout=3600):
+            self._guardrails_log(f"{item_id}: VLAN 원복 확인 타임아웃 — 유지로 처리")
+            return False
+        return bool(box["restore"])
+
+    def _guardrails_run_vlan_untag_restore(self, pending: dict[str, Any]) -> tuple[str, str]:
+        """add base → renew → 즉시 remove 시험VLAN."""
+        item_id = str(pending.get("item_id") or "dhcp_v4")
+        fam = "v4" if str(pending.get("fam") or "v4").lower().startswith("v4") else "v6"
+        vid = str(pending.get("vid") or "").strip()
+        learned = str(pending.get("learned_ip") or "").strip()
+        probe = str(pending.get("probe") or "").strip()
+        renew_cmd = str(pending.get("renew_cmd") or "dhcp renew force").strip() or "dhcp renew force"
+        sif = str(pending.get("solid_vlan_if") or "").strip()
+        ru_mac = str(pending.get("ru_mac") or "").strip()
+        if not ru_mac:
+            mac_norm = self._guardrails_normalize_mac(self._guardrails_gf("ru_mac"))
+            ru_mac = (
+                ":".join(mac_norm[i : i + 2] for i in range(0, 12, 2)) if mac_norm else ""
+            )
+        prev = getattr(self, "_guardrails_settings_item_id", None)
+        self._guardrails_settings_item_id = item_id
+        notes: list[str] = []
+        try:
+            user = self._guardrails_gf("oru_cli_id") or "admin"
+            base = str(pending.get("base_vid") or self._guardrails_vlan_discovery_base_vid())
+            # 중지 시 learned 비어 있던 경우: neigh/lease 로 tag IP 재확보 (원복 전)
+            if (not learned) or self._guardrails_is_pre_discovery_ip(learned, fam):
+                try:
+                    for ip in self._guardrails_find_ip_by_ru_mac(ru_mac, sif, fam):
+                        if ip and not self._guardrails_is_pre_discovery_ip(ip, fam):
+                            learned = ip
+                            self._guardrails_log(
+                                f"{item_id}: 원복 전 Discovery IP 재확보 → {learned}"
+                            )
+                            break
+                except Exception as exc:
+                    self._guardrails_log(f"{item_id}: Discovery IP 재확보 실패: {exc}")
+            # 1) add base
+            st_a, det_a = self._guardrails_l2sw_vlan_discovery_add_base(base)
+            notes.append(det_a)
+            self._guardrails_log(f"{item_id}: L2 base add → {st_a}: {det_a}")
+            time.sleep(1.0)
+            # 2) renew — tag → untag probe → neigh(현재 IP). reset 후 IP 변경(::141) 대응
+            renewed = False
+            if learned and not self._guardrails_is_pre_discovery_ip(learned, fam):
+                self._guardrails_log(
+                    f"{item_id}: renew `{renew_cmd}` → ssh {user}@{learned} (tag/{fam})"
+                )
+                ok_r, det_r = self._guardrails_ru_force_dhcp_renew(
+                    learned, fam, command=renew_cmd, via_dhcp_host=True, vlan_bind=True
+                )
+                notes.append(f"dhcp_renew:{'OK' if ok_r else 'WARN'}@{learned}/tag")
+                self._guardrails_log(
+                    f"{item_id}: dhcp renew → {'OK' if ok_r else 'WARN'}: {det_r[:200]}"
+                )
+                renewed = bool(ok_r)
+            if (not renewed) and probe and probe != learned:
+                self._guardrails_log(
+                    f"{item_id}: renew `{renew_cmd}` → ssh {user}@{probe} (untag/{fam})"
+                    + (" — tag 실패 후 재시도" if learned else "")
+                )
+                ok_r, det_r = self._guardrails_ru_force_dhcp_renew(
+                    probe, fam, command=renew_cmd, via_dhcp_host=True, vlan_bind=False
+                )
+                notes.append(f"dhcp_renew:{'OK' if ok_r else 'WARN'}@{probe}/untag")
+                self._guardrails_log(
+                    f"{item_id}: dhcp renew → {'OK' if ok_r else 'WARN'}: {det_r[:200]}"
+                )
+                renewed = bool(ok_r)
+            if (not renewed) and ru_mac:
+                try:
+                    live = self._guardrails_find_ip_by_ru_mac(ru_mac, sif, fam)
+                except Exception:
+                    live = []
+                seen = {x for x in (learned, probe) if x}
+                for ip in live:
+                    if not ip or ip in seen:
+                        continue
+                    is_untag = self._guardrails_is_pre_discovery_ip(ip, fam)
+                    label = "untag/neigh" if is_untag else "tag/neigh"
+                    self._guardrails_log(
+                        f"{item_id}: renew `{renew_cmd}` → ssh {user}@{ip} ({label}) "
+                        "— tag/probe 실패 후 neigh 폴백"
+                    )
+                    ok_r, det_r = self._guardrails_ru_force_dhcp_renew(
+                        ip,
+                        fam,
+                        command=renew_cmd,
+                        via_dhcp_host=True,
+                        vlan_bind=not is_untag,
+                    )
+                    notes.append(
+                        f"dhcp_renew:{'OK' if ok_r else 'WARN'}@{ip}/{label}"
+                    )
+                    self._guardrails_log(
+                        f"{item_id}: dhcp renew → {'OK' if ok_r else 'WARN'}: "
+                        f"{det_r[:200]}"
+                    )
+                    if ok_r:
+                        renewed = True
+                        break
+            if not renewed:
+                for tag_ll in (True, False):
+                    ll, how_ll = self._guardrails_ru_linklocal_scoped(tag=tag_ll)
+                    if not ll:
+                        continue
+                    label = "LL/tag" if tag_ll else "LL/untag"
+                    self._guardrails_log(
+                        f"{item_id}: renew `{renew_cmd}` → ssh {user}@{ll} ({label}) "
+                        f"— {how_ll}"
+                    )
+                    ok_r, det_r = self._guardrails_ru_force_dhcp_renew(
+                        ll,
+                        fam,
+                        command=renew_cmd,
+                        via_dhcp_host=True,
+                        vlan_bind=tag_ll,
+                    )
+                    notes.append(f"dhcp_renew:{'OK' if ok_r else 'WARN'}@{ll}/{label}")
+                    self._guardrails_log(
+                        f"{item_id}: dhcp renew → {'OK' if ok_r else 'WARN'}: "
+                        f"{det_r[:200]}"
+                    )
+                    if ok_r:
+                        renewed = True
+                        break
+            if not renewed and not learned and not probe:
+                notes.append("dhcp_renew:SKIP no tag/probe ip")
+                self._guardrails_log(
+                    f"{item_id}: ⚠ renew 생략 — Discovery IP·probe 없음 "
+                    f"(RU는 vlan {vid} IP만 있을 수 있음). L2 원복만 진행"
+                )
+            elif not renewed:
+                notes.append("dhcp_renew:WARN all-targets-failed")
+                self._guardrails_log(
+                    f"{item_id}: ⚠ renew 전부 실패 — L2 remove 계속 "
+                    f"(tag={learned or '-'} probe={probe or '-'})"
+                )
+            # 3) 즉시 remove 시험 VLAN
+            self._guardrails_log(f"{item_id}: renew 직후 즉시 remove vlan {vid}")
+            st_r, det_r = self._guardrails_l2sw_vlan_discovery_remove_test(vid)
+            notes.append(det_r)
+            self._guardrails_log(f"{item_id}: L2 vlan remove → {st_r}: {det_r}")
+            # tag 시험용 vlan IF 는 원복 끝에서 항상 삭제 (IPv6 ::252 포함)
+            if sif:
+                st_s, det_s = self._guardrails_solid_vlan_if_teardown(sif)
+                notes.append(f"solid_if:{det_s}")
+                self._guardrails_log(f"{item_id}: solid 임시 IF 삭제 → {st_s}: {det_s}")
+            st_c = "PASS" if st_a == "PASS" and st_r == "PASS" else "FAIL"
+            return st_c, " | ".join(notes)
+        finally:
+            if prev is not None:
+                self._guardrails_settings_item_id = prev
+
+    def _guardrails_btn_vlan_untag_restore(self) -> None:
+        pending = getattr(self, "_guardrails_vlan_restore_pending", None)
+        if not pending:
+            messagebox.showinfo("M-Plane Test", "원복 대기 중인 VLAN이 없습니다.")
+            return
+        if self.guardrails_busy:
+            messagebox.showwarning("M-Plane Test", "검증 중에는 VLAN 원복을 실행할 수 없습니다.")
+            return
+        vid = pending.get("vid") or "?"
+        lip = pending.get("learned_ip") or "-"
+        fam_p = pending.get("fam") or "?"
+        if not messagebox.askyesno(
+            "VLAN untag 원복",
+            f"순서: add base → renew(ssh) → remove vlan {vid}\n"
+            f"base vlan {pending.get('base_vid') or 1}, family={fam_p}, "
+            f"tag IP={lip}\n\n"
+            f"tag IP 가 '-' 이면 renew 가 안 나갈 수 있습니다.",
+        ):
+            return
+
+        snap = dict(pending)
+
+        def _work() -> None:
+            try:
+                st, detail = self._guardrails_run_vlan_untag_restore(snap)
+                self.after(0, self._guardrails_disarm_vlan_restore)
+                self.after(
+                    0,
+                    lambda: messagebox.showinfo(
+                        "VLAN untag 원복",
+                        f"{st}\n{detail}",
+                    ),
+                )
+            except Exception as exc:
+                self.after(
+                    0,
+                    lambda: messagebox.showerror("VLAN untag 원복", str(exc)),
+                )
+
+        threading.Thread(target=_work, daemon=True).start()
+
+    def _guardrails_vlan_discovery_base_vid(self) -> str:
+        """Untagged/base VLAN removed during Discovery and restored on untag 원복 (default 1)."""
+        b = (self._guardrails_gf("vlan_discovery_base_vid", "1") or "1").strip() or "1"
+        if not re.fullmatch(r"\d{1,4}", b) or not (1 <= int(b) <= 4094):
+            return "1"
+        return b
+
+    def _guardrails_capture_host_vlan_if_names(
+        self, vid: str | None = None, primary_if: str | None = None
+    ) -> tuple[str, str, str]:
+        """Return (parent, ifname, cidr) for temporary IF on dhcp_host (9.249).
+
+        Linux IFNAMSIZ=16 → 이름 최대 15자.
+        enx00e04c681c64.100 은 19자라 생성 실패 → vlan<VID> 짧은 이름 사용.
+        """
+        v = str(vid or self._guardrails_gf("vlan_discovery_vid", "100") or "100").strip()
+        parent = (self._guardrails_gf("vlan_discovery_solid_parent") or "").strip()
+        if not parent:
+            parent = (primary_if or self._guardrails_gf("dhcp_if") or "").strip()
+        if not parent:
+            try:
+                parent = (self.fields.get("LOCAL_IF").get() or "").strip()  # type: ignore[union-attr]
+            except Exception:
+                parent = ""
+        if not parent:
+            parent = "enx00e04c681c64"
+        m = re.fullmatch(r"(.+)\.(\d+)", parent)
+        if m:
+            parent = m.group(1)
+        cidr = (self._guardrails_gf("vlan_discovery_solid_cidr", "10.0.61.252/24") or "").strip()
+        if not cidr:
+            cidr = "10.0.61.252/24"
+        # "10.0.61.252" 만 넣으면 ip addr add 가 /32 가 됨 → .61 라우트 안 생김 → ping GW로 나감
+        if "/" not in cidr:
+            cidr = f"{cidr}/24"
+        else:
+            try:
+                import ipaddress
+
+                iface = ipaddress.ip_interface(cidr)
+                # /32 는 Discovery 서브넷 라우트가 안 생김 → /24 로 강제
+                if iface.network.prefixlen >= 32:
+                    cidr = f"{iface.ip}/24"
+            except Exception:
+                if cidr.endswith("/32"):
+                    cidr = cidr.rsplit("/", 1)[0] + "/24"
+        # prefer parent.vid when ≤15 chars; else vlan<vid>
+        long_name = f"{parent}.{v}"
+        if len(long_name) <= 15:
+            ifname = long_name
+        else:
+            ifname = f"vlan{v}"
+            if len(ifname) > 15:
+                ifname = f"v{v}"[:15]
+        return parent, ifname, cidr
+
+    def _guardrails_dhcp_host_sudo_line(self, cmd: str) -> str:
+        """One remote line = 수동 `sudo <cmd>` 와 동일 (비밀번호는 dhcp_pw).
+
+        tcpdump 는 NOPASSWD 인 경우가 많아 sudo -n 으로도 되는데,
+        `ip addr add` 는 보통 암호 필요 → dhcp_pw 비면 여기서 실패함.
+        """
+        use_sudo = (self._guardrails_gf("use_sudo", "1") or "1").strip().lower() not in (
+            "0", "false", "no", "n",
+        )
+        if not use_sudo:
+            return cmd
+        pw = (self._guardrails_gf("dhcp_pw") or "").strip()
+        if pw:
+            # 수동: sudo ip addr add …  /  자동: printf pw | sudo -S -k -- ip addr add …
+            return f"printf '%s\\n' {shlex.quote(pw)} | sudo -S -k -- {cmd}"
+        return f"sudo -n -- {cmd}"
+
+    def _guardrails_dhcp_host_sudo_prefix(self) -> str:
+        """Deprecated alias — heal 등 구형 호출용."""
+        use_sudo = (self._guardrails_gf("use_sudo", "1") or "1").strip().lower() not in (
+            "0", "false", "no", "n",
+        )
+        if not use_sudo:
+            return ""
+        pw = (self._guardrails_gf("dhcp_pw") or "").strip()
+        if pw:
+            return f"printf '%s\\n' {shlex.quote(pw)} | sudo -S -k -- "
+        return "sudo -n -- "
+
+    def _guardrails_dhcp_vlan_l3_fix_lines(
+        self, *, ifname: str, parent: str, cidr: str, net_cidr: str, ip_only: str
+    ) -> list[str]:
+        """수동으로 성공한 순서와 동일:
+
+        - carrier=0 이어도 ignore_routes_with_linkdown=0
+        - /32 주소면 /24 로 교체
+        - ip route add 10.0.61.0/24 dev vlan100 scope link src … metric 0
+        """
+        s = self._guardrails_dhcp_host_sudo_line
+        return [
+            f"{s(f'ip link set {parent} up')} 2>/dev/null || true",
+            f"{s(f'ip link set {ifname} up')} 2>/dev/null || true",
+            f"{s(f'sysctl -w net.ipv4.conf.{ifname}.ignore_routes_with_linkdown=0')} 2>/dev/null || true",
+            f"{s('sysctl -w net.ipv4.conf.all.ignore_routes_with_linkdown=0')} 2>/dev/null || true",
+            # /32 남아 있으면 connected /24 안 생김 → 제거 후 /24 재부여
+            f"if ip -4 -o addr show dev {shlex.quote(ifname)} 2>/dev/null | grep -Eq '{ip_only}/32'; then",
+            f"  echo CAP_VLAN_FIX_32",
+            f"  {s(f'ip addr del {ip_only}/32 dev {ifname}')} 2>/dev/null || true",
+            f"  {s(f'ip addr add {cidr} dev {ifname}')} 2>&1 || true",
+            "fi",
+            f"if ! ip -4 -o addr show dev {shlex.quote(ifname)} 2>/dev/null | grep -Fq {shlex.quote(ip_only)}; then",
+            f"  {s(f'ip addr add {cidr} dev {ifname}')} 2>&1 || true",
+            "fi",
+            f"{s(f'ip route del {net_cidr}')} 2>/dev/null || true",
+            f"{s(f'ip route del {net_cidr} via 192.168.1.1')} 2>/dev/null || true",
+            f"{s(f'ip route del {net_cidr} via 192.168.9.254')} 2>/dev/null || true",
+            # 사용자가 수동으로 성공한 명령과 동일
+            f"{s(f'ip route add {net_cidr} dev {ifname} scope link src {ip_only} metric 0')} 2>&1 "
+            f"|| {s(f'ip route replace {net_cidr} dev {ifname} src {ip_only} metric 0')} 2>&1 "
+            f"|| true",
+            "echo CAP_VLAN_ROUTE_DONE",
+            f"echo LINK=$(ip -br link show {shlex.quote(ifname)} 2>&1 | tr ' ' '_')",
+            f"echo CARRIER=$(cat /sys/class/net/{ifname}/carrier 2>/dev/null || echo NA)",
+            f"echo OPER=$(cat /sys/class/net/{ifname}/operstate 2>/dev/null || echo NA)",
+            f"echo ADDR=$(ip -4 -o addr show dev {shlex.quote(ifname)} 2>&1 | tr ' ' '_' | head -c 160)",
+            f"echo ROUTES=$(ip -4 route show {shlex.quote(net_cidr)} 2>&1 | tr '\\n' ';' | head -c 200)",
+            f"echo ROUTES_DEV=$(ip -4 route show dev {shlex.quote(ifname)} 2>&1 | tr '\\n' ';' | head -c 200)",
+        ]
+
+    def _guardrails_solid_vlan_if_prepare(
+        self, vid: str | None = None, primary_if: str | None = None
+    ) -> tuple[str, str, bool, str]:
+        """Create temporary vlan IF on dhcp_host for ping/SSH (v4 + v6).
+
+        수동과 동일:
+          ip link add vlan100 … / ip addr add 10.0.61.252/24
+          / ip -6 addr add 2001:…::252/64  (dhcp_v6 / ⚙ vlan_discovery_solid_cidr_v6)
+        """
+        parent, ifname, cidr = self._guardrails_capture_host_vlan_if_names(vid, primary_if)
+        # parent enx 에 .61 이 남아 있으면 먼저 제거 (이전 renew/ping 버그 잔존)
+        self._guardrails_dhcp_host_strip_tag_addr_from_parent()
+        v = str(vid or self._guardrails_gf("vlan_discovery_vid", "100") or "100").strip()
+        if not re.fullmatch(r"\d{1,4}", v):
+            return "FAIL", f"VLAN ID 오류: {v!r}", False, ifname
+        if not re.fullmatch(r"[\w.-]+", parent) or not re.fullmatch(r"[\w.-]+", ifname):
+            return "FAIL", f"IF name 오류: {parent!r}/{ifname!r}", False, ifname
+        ip_only = cidr.split("/")[0].strip()
+        try:
+            import ipaddress
+
+            net_cidr = str(ipaddress.ip_interface(cidr).network)
+        except Exception:
+            net_cidr = "10.0.61.0/24"
+        cidr6 = self._guardrails_v6_solid_cidr(plane="tag")
+        fam_now = "v6"
+        try:
+            fam_now = self._guardrails_resolve_ssh_family(
+                getattr(self, "_guardrails_settings_item_id", None)
+            )
+        except Exception:
+            pass
+        pw = (self._guardrails_gf("dhcp_pw") or "").strip()
+        if not pw:
+            self._guardrails_log(
+                "dhcp_host: ⚠ dhcp_pw 비어 있음 — sudo -n 으로 ip addr add 시도 "
+                "(수동 sudo 는 되고 GUI 만 실패하는 대표 원인)"
+            )
+        s = self._guardrails_dhcp_host_sudo_line
+        v6_lines: list[str] = [
+            s(f"sysctl -w net.ipv6.conf.{ifname}.disable_ipv6=0") + " 2>/dev/null || true",
+            s("sysctl -w net.ipv6.conf.all.disable_ipv6=0") + " 2>/dev/null || true",
+        ]
+        if cidr6:
+            lip6 = cidr6.split("/")[0].strip()
+            try:
+                import ipaddress
+
+                net6 = str(ipaddress.IPv6Interface(cidr6 if "/" in cidr6 else f"{cidr6}/64").network)
+            except Exception:
+                net6 = ""
+            v6_lines.extend(
+                [
+                    f"echo CAP_VLAN6_CIDR={shlex.quote(cidr6)}",
+                    f"{s(f'ip -6 addr add {cidr6} dev {ifname} nodad')} 2>&1 || "
+                    f"{s(f'ip -6 addr add {cidr6} dev {ifname}')} 2>&1 || true",
+                    (
+                        f"{s(f'ip -6 route replace {net6} dev {ifname} metric 0')} 2>&1 || true"
+                        if net6
+                        else "true"
+                    ),
+                    f"echo ADDR6=$(ip -6 -o addr show dev {shlex.quote(ifname)} 2>&1 | tr ' ' '_' | head -c 200)",
+                    f"if ip -6 -o addr show dev {shlex.quote(ifname)} 2>/dev/null "
+                    f"| grep -Fq {shlex.quote(lip6)}; then echo CAP_VLAN6_ADDR_OK; "
+                    "else echo CAP_VLAN6_ADDR_FAIL; fi",
+                ]
+            )
+        else:
+            v6_lines.append("echo CAP_VLAN6_SKIP")
+        script = "\n".join(
+            [
+                "set +e",
+                f"echo CAP_VLAN_BEGIN parent={parent} if={ifname} cidr={cidr} "
+                f"cidr6={cidr6 or '-'} pw={'set' if pw else 'EMPTY'}",
+                s("modprobe 8021q") + " >/dev/null 2>&1 || true",
+                s(f"ip link set {parent} up") + " 2>&1 | tail -n 2 || true",
+                f"if ip -o link show {ifname} >/dev/null 2>&1; then",
+                "  echo CAP_VLAN_LINK_EXISTS",
+                "else",
+                "  "
+                + s(
+                    f"ip link add name {ifname} link {parent} "
+                    f"type vlan protocol 802.1Q id {v}"
+                )
+                + " 2>&1",
+                "  echo CAP_VLAN_LINK_RC=$?",
+                "  echo CAP_VLAN_LINK_NEW",
+                "fi",
+                s(f"ip link set {ifname} up") + " 2>&1 | tail -n 2 || true",
+                # 주소만 빠지는 케이스: 기존 IF reuse 후 addr 없음 → 수동 add 와 동일
+                s(f"ip addr flush dev {ifname}") + " 2>/dev/null || true",
+                s(f"ip addr add {cidr} dev {ifname}") + " 2>&1",
+                "echo CAP_VLAN_ADDR_RC=$?",
+                *self._guardrails_dhcp_vlan_l3_fix_lines(
+                    ifname=ifname,
+                    parent=parent,
+                    cidr=cidr,
+                    net_cidr=net_cidr,
+                    ip_only=ip_only,
+                ),
+                f"rg0=$(ip -4 route get {ip_only} 2>&1 || true)",
+                'echo "ROUTE_SELF=$rg0"',
+                f"if ip -4 -o addr show dev {ifname} 2>/dev/null | grep -Fq {shlex.quote(ip_only)}; then",
+                "  echo CAP_VLAN_ADDR_OK",
+                "else",
+                "  echo CAP_VLAN_ADDR_FAIL",
+                "fi",
+                *v6_lines,
+            ]
+        )
+        _ok, text = self._guardrails_dhcp_server_run(script, timeout=40)
+        out = text or ""
+        owned = "CAP_VLAN_LINK_NEW" in out
+        if "CAP_VLAN_ADDR_OK" not in out:
+            return (
+                "FAIL",
+                f"dhcp_host `sudo ip addr add {cidr} dev {ifname}` 실패 "
+                f"(dhcp_pw={'있음' if pw else '없음/EMPTY'}). 출력: {out[:300]}",
+                owned,
+                ifname,
+            )
+        how = "created" if owned else "reuse"
+        detail = f"{how} {ifname} {cidr} on dhcp_host"
+        if cidr6:
+            if "CAP_VLAN6_ADDR_OK" in out:
+                detail += f" + {cidr6}"
+            else:
+                detail += f" +v6FAIL({cidr6})"
+                if fam_now == "v6":
+                    return (
+                        "FAIL",
+                        f"dhcp_host vlan IF IPv6 부여 실패 ({cidr6}). "
+                        f"출력: {out[:280]}",
+                        owned,
+                        ifname,
+                    )
+                self._guardrails_log(
+                    f"dhcp_host: vlan IF IPv6 부여 실패(비치명) {cidr6} — {out[:120]}"
+                )
+        return "PASS", detail, owned, ifname
+
+    def _guardrails_solid_vlan_if_teardown(self, ifname: str | None) -> tuple[str, str]:
+        """Delete temporary vlan IF on dhcp_host (only when owned by this test)."""
+        self._guardrails_dhcp_host_strip_tag_addr_from_parent()
+        name = (ifname or "").strip()
+        if not name or not re.fullmatch(r"[\w.-]+", name):
+            return "SKIP", "no ifname"
+        s = self._guardrails_dhcp_host_sudo_line
+        cmd = "\n".join(
+            [
+                "set +e",
+                f"if ip link show {name} >/dev/null 2>&1; then",
+                f"  {s(f'ip link delete {name}')} 2>&1",
+                "  echo CAP_VLAN_DELETED",
+                "else",
+                "  echo CAP_VLAN_GONE",
+                "fi",
+            ]
+        )
+        _ok, text = self._guardrails_dhcp_server_run(cmd, timeout=20)
+        out = text or ""
+        if "CAP_VLAN_DELETED" in out or "CAP_VLAN_GONE" in out:
+            return "PASS", f"deleted {name} on dhcp_host"
+        return "FAIL", f"dhcp_host {name} 삭제 실패: {out[:200]}"
+
+    def _guardrails_v4_local_cidr_for_target(self, target: str) -> str:
+        """Unused — untag 는 기존 IF IP(.99 등)만 사용, .252 를 만들지 않음."""
+        return ""
+
+    def _guardrails_dhcp_host_existing_untag_v4(
+        self, ifname: str, peer: str
+    ) -> tuple[str, str]:
+        """parent enx 에 이미 있는 untag IPv4 (같은 /24). .252 를 만들지 않음.
+
+        예: 10.0.60.99/24 유지. 여러 개면 .252/.253 보다 기존 주소 우선.
+        Returns (ip, cidr) or ("", "").
+        """
+        name = (ifname or "").strip()
+        peer_ip = self._guardrails_strip_ip_cidr(peer)
+        if not name or not peer_ip or ":" in peer_ip:
+            return "", ""
+        try:
+            import ipaddress
+
+            peer_net = ipaddress.IPv4Interface(f"{peer_ip}/24").network
+        except Exception:
+            return "", ""
+        _ok, text = self._guardrails_dhcp_server_run(
+            f"ip -4 -o addr show dev {shlex.quote(name)} 2>/dev/null || true",
+            timeout=12,
+        )
+        found: list[tuple[str, str]] = []
+        for m in re.finditer(
+            r"\binet\s+(\d{1,3}(?:\.\d{1,3}){3})(?:/(\d{1,2}))?", text or ""
+        ):
+            ip = m.group(1)
+            pfx = m.group(2) or "24"
+            try:
+                import ipaddress
+
+                if ipaddress.IPv4Address(ip) not in peer_net:
+                    continue
+            except Exception:
+                continue
+            if ip == peer_ip:
+                continue
+            found.append((ip, f"{ip}/{pfx}"))
+        if not found:
+            return "", ""
+        preferred = [x for x in found if not x[0].endswith((".252", ".253"))]
+        pick = (preferred or found)[0]
+        return pick[0], pick[1]
+
+    def _guardrails_dhcp_host_strip_invented_untag_252(self, parent: str) -> None:
+        """예전에 ping heal 이 올린 임시 10.0.60.252 만 제거.
+
+        Settings LOCAL_IP (CallHome listen, 예: .252/.253) 는 절대 삭제하지 않음.
+        """
+        name = (parent or "").strip()
+        if not name:
+            return
+        try:
+            local_ip = self._guardrails_strip_ip_cidr(
+                (self.fields.get("LOCAL_IP").get() or "").strip()  # type: ignore[union-attr]
+            )
+        except Exception:
+            local_ip = ""
+        # LOCAL_IP 가 .252 이면 heal 정리 대상이 아님
+        if local_ip == "10.0.60.252":
+            return
+        s = self._guardrails_dhcp_host_sudo_line
+        script = "\n".join(
+            [
+                "set +e",
+                f"has_ops=$(ip -4 -o addr show dev {shlex.quote(name)} 2>/dev/null "
+                f"| grep -E 'inet 10\\.0\\.60\\.[0-9]+' | grep -vE '\\.252/' || true)",
+                f"has252=$(ip -4 -o addr show dev {shlex.quote(name)} 2>/dev/null "
+                f"| grep -E 'inet 10\\.0\\.60\\.252/' || true)",
+                'if [ -n "$has_ops" ] && [ -n "$has252" ]; then',
+                f"  {s('ip addr del 10.0.60.252/24 dev ' + name)} 2>/dev/null || true",
+                "  echo CAP_STRIP_UNTAG_252",
+                "fi",
+            ]
+        )
+        try:
+            _ok, text = self._guardrails_dhcp_server_run(script, timeout=12)
+            if text and "CAP_STRIP_UNTAG_252" in text:
+                self._guardrails_log(
+                    f"dhcp_host: parent {name} 에서 heal용 10.0.60.252 제거 "
+                    f"(LOCAL_IP={local_ip or '-'} 유지)"
+                )
+        except Exception:
+            pass
+
+    def _guardrails_verify_local_ip_on_remote(self, client: Any) -> tuple[bool, str]:
+        """CallHome LOCAL_IP 가 헬퍼 실행 호스트에 있는지 확인."""
+        try:
+            local_ip = self._guardrails_strip_ip_cidr(
+                (self.fields.get("LOCAL_IP").get() or "").strip()  # type: ignore[union-attr]
+            )
+        except Exception:
+            local_ip = ""
+        if not local_ip or ":" in local_ip:
+            return False, "Settings LOCAL_IP 비어 있음"
+        cmd = (
+            f"ip -4 -o addr show 2>/dev/null | grep -F {shlex.quote(local_ip + '/')} "
+            f"|| ip -4 -o addr show 2>/dev/null | grep -F {shlex.quote('inet ' + local_ip)} "
+            f"|| true"
+        )
+        try:
+            _stdin, stdout, _stderr = client.exec_command(cmd)
+            out = (stdout.read() or b"").decode(errors="ignore").strip()
+        except Exception as exc:
+            return False, f"LOCAL_IP 검사 실패: {exc}"
+        if local_ip in out:
+            return True, f"LOCAL_IP {local_ip} present: {out.splitlines()[0][:120]}"
+        return (
+            False,
+            f"LOCAL_IP {local_ip} 가 헬퍼 호스트에 없음 — "
+            f"listen 불가 → LOGIN=NOK. solid에 {local_ip} (untag eno2 / tag vlan IF) 확인",
+        )
+
+    def _guardrails_dhcp_host_strip_tag_addr_from_parent(self) -> None:
+        """Safety: .61(tag) must not sit on parent enx — only on vlan<VID>."""
+        try:
+            parent, vlan_if, tag_cidr = self._guardrails_capture_host_vlan_if_names()
+        except Exception:
+            return
+        tag_ip = (tag_cidr.split("/")[0] or "").strip()
+        if not parent or not tag_ip or parent == vlan_if:
+            return
+        self._guardrails_dhcp_host_strip_invented_untag_252(parent)
+        s = self._guardrails_dhcp_host_sudo_line
+        script = "\n".join(
+            [
+                "set +e",
+                f"if ip -4 -o addr show dev {shlex.quote(parent)} 2>/dev/null "
+                f"| grep -Fq {shlex.quote(tag_ip)}; then",
+                f"  {s(f'ip addr del {tag_cidr} dev {parent}')} 2>/dev/null || "
+                f"  {s(f'ip addr del {tag_ip}/24 dev {parent}')} 2>/dev/null || "
+                f"  {s(f'ip addr del {tag_ip} dev {parent}')} 2>/dev/null || true",
+                f"  echo CAP_STRIP_TAG_FROM_PARENT {parent} {tag_ip}",
+                "fi",
+            ]
+        )
+        try:
+            _ok, text = self._guardrails_dhcp_server_run(script, timeout=15)
+            if text and "CAP_STRIP_TAG_FROM_PARENT" in text:
+                self._guardrails_log(
+                    f"dhcp_host: parent {parent} 에서 tag IP {tag_ip} 제거 "
+                    f"(tag는 {vlan_if} 전용)"
+                )
+        except Exception:
+            pass
+
+    def _guardrails_probe_from_dhcp_host(
+        self,
+        ip: str,
+        via_if: str | None = None,
+        family: str = "v4",
+    ) -> tuple[bool, str]:
+        """Ping RU from dhcp_host (v4=ping / v6=ping6).
+
+        untag(.60/1200): parent enx 만 — .61/1300 주소를 parent 에 올리지 않음.
+        tag(.61/1300): vlan<VID> 만.
+        """
+        host = self._guardrails_strip_ip_cidr(ip)
+        if not host:
+            return False, "ping: no ip"
+        fam = "v6" if (
+            str(family).lower().startswith("v6") or ":" in host
+        ) else "v4"
+        parent, vlan_if, tag_cidr = self._guardrails_capture_host_vlan_if_names()
+        via = (via_if or "").strip()
+        s = self._guardrails_dhcp_host_sudo_line
+        # 잘못 parent 에 남은 .61 정리
+        self._guardrails_dhcp_host_strip_tag_addr_from_parent()
+
+        if fam == "v6":
+            is_untag = self._guardrails_is_pre_discovery_ip(host, "v6")
+            if is_untag:
+                ifname = parent if (not via or via == vlan_if) else via
+                if ifname == vlan_if:
+                    ifname = parent
+            else:
+                ifname = via if (via and via != parent) else vlan_if
+                if ifname == parent:
+                    ifname = vlan_if
+            local6 = self._guardrails_v6_local_cidr_for_target(host)
+            if not local6:
+                return False, f"ping6: local cidr 계산 실패 for {host}"
+            lip = local6.split("/")[0]
+            if host == lip:
+                return False, f"ping6: target is local {ifname} ({host})"
+            ok6, det6 = self._guardrails_dhcp_host_ensure_v6_addr(ifname, local6)[:2]
+            if not ok6:
+                return False, f"ping6: IF IPv6 부여 실패 ({det6})"
+            if self._guardrails_is_pre_discovery_ip(host, "v6"):
+                self._guardrails_arm_parent_v6_cleanup(ifname, local6)
+            heal = "\n".join(
+                [
+                    "set +e",
+                    f"{s(f'ip link set {parent} up')} 2>/dev/null || true",
+                    f"rg=$(ip -6 route get {shlex.quote(host)} 2>&1)",
+                    'echo "ROUTE_GET6=$rg"',
+                    f'if ! echo "$rg" | grep -Eq {shlex.quote(f"dev {ifname}")}; then',
+                    "  echo PING_FAIL bad_route6_dev",
+                    "  exit 0",
+                    "fi",
+                    "echo ROUTE6_OK",
+                    "okn=0",
+                    "for i in 1 2; do",
+                    f"  po=$(ping -6 -c 1 -W 2 -I {shlex.quote(lip)} "
+                    f"{shlex.quote(host)} 2>&1) || true",
+                    '  echo "PING6_OUT_$i: $(echo "$po" | tr \'\\n\' \' \' | head -c 220)"',
+                    "  echo \"$po\" | grep -Eqi 'bytes from' || continue",
+                    "  echo \"$po\" | grep -Eqi "
+                    "'Destination.*Unreachable|100% packet loss' && continue",
+                    "  echo \"$po\" | grep -Eqi "
+                    "'1 received|1 packets received|0% packet loss' || continue",
+                    "  okn=$((okn+1))",
+                    "done",
+                    'if [ "$okn" -ge 2 ]; then echo PING_OK okn=$okn; else echo PING_FAIL okn=$okn; fi',
+                ]
+            )
+            _ok, text = self._guardrails_dhcp_server_run(heal, timeout=30)
+            out = text or ""
+            last_ok = out.rfind("PING_OK")
+            last_fail = out.rfind("PING_FAIL")
+            if last_ok >= 0 and last_ok > last_fail:
+                return True, f"ping6-ok route:{ifname}/{lip}→{host}"
+            return False, f"ping6-fail via {ifname}→{host}: {out.replace(chr(10), ' | ')[:240]}"
+
+        # ---- IPv4 ----
+        is_untag = self._guardrails_is_pre_discovery_ip(host, "v4")
+        if is_untag:
+            # parent enx + 기존 IP 유지(예: 10.0.60.99). .252 추가/변경 금지
+            ifname = parent if (not via or via == vlan_if) else via
+            if ifname == vlan_if:
+                ifname = parent
+            self._guardrails_dhcp_host_strip_invented_untag_252(ifname)
+            ip_only, cidr = self._guardrails_dhcp_host_existing_untag_v4(ifname, host)
+            if not ip_only:
+                return (
+                    False,
+                    f"ping: {ifname} 에 untag IPv4(같은 /24) 없음 — "
+                    f"기존 IP(예: 10.0.60.99/24)를 유지하세요 (.252 자동추가 안 함)",
+                )
+            try:
+                import ipaddress
+
+                net_cidr = str(ipaddress.ip_interface(cidr).network)
+            except Exception:
+                net_cidr = "10.0.60.0/24"
+            if host == ip_only:
+                return False, f"ping: target is local {ifname} addr ({host})"
+            # 주소 추가/flush 없음 — link up + ping 만
+            heal = "\n".join(
+                [
+                    "set +e",
+                    f"{s(f'ip link set {ifname} up')} 2>/dev/null || true",
+                    f"echo CAP_UNTAG_USE existing={ip_only}",
+                    f"rg=$(ip -4 route get {shlex.quote(host)} 2>&1)",
+                    'echo "ROUTE_GET=$rg"',
+                    'if echo "$rg" | grep -Eq "\\bvia\\b"; then',
+                    "  echo PING_FAIL bad_route_via_gw",
+                    f"  ip -4 route | head -n 20 | tr '\\n' ';' || true",
+                    "  exit 0",
+                    "fi",
+                    f'if ! echo "$rg" | grep -Eq {shlex.quote(f"dev {ifname}")}; then',
+                    "  echo PING_FAIL bad_route_dev",
+                    "  exit 0",
+                    "fi",
+                    "echo ROUTE_OK",
+                    "okn=0",
+                    "for i in 1 2; do",
+                    f"  po=$(ping -c 1 -W 2 -I {shlex.quote(ip_only)} "
+                    f"{shlex.quote(host)} 2>&1) || true",
+                    '  echo "PING_OUT_$i: $(echo "$po" | tr \'\\n\' \' \' | head -c 220)"',
+                    f"  echo \"$po\" | grep -Eqi {shlex.quote(f'bytes from {host}')} || continue",
+                    "  echo \"$po\" | grep -Eqi "
+                    "'Destination Host Unreachable|Network Unreachable|100% packet loss' "
+                    "&& continue",
+                    "  echo \"$po\" | grep -Eqi "
+                    "'1 received|1 packets received|0% packet loss' || continue",
+                    "  okn=$((okn+1))",
+                    "done",
+                    'if [ "$okn" -ge 2 ]; then echo PING_OK okn=$okn; '
+                    "else echo PING_FAIL okn=$okn; fi",
+                ]
+            )
+            _ok, text = self._guardrails_dhcp_server_run(heal, timeout=25)
+            out = text or ""
+            last_ok = out.rfind("PING_OK")
+            last_fail = out.rfind("PING_FAIL")
+            if last_ok >= 0 and last_ok > last_fail:
+                return True, f"ping-ok route:{ifname}/{ip_only}→{host}"
+            return False, f"ping-fail via {ifname}/{ip_only}→{host}: {out.replace(chr(10), ' | ')[:240]}"
+
+        # tag: vlan IF only — .61.252 부여/정리 허용
+        ifname = via if (via and via != parent) else vlan_if
+        if ifname == parent:
+            ifname = vlan_if
+        cidr = tag_cidr
+        ip_only = cidr.split("/")[0].strip()
+        try:
+            import ipaddress
+
+            net_cidr = str(ipaddress.ip_interface(cidr).network)
+        except Exception:
+            net_cidr = "10.0.61.0/24"
+        if host == ip_only:
+            return False, f"ping: target is local {ifname} addr ({host})"
+        heal = "\n".join(
+            [
+                "set +e",
+                f"if ! ip -4 -o addr show dev {shlex.quote(ifname)} 2>/dev/null "
+                f"| grep -Fq {shlex.quote(ip_only)}; then",
+                f"  {s(f'ip addr flush dev {ifname}')} 2>/dev/null || true",
+                f"  {s(f'ip addr add {cidr} dev {ifname}')} 2>&1 || true",
+                "  echo CAP_VLAN_HEAL",
+                "fi",
+                *self._guardrails_dhcp_vlan_l3_fix_lines(
+                    ifname=ifname,
+                    parent=parent,
+                    cidr=cidr,
+                    net_cidr=net_cidr,
+                    ip_only=ip_only,
+                ),
+                f"rg=$(ip -4 route get {shlex.quote(host)} 2>&1)",
+                'echo "ROUTE_GET=$rg"',
+                'if echo "$rg" | grep -Eq "\\bvia\\b"; then',
+                "  echo PING_FAIL bad_route_via_gw",
+                f"  ip -4 route | head -n 20 | tr '\\n' ';' || true",
+                "  exit 0",
+                "fi",
+                f'if ! echo "$rg" | grep -Eq {shlex.quote(f"dev {ifname}")}; then',
+                "  echo PING_FAIL bad_route_dev",
+                "  exit 0",
+                "fi",
+                "echo ROUTE_OK",
+                "okn=0",
+                "for i in 1 2; do",
+                f"  po=$(ping -c 1 -W 2 {shlex.quote(host)} 2>&1) || true",
+                '  echo "PING_OUT_$i: $(echo "$po" | tr \'\\n\' \' \' | head -c 220)"',
+                f"  echo \"$po\" | grep -Eqi {shlex.quote(f'bytes from {host}')} || continue",
+                "  echo \"$po\" | grep -Eqi "
+                "'Destination Host Unreachable|Network Unreachable|100% packet loss' "
+                "&& continue",
+                "  echo \"$po\" | grep -Eqi '1 received|1 packets received|0% packet loss' || continue",
+                "  okn=$((okn+1))",
+                "done",
+                'if [ "$okn" -ge 2 ]; then echo PING_OK okn=$okn; else echo PING_FAIL okn=$okn; fi',
+            ]
+        )
+        _ok, text = self._guardrails_dhcp_server_run(heal, timeout=25)
+        out = text or ""
+        last_ok = out.rfind("PING_OK")
+        last_fail = out.rfind("PING_FAIL")
+        if last_ok >= 0 and last_ok > last_fail:
+            return True, f"ping-ok route:{ifname}/{ip_only}→{host}"
+        return False, f"ping-fail via {ifname}→{host}: {out.replace(chr(10), ' | ')[:240]}"
+
+    def _guardrails_l2sw_vlan_discovery_prepare(
+        self, vid: str | None = None, name: str | None = None
+    ) -> tuple[str, str]:
+        """Early step: create test VLAN + trunk add only (base remove is post-reset)."""
+        v = (vid if vid is not None else self._guardrails_gf("vlan_discovery_vid", "61")) or "61"
+        v = str(v).strip()
+        if not re.fullmatch(r"\d{1,4}", v) or not (1 <= int(v) <= 4094):
+            return "FAIL", f"VLAN ID 오류: {v!r}"
+        base = self._guardrails_vlan_discovery_base_vid()
+        if base == v:
+            return "FAIL", f"시험 VLAN과 base VLAN이 같음: {v}"
+        vname = (
+            name
+            if name is not None
+            else (self._guardrails_gf("vlan_discovery_name") or "").strip()
+        )
+        ifc = self._guardrails_l2sw_normalize_if()
+        # Dasan: vlan N 후 exit 금지. base(vlan1) remove는 reset 직후 별도 호출.
+        cmds: list[str] = [
+            "enable",
+            "configure terminal",
+            f"vlan {v}",
+        ]
+        if vname:
+            cmds.append(f"name {vname}")
+        cmds.extend(
+            [
+                f"interface {ifc}",
+                f"switchport trunk allowed vlan add {v}",
+                "exit",
+                "exit",
+            ]
+        )
+        ok, detail = self._guardrails_l2sw_run_cmds(cmds, settle_s=0.8)
+        if not ok:
+            return "FAIL", f"vlan {v} prepare 실패: {detail}"
+        nm = f" name={vname}" if vname else ""
+        return "PASS", f"trunk add {v}{nm} on {ifc}"
+
+    def _guardrails_l2sw_vlan_discovery_remove_base(
+        self, base_vid: str | None = None
+    ) -> tuple[str, str]:
+        """Right after ORU reset: remove base(vlan1) from trunk so Discovery is forced."""
+        base = (
+            str(base_vid).strip()
+            if base_vid is not None
+            else self._guardrails_vlan_discovery_base_vid()
+        )
+        if not re.fullmatch(r"\d{1,4}", base) or not (1 <= int(base) <= 4094):
+            return "FAIL", f"base VLAN ID 오류: {base!r}"
+        ifc = self._guardrails_l2sw_normalize_if()
+        cmds = [
+            "enable",
+            "configure terminal",
+            f"interface {ifc}",
+            f"switchport trunk allowed vlan remove {base}",
+            "exit",
+            "exit",
+        ]
+        ok, detail = self._guardrails_l2sw_run_cmds(cmds, settle_s=0.8)
+        if not ok:
+            return "FAIL", f"vlan {base} remove 실패: {detail}"
+        return "PASS", f"trunk remove base {base} on {ifc}"
+
+    def _guardrails_l2sw_vlan_discovery_add_base(
+        self, base_vid: str | None = None
+    ) -> tuple[str, str]:
+        """원복 1단계: trunk에 base(vlan1) 만 add (시험 VLAN은 아직 유지)."""
+        base = (
+            str(base_vid).strip()
+            if base_vid is not None
+            else self._guardrails_vlan_discovery_base_vid()
+        )
+        if not re.fullmatch(r"\d{1,4}", base) or not (1 <= int(base) <= 4094):
+            base = "1"
+        ifc = self._guardrails_l2sw_normalize_if()
+        cmds = [
+            "enable",
+            "configure terminal",
+            f"interface {ifc}",
+            f"switchport trunk allowed vlan add {base}",
+            "exit",
+            "exit",
+        ]
+        ok, detail = self._guardrails_l2sw_run_cmds(cmds, settle_s=0.5)
+        if not ok:
+            return "FAIL", f"base {base} add 실패: {detail}"
+        return "PASS", f"trunk add base {base} on {ifc}"
+
+    def _guardrails_l2sw_vlan_discovery_remove_test(
+        self, vid: str | None = None
+    ) -> tuple[str, str]:
+        """원복 2단계: 시험 VLAN trunk remove + no vlan (renew 직후 즉시)."""
+        v = (vid if vid is not None else self._guardrails_gf("vlan_discovery_vid", "100")) or "100"
+        v = str(v).strip()
+        if not re.fullmatch(r"\d{1,4}", v) or not (1 <= int(v) <= 4094):
+            return "FAIL", f"VLAN ID 오류: {v!r}"
+        ifc = self._guardrails_l2sw_normalize_if()
+        cmds = [
+            "enable",
+            "configure terminal",
+            f"interface {ifc}",
+            f"switchport trunk allowed vlan remove {v}",
+            "exit",
+            f"no vlan {v}",
+            "exit",
+        ]
+        ok, detail = self._guardrails_l2sw_run_cmds(cmds, settle_s=0.4)
+        if not ok:
+            return "FAIL", f"vlan {v} remove 실패: {detail}"
+        return "PASS", f"vlan {v} 삭제(trunk remove+no vlan) on {ifc}"
+
+    def _guardrails_l2sw_vlan_discovery_cleanup(
+        self, vid: str | None = None, base_vid: str | None = None
+    ) -> tuple[str, str]:
+        """원복 일괄: base add → 시험 VLAN remove (한 세션)."""
+        st1, d1 = self._guardrails_l2sw_vlan_discovery_add_base(base_vid)
+        if st1 != "PASS":
+            return st1, d1
+        st2, d2 = self._guardrails_l2sw_vlan_discovery_remove_test(vid)
+        if st2 != "PASS":
+            return st2, f"{d1} | {d2}"
+        return "PASS", f"{d1} → {d2}"
+
+    def _guardrails_run_dhcp_family(self, fam: str, item_id: str | None = None) -> tuple[str, str]:
+        """ACL → reboot → SSH check address recovery → cleanup."""
+        fam = "v4" if str(fam).lower().startswith("v4") else "v6"
+        iid = item_id or ("dhcp_v4_only_boot" if fam == "v4" else "dhcp_v6_only_boot")
+        self._guardrails_settings_item_id = iid
+        self._guardrails_fill_defaults_from_context(iid)
+        pass_sec = self._guardrails_int("pass_sec", 240)
+        timeout_sec = self._guardrails_int("timeout_sec", 540)
+        poll_sec = self._guardrails_int("poll_sec", 5)
+        stable_sec = self._guardrails_int("stable_sec", 10)
+        down_detect_sec = self._guardrails_int("down_detect_sec", 180)
+
+        host, how = self._guardrails_ru_ssh_target(fam)
+        if not host:
+            need = "Settings ALLOWED_IP" if fam == "v4" else "Settings ALLOWED_IP_V6 또는 RU MAC+M-Plane NIC"
+            return "FAIL", f"SSH 대상 불가: {how} ({need})"
+        if not self._guardrails_gf("oru_cli_id"):
+            return "FAIL", "RU SSH ID 필요 (Settings ★ RU SSH ID)"
+
+        notes: list[str] = [f"family={fam}", f"ssh-target {how}"]
+        st, detail = self._guardrails_apply_acl(fam)
+        if st != "PASS":
+            return st, detail
+        notes.append(detail)
+        expect = "IPv4 inet" if fam == "v4" else "global inet6"
+        self.after(
+            0,
+            self.append_log,
+            f"[M-Plane Test] ACL 적용({fam}). RU 재부팅 후 SSH로 {expect} 복구를 감시합니다.\n",
+        )
+
+        t_acl = time.monotonic()
+        saw_down = False
+        while time.monotonic() - t_acl < down_detect_sec:
+            if self._guardrails_cancel.is_set():
+                self._guardrails_remove_acl()
+                return "INFO", "사용자 중지 (ACL 원복 시도)"
+            up, pdetail = self._guardrails_probe_once(fam)
+            if not up:
+                saw_down = True
+                notes.append(f"unhealthy/down: {pdetail}")
+                break
+            time.sleep(poll_sec)
+
+        if not saw_down:
+            self._guardrails_remove_acl()
+            return (
+                "FAIL",
+                "재부팅(SSH unhealthy) 미감지. RU 재부팅·설정 확인. ACL 원복. "
+                + " | ".join(notes),
+            )
+
+        t0 = time.monotonic()
+        recovered = False
+        last = ""
+        healthy_since: float | None = None
+        self._guardrails_log(
+            f"{iid}: 복구 PASS 조건 = SSH healthy {stable_sec}s 연속 유지"
+        )
+        while time.monotonic() - t0 < timeout_sec:
+            if self._guardrails_cancel.is_set():
+                self._guardrails_remove_acl()
+                return "INFO", f"사용자 중지 (down 이후 {time.monotonic() - t0:.0f}s, ACL 원복)"
+            up, last = self._guardrails_probe_once(fam)
+            if up:
+                now_h = time.monotonic()
+                if healthy_since is None:
+                    healthy_since = now_h
+                    self._guardrails_log(
+                        f"{iid}: 주소 복구 1차 OK — {stable_sec}s 유지 확인 중… {last[:100]}"
+                    )
+                held = now_h - healthy_since
+                if held >= float(stable_sec):
+                    recovered = True
+                    self._guardrails_log(
+                        f"{iid}: 주소 복구 OK (유지 {held:.0f}s≥{stable_sec}s) {last[:120]}"
+                    )
+                    notes.append(f"stable:{stable_sec}s")
+                    break
+            else:
+                if healthy_since is not None:
+                    self._guardrails_log(
+                        f"{iid}: 복구 유지 실패 — 재대기 last={last[:80]}"
+                    )
+                healthy_since = None
+            time.sleep(min(poll_sec, 3) if healthy_since is not None else poll_sec)
+
+        elapsed = time.monotonic() - t0
+        rm_st, rm_detail = self._guardrails_remove_acl()
+        notes.append(rm_detail if rm_st == "PASS" else f"원복주의:{rm_detail}")
+
+        if not recovered:
+            return "FAIL", f"복구 타임아웃 {elapsed:.0f}s (한도 {timeout_sec}s) last={last} | " + " | ".join(notes)
+
+        verdict = "PASS" if elapsed <= pass_sec else "FAIL"
+        why = f"[{fam}] 복구 {elapsed:.0f}s (PASS≤{pass_sec}s, stable≥{stable_sec}s) {last}"
+        if verdict == "FAIL":
+            why += " — renew(~300s) 대기 의심"
+        return verdict, why + " | " + " | ".join(notes)
+
+    def _guardrails_run_dhcp_v6_only(self) -> tuple[str, str]:
+        return self._guardrails_run_dhcp_family("v6", item_id="dhcp_v6_only_boot")
+
+    def _guardrails_run_dhcp_v4_only(self) -> tuple[str, str]:
+        return self._guardrails_run_dhcp_family("v4", item_id="dhcp_v4_only_boot")
+
+    def _guardrails_open_settings(self, item_id: str) -> None:
+        schema = self._GUARDRAILS_PER_TEST_SCHEMA.get(item_id)
+        if not schema:
+            messagebox.showinfo("M-Plane Test", f"{item_id}: 설정 스키마 없음")
+            return
+        self._guardrails_fill_defaults_from_context(item_id)
+        win = tk.Toplevel(self)
+        win.title(f"설정 — {schema['title']}")
+        win.resizable(False, False)
+        win.transient(self)
+        win.grab_set()
+
+        fr = ttk.Frame(win, padding=12)
+        fr.pack(fill="both", expand=True)
+        share_note = ""
+        if item_id in self._GUARDRAILS_DHCP_ITEM_IDS:
+            share_note = "  (캡처호스트·RU SSH 공유 · Option/IA_NA regex는 family 공유 · L2SW/VLAN은 VLAN 항목)"
+        ttk.Label(fr, text=schema["title"] + share_note, font=("", 11, "bold")).grid(
+            row=0, column=0, columnspan=3, sticky="w", pady=(0, 4)
+        )
+        if item_id in ("dhcp_v4_vlan", "dhcp_v6_vlan"):
+            ttk.Label(
+                fr,
+                text="★ = 시험 VLAN ID  ·  RU MAC=ALLOWED_IP ping→neigh 자동  ·  "
+                "RU ID·PW·IPv4/IPv6 = Settings 공용  ·  Capture/L2SW IF 자동",
+                foreground="#b45309",
+                font=("", 9, "bold"),
+            ).grid(row=1, column=0, columnspan=3, sticky="w", pady=(0, 8))
+            row_i = 2
+        elif item_id in ("dhcp_v4", "dhcp_v6"):
+            ttk.Label(
+                fr,
+                text="Boot: 재시작 후 IP 재수신 + Option tcpdump  ·  "
+                "RU ID·PW·IP = Settings 공용  ·  Capture IF 자동",
+                foreground="#64748b",
+                font=("", 9),
+            ).grid(row=1, column=0, columnspan=3, sticky="w", pady=(0, 8))
+            row_i = 2
+        else:
+            row_i = 1
+        entries: dict[str, tk.StringVar] = {}
+        sk = self._guardrails_store_key(item_id)
+        # Merge stored blob + sibling shared values for display
+        cur = dict((getattr(self, "_guardrails_per_test_settings", {}) or {}).get(sk) or {})
+        if not cur:
+            cur = dict((getattr(self, "_guardrails_per_test_settings", {}) or {}).get(item_id) or {})
+        for field in schema["fields"]:
+            key = str(field.get("key") or "")
+            if not key:
+                continue
+            got = self._guardrails_get_val(item_id, key, str(field.get("default") or ""))
+            if got and not (cur.get(key) or "").strip():
+                cur[key] = got
+        for field in schema["fields"]:
+            if field.get("hidden"):
+                continue
+            emph = bool(field.get("emphasize"))
+            lbl_kw: dict[str, Any] = {"text": field["label"]}
+            if emph:
+                lbl_kw["foreground"] = "#b45309"
+                lbl_kw["font"] = ("", 9, "bold")
+            ttk.Label(fr, **lbl_kw).grid(row=row_i, column=0, sticky="w", padx=(0, 8), pady=2)
+            raw_val = cur.get(field["key"])
+            if raw_val is None or str(raw_val).strip() == "":
+                raw_val = self._guardrails_get_val(
+                    item_id, str(field["key"]), str(field.get("default") or "")
+                )
+            if raw_val is None or str(raw_val).strip() == "":
+                raw_val = field.get("default") or ""
+            sv = tk.StringVar(value=str(raw_val))
+            if field.get("widget") == "checkbox":
+                on = str(raw_val).strip().lower() not in ("0", "false", "no", "n", "")
+                sv.set("1" if on else "0")
+                ttk.Checkbutton(fr, variable=sv, onvalue="1", offvalue="0").grid(
+                    row=row_i, column=1, sticky="w", pady=2
+                )
+            else:
+                w = 40 if field.get("wide") else 14
+                show_pw = "*" if field.get("password") else ""
+                ent = ttk.Entry(fr, textvariable=sv, width=w, show=show_pw)
+                ent.grid(row=row_i, column=1, sticky="we", pady=2)
+            entries[field["key"]] = sv
+            hint = field.get("hint") or ""
+            if hint:
+                ttk.Label(
+                    fr,
+                    text=hint,
+                    foreground="#b45309" if emph else "#64748b",
+                    font=("", 8, "bold") if emph else ("", 8),
+                ).grid(row=row_i, column=2, sticky="w", padx=(6, 0), pady=2)
+            row_i += 1
+
+        def _apply() -> None:
+            vals: dict[str, str] = {}
+            for field in schema["fields"]:
+                key = field["key"]
+                if field.get("hidden"):
+                    # keep previously saved / default — not shown in UI
+                    continue
+                sv = entries.get(key)
+                if sv is None:
+                    continue
+                v = (sv.get() or "").strip()
+                if field.get("widget") == "checkbox":
+                    vals[key] = "1" if v in ("1", "true", "yes", "on") else "0"
+                elif v:
+                    vals[key] = v
+            # merge with shared store so v4-only regex + v6-only regex both keep
+            merged = dict(cur)
+            merged.update(vals)
+            # drop empty
+            merged = {k: v for k, v in merged.items() if str(v).strip()}
+            self._guardrails_set_vals(item_id, merged)
+            sib = self._guardrails_dhcp_sibling_key(item_id)
+            try:
+                a4 = self._guardrails_strip_ip_cidr(
+                    (self.fields.get("ALLOWED_IP").get() or "").strip()  # type: ignore[union-attr]
+                )
+            except Exception:
+                a4 = ""
+            try:
+                a6 = self._guardrails_strip_ip_cidr(
+                    (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+                )
+            except Exception:
+                a6 = ""
+            self.append_log(
+                f"[GUI] M-Plane Test 항목 설정 저장: {item_id}/{sk} ({len(merged)}개 필드)"
+                + (f" · 공통항목→{sib} 동기화" if sib else "")
+                + (f" · RU IP=Settings({a4 or '-'}" + (f"/{a6}" if a6 and ':' in a6 else "") + ")" if (a4 or a6) else "")
+                + "\n"
+            )
+            for other in self._GUARDRAILS_PER_TEST_SCHEMA:
+                self._guardrails_sync_tree_row(other)
+            win.destroy()
+
+        def _reset() -> None:
+            for field in schema["fields"]:
+                if field.get("hidden"):
+                    continue
+                sv = entries.get(field["key"])
+                if sv is not None:
+                    sv.set(str(field.get("default") or ""))
+
+        def _mac_if_lookup_now() -> None:
+            vals = {k: (sv.get() or "").strip() for k, sv in entries.items() if (sv.get() or "").strip()}
+            merged = dict(cur)
+            merged.update(vals)
+            self._guardrails_set_vals(item_id, merged)
+            self._guardrails_settings_item_id = item_id
+
+            def work() -> None:
+                st_mac, det_mac = self._guardrails_ensure_ru_mac(item_id, force=True)
+                if st_mac == "FAIL":
+                    self._guardrails_log(f"⚙ MAC→IF ({item_id}) → FAIL: {det_mac}")
+                    self.after(
+                        0,
+                        lambda: messagebox.showerror(
+                            "M-Plane Test", f"RU MAC 조회 실패\n{det_mac}", parent=win
+                        ),
+                    )
+                    return
+                st, detail = self._guardrails_ensure_l2sw_if_from_mac(item_id, force=True)
+                ifc = self._guardrails_l2sw_normalize_if()
+                mac = (self._guardrails_gf("ru_mac") or "").strip()
+
+                def _ui() -> None:
+                    if ifc and "l2sw_if" in entries:
+                        entries["l2sw_if"].set(ifc)
+                    messagebox.showinfo(
+                        "M-Plane Test",
+                        f"MAC: {st_mac}\n{det_mac}\n\nIF: {st}\n{detail}",
+                        parent=win,
+                    )
+
+                self._guardrails_log(
+                    f"⚙ MAC→IF ({item_id}) → MAC={mac or '-'} / {st}: {detail}"
+                )
+                self.after(0, _ui)
+
+            threading.Thread(target=work, daemon=True).start()
+
+        def _acl_apply_now() -> None:
+            # persist current form values first
+            vals = {k: (sv.get() or "").strip() for k, sv in entries.items() if (sv.get() or "").strip()}
+            merged = dict(cur)
+            merged.update(vals)
+            self._guardrails_set_vals(item_id, merged)
+            self._guardrails_settings_item_id = item_id
+            fam = self._guardrails_item_family(item_id)
+
+            def work() -> None:
+                st, detail = self._guardrails_apply_acl(fam)
+                ifc = self._guardrails_l2sw_normalize_if()
+
+                def _ui() -> None:
+                    if ifc and "l2sw_if" in entries:
+                        entries["l2sw_if"].set(ifc)
+                    messagebox.showinfo("M-Plane Test", f"{st}\n{detail}", parent=win)
+
+                self._guardrails_log(f"⚙ ACL 적용({fam}/{item_id}) → {st}: {detail}")
+                self.after(0, _ui)
+
+            threading.Thread(target=work, daemon=True).start()
+
+        def _acl_remove_now() -> None:
+            vals = {k: (sv.get() or "").strip() for k, sv in entries.items() if (sv.get() or "").strip()}
+            merged = dict(cur)
+            merged.update(vals)
+            self._guardrails_set_vals(item_id, merged)
+            self._guardrails_settings_item_id = item_id
+
+            def work() -> None:
+                st, detail = self._guardrails_remove_acl()
+                self._guardrails_log(f"⚙ ACL 제거({item_id}) → {st}: {detail}")
+                self.after(0, lambda: messagebox.showinfo("M-Plane Test", f"{st}\n{detail}", parent=win))
+
+            threading.Thread(target=work, daemon=True).start()
+
+        btn_fr = ttk.Frame(fr)
+        btn_fr.grid(row=row_i + 1, column=0, columnspan=3, pady=(10, 0), sticky="w")
+        ttk.Button(btn_fr, text="초기화", command=_reset, width=8).pack(side="left", padx=(0, 8))
+        ttk.Button(btn_fr, text="적용", command=_apply, width=8).pack(side="left", padx=(0, 8))
+        ttk.Button(btn_fr, text="취소", command=win.destroy, width=8).pack(side="left", padx=(0, 16))
+        if item_id in ("dhcp_v4_vlan", "dhcp_v6_vlan", "dhcp_v4_only_boot", "dhcp_v6_only_boot"):
+            ttk.Button(btn_fr, text="MAC→IF 조회", command=_mac_if_lookup_now, width=12).pack(
+                side="left", padx=(0, 6)
+            )
+            ttk.Button(btn_fr, text="ACL만 적용(테스트)", command=_acl_apply_now, width=16).pack(
+                side="left", padx=(0, 6)
+            )
+            ttk.Button(btn_fr, text="ACL만 제거", command=_acl_remove_now, width=12).pack(side="left")
+            ttk.Label(
+                fr,
+                text="※ VLAN 검증 순서: ① ALLOWED_IP ping→ip neigh(MAC) ② L2SW show mac(IF) "
+                "③ Capture IF(ifconfig). 「MAC→IF 조회」도 동일 순서.",
+                foreground="#64748b",
+                wraplength=520,
+            ).grid(row=len(schema["fields"]) + 2, column=0, columnspan=3, sticky="w", pady=(8, 0))
+        win.update_idletasks()
+        pw, ph = win.winfo_width(), win.winfo_height()
+        sx = self.winfo_rootx() + (self.winfo_width() - pw) // 2
+        sy = self.winfo_rooty() + (self.winfo_height() - ph) // 3
+        win.geometry(f"+{max(0, sx)}+{max(0, sy)}")
+
+    def _guardrails_l2sw_run_cmds(
+        self,
+        cmds: list[str],
+        settle_s: float = 0.5,
+        timeout: int | None = None,
+        *,
+        require_config: bool = True,
+        tolerate_invalid: bool = False,
+    ) -> tuple[bool, str]:
+        """Send CLI lines to L2SW via solid→sshpass (same path as Conformance 3151).
+
+        require_config=False: show-only 세션 (enable→show) — (config 미진입 OK.
+        tolerate_invalid=True: % Invalid input 있어도 출력 반환 (show mac 변형 시도용).
+        """
+        host = self._guardrails_gf("l2sw_ip")
+        user = self._guardrails_gf("l2sw_id")
+        pw = self._guardrails_gf("l2sw_pw")
+        ifc = self._guardrails_l2sw_normalize_if() or "-"
+        if not host or not user:
+            return False, "L2SW IP/ID 필요 (⚙ 설정)"
+        if " " in user or user.lower().startswith("ethernet") or user.lower().startswith("eth"):
+            return False, (
+                f"L2SW ID가 이상함: {user!r} (포트명이 ID에 들어간 듯). "
+                "⚙ L2SW ID=admin, L2SW IF=ethernet 0/22 로 다시 저장하세요."
+            )
+        # Build feeder on solid: sshpass → L2SW interactive SSH
+        feeder_parts: list[str] = ["sleep 2.5"]
+        for line in cmds:
+            feeder_parts.append(f"printf '%s\\r\\n' {shlex.quote(line)}")
+            pause = settle_s
+            low = line.strip().lower()
+            if low in ("enable", "configure terminal", "configure", "conf t"):
+                pause = max(settle_s, 1.2)
+            elif low.startswith("show mac"):
+                pause = max(settle_s, 1.8)
+            feeder_parts.append(f"sleep {pause}")
+        # Dasan: privileged '#' 에서 'end' 는 Invalid — exit 만 사용
+        feeder_parts.append("printf 'exit\\r\\n'")
+        feeder_parts.append("sleep 0.5")
+        feeder = "; ".join(feeder_parts)
+        # Worst-case: ~2.5 + N*(settle+1.2) + SSH handshake; keep SSH timeout generous
+        est_s = int(2.5 + len(cmds) * (max(settle_s, 0.8) + 0.3) + 25)
+        ssh_to = int(timeout) if timeout is not None else max(120, est_s + 15)
+        remote = (
+            "export SSHPASS=" + shlex.quote(pw) + "; "
+            f"( {feeder} ) | sshpass -e ssh -tt "
+            "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "
+            "-o ConnectTimeout=12 "
+            + shlex.quote(f"{user}@{host}")
+            + " 2>&1; "
+            "echo L2SW_SSH_DONE"
+        )
+        self._guardrails_log(
+            f"L2SW CLI via solid → {user}@{host} if={ifc} ({len(cmds)} cmds, 최대 ~{ssh_to}s 대기)"
+        )
+        ok, text = self._guardrails_ssh_exec(f"bash -lc {shlex.quote(remote)}", timeout=ssh_to)
+        out = text or ""
+        # ssh -tt often returns non-zero on exit; judge by CLI transcript
+        if "Connection timed out" in out or "Connection refused" in out:
+            return False, out[:300]
+        if "Permission denied" in out:
+            return False, out[:300]
+        if "no matching host key type" in out.lower() or "host key type found" in out.lower():
+            self._guardrails_log(f"[L2SW] FAIL host key: {out[:240].replace(chr(10), ' | ')}")
+            return False, (
+                "SSH host key 협상 실패(ssh-rsa/dss). "
+                "옵션 재시도 후에도 실패면 solid OpenSSH 확인: " + out[:200]
+            )
+        if "L2SW_SSH_DONE" not in out and not ok:
+            if "timed out" in out.lower() or "timeout" in out.lower():
+                return False, f"timed out (solid→{host}): {out[:200]}"
+            return False, out[:300] or "exit fail"
+        # Real Dasan failure: bad syntax / wrong mode
+        # Soft messages while ACL still attached / already present — not hard FAIL
+        soft_markers = (
+            "Access-group already configured",
+            "This object already exist",
+            "object already exist",
+            "Modification of ACL is not permitted",
+            "This object is in use",
+            "object is in use",
+            "Port is already added to the Vlan",
+            "already added to the Vlan",
+            "is not a member",
+            "not a member of the VLAN",
+        )
+        if any(b in out for b in soft_markers):
+            self._guardrails_log("[L2SW] note: ACL/VLAN already/in-use 메시지 (무시 가능)")
+        if "% Invalid input" in out or "Invalid input detected" in out:
+            if tolerate_invalid:
+                self._guardrails_log(
+                    f"[L2SW] Invalid input (tolerated), out={out[-400:].replace(chr(10), ' | ')}"
+                )
+            else:
+                # Ignore Invalid only if it's clearly from a soft conflict line nearby — still FAIL otherwise
+                self._guardrails_log(f"[L2SW] FAIL Invalid input, out={out[-500:].replace(chr(10), ' | ')}")
+                return False, "Invalid input (enable/configure/IF 문법 확인): " + out[-400:]
+        if require_config and "(config" not in out.lower():
+            self._guardrails_log(f"[L2SW] FAIL no config mode, out={out[-400:].replace(chr(10), ' | ')}")
+            return False, "config mode 미진입 (enable→configure terminal): " + out[-300:]
+        self._guardrails_log(f"[L2SW] ok, out={out[-400:].replace(chr(10), ' | ')}")
+        return True, out or "(ok)"
+
+    def _guardrails_run_one(self, item_id: str) -> tuple[str, str]:
+        """Return (PASS|FAIL|INFO|SKIP, detail)."""
+        self._guardrails_settings_item_id = item_id
+        if item_id in ("dhcp_v4", "dhcp_v4_vlan", "dhcp_v4_only_boot", "dhcp_options"):
+            try:
+                return self._guardrails_run_dhcp_options_family(
+                    "dhcp_v4_vlan" if item_id == "dhcp_v4_vlan" else "dhcp_v4"
+                )
+            finally:
+                self._guardrails_cleanup_parent_v6_pending()
+        if item_id in ("dhcp_v6", "dhcp_v6_vlan", "dhcp_v6_only_boot"):
+            try:
+                return self._guardrails_run_dhcp_options_family(
+                    "dhcp_v6_vlan" if item_id == "dhcp_v6_vlan" else "dhcp_v6"
+                )
+            finally:
+                self._guardrails_cleanup_parent_v6_pending()
+        if item_id == "dhcp_boot":
+            return self._guardrails_run_dhcp_boot()
+        if item_id == "vlan_discovery":
+            return self._guardrails_run_vlan_discovery()
+        if item_id in ("netconf_capability", "config_states", "performance_mgmt"):
+            return "SKIP", "목록 등록만 — 추후 구현"
+        return "SKIP", f"미정의 항목: {item_id}"
+
+    def _guardrails_result_tag(self, text: str) -> str:
+        u = (text or "").upper()
+        if u.startswith("PASS"):
+            return "res_pass"
+        if u.startswith("FAIL"):
+            return "res_fail"
+        if u.startswith("INFO") or u.startswith("SKIP"):
+            return "res_stop"
+        if u.startswith("RUN") or "검증" in (text or ""):
+            return "res_run"
+        return "res_idle"
+
+    def _guardrails_sync_tree_row(self, item_id: str) -> None:
+        tree = getattr(self, "guardrails_list_tree", None)
+        if tree is None:
+            return
+        try:
+            if not tree.exists(item_id):
+                return
+        except tk.TclError:
+            return
+        bv = self.guardrails_check_vars.get(item_id)
+        rv = self.guardrails_result_vars.get(item_id)
+        pick = "☑" if (bv is not None and bv.get()) else "☐"
+        has_cfg = item_id in self._GUARDRAILS_PER_TEST_SCHEMA
+        cfg_mark = "⚙" if has_cfg else ""
+        sk = self._guardrails_store_key(item_id) if has_cfg else item_id
+        store = getattr(self, "_guardrails_per_test_settings", {}) or {}
+        stored = store.get(sk) or store.get(item_id) or {}
+        if has_cfg and stored:
+            cfg_mark = "⚙✓"
+        result = (rv.get() if rv is not None else "—") or "—"
+        # 목록에는 짧은 판정만 (상세는 더블클릭 팝업 / Logs)
+        short = result.strip()
+        for prefix in ("PASS", "FAIL", "SKIP", "INFO", "RUN"):
+            if short.upper().startswith(prefix):
+                short = prefix if prefix != "RUN" else "RUN…"
+                break
+        else:
+            if len(short) > 12:
+                short = short[:10] + "…"
+        vals = list(tree.item(item_id, "values"))
+        if len(vals) >= 6:
+            vals[0] = pick
+            vals[4] = cfg_mark
+            vals[5] = short
+            tag = self._guardrails_result_tag(result)
+            parity = "row_odd" if tree.index(item_id) % 2 else "row_even"
+            tree.item(item_id, values=tuple(vals), tags=(parity, tag))
+
+    def _build_guardrails_tab(self, parent: ttk.Frame) -> None:
+        if not hasattr(self, "_guardrails_user_items") or self._guardrails_user_items is None:
+            self._guardrails_user_items = []
+        if not hasattr(self, "_guardrails_per_test_settings") or self._guardrails_per_test_settings is None:
+            self._guardrails_per_test_settings = {}
+        self.guardrails_check_vars.clear()
+        self.guardrails_result_vars.clear()
+
+        intro = ttk.LabelFrame(parent, text="M-Plane Test — 현장/시스템 검증 자동화 (Conformance 외)", padding=8)
+        intro.pack(fill="x", padx=8, pady=(8, 4))
+        ttk.Label(
+            intro,
+            text=(
+                "엑셀 통합 ORU 검증 중 Conformance와 겹치지 않는 M-Plane 항목을 자동화합니다 "
+                "(TLS CallHome·CCM·802.1X·Management 일부 제외). "
+                "DHCP v4/v6는 검증 실행 시 ACL 자동 적용·원복(solid→L2SW). "
+                "L2SW/ACL 값은 항목 ⚙에 두고, ACL 수동 테스트도 ⚙ 안에서 합니다."
+            ),
+            foreground="#475569",
+            wraplength=1000,
+            justify="left",
+        ).pack(anchor="w")
+
+        bar = ttk.Frame(parent)
+        bar.pack(fill="x", padx=8, pady=6)
+        ttk.Button(bar, text="일괄 선택", command=self._guardrails_select_all).pack(side="left", padx=(0, 4))
+        ttk.Button(bar, text="일괄 해지", command=self._guardrails_clear_all).pack(side="left", padx=(0, 8))
+        ttk.Button(
+            bar,
+            text="선택 항목 검증 실행",
+            command=self._guardrails_run_checked,
+            style="Big.TButton",
+        ).pack(side="left", padx=(0, 8))
+        self.guardrails_stop_btn = ttk.Button(
+            bar, text="검증 중지", command=self._guardrails_stop, state="disabled"
+        )
+        self.guardrails_stop_btn.pack(side="left", padx=(0, 8))
+        ttk.Label(bar, text="반복").pack(side="left", padx=(0, 2))
+        ttk.Entry(bar, textvariable=self.guardrails_run_repeat_var, width=5).pack(side="left")
+        ttk.Label(bar, text="(0=무한)", foreground="#64748b").pack(side="left", padx=(2, 8))
+        ttk.Button(bar, text="Probe 1회", command=self._guardrails_btn_probe).pack(side="left")
+        ttk.Button(
+            bar, text="로컬 pcap 폴더", command=self._guardrails_open_local_pcap_folder
+        ).pack(side="left", padx=(8, 0))
+        ttk.Button(
+            bar, text="결과 txt 폴더", command=self._guardrails_open_local_results_folder
+        ).pack(side="left", padx=(8, 0))
+        self.guardrails_vlan_restore_btn = ttk.Button(
+            bar,
+            text="VLAN untag 원복",
+            command=self._guardrails_btn_vlan_untag_restore,
+            state="disabled",
+        )
+        self.guardrails_vlan_restore_btn.pack(side="left", padx=(8, 0))
+        ttk.Label(
+            bar,
+            text="(ACL 수동적용/제거는 항목 ⚙ / VLAN원복은 Discovery 유지 후)",
+            foreground="#64748b",
+        ).pack(side="left", padx=(12, 0))
+        self._guardrails_sync_vlan_restore_btn()
+
+        mid = ttk.Frame(parent)
+        mid.pack(fill="both", expand=True, padx=4, pady=(0, 8))
+
+        tree_fr = ttk.Frame(mid)
+        tree_fr.pack(fill="both", expand=True)
+        cols = ("pick", "ref", "scope", "summary", "config", "result")
+        tree = ttk.Treeview(tree_fr, columns=cols, show="headings", selectmode="browse", takefocus=1)
+        self.guardrails_list_tree = tree
+        tree.heading("pick", text="선택")
+        tree.column("pick", width=44, anchor="center", stretch=False)
+        tree.heading("ref", text="참조")
+        tree.column("ref", width=88, anchor="center", stretch=False)
+        tree.heading("scope", text="범위")
+        tree.column("scope", width=72, anchor="center", stretch=False)
+        tree.heading("summary", text="개요")
+        tree.column("summary", width=360, anchor="w", stretch=True)
+        tree.heading("config", text="설정")
+        tree.column("config", width=44, anchor="center", stretch=False)
+        tree.heading("result", text="결과")
+        tree.column("result", width=100, anchor="center", stretch=False)
+        tree.tag_configure("row_even", background="#ffffff")
+        tree.tag_configure("row_odd", background="#f0f4f8")
+        tree.tag_configure("res_idle", foreground="#94a3b8")
+        tree.tag_configure("res_run", foreground="#d97706")
+        tree.tag_configure("res_pass", foreground="#15803d")
+        tree.tag_configure("res_fail", foreground="#b91c1c")
+        tree.tag_configure("res_stop", foreground="#64748b")
+
+        def _on_tree_click(evt: tk.Event) -> None:
+            row = tree.identify_row(evt.y)
+            if not row:
+                return
+            col = tree.identify_column(evt.x)
+            if col == "#1":
+                bv = self.guardrails_check_vars.get(row)
+                if bv is not None:
+                    bv.set(not bv.get())
+                    self._guardrails_sync_tree_row(row)
+                    try:
+                        self._on_any_setting_changed()
+                    except Exception:
+                        pass
+            elif col == "#5":
+                if row in self._GUARDRAILS_PER_TEST_SCHEMA:
+                    self._guardrails_open_settings(row)
+
+        def _on_tree_double(evt: tk.Event) -> None:
+            row = tree.identify_row(evt.y)
+            if not row:
+                return
+            col = tree.identify_column(evt.x)
+            if col == "#5":
+                return  # settings gear — single click opens
+            self._guardrails_open_result_detail(row)
+
+        tree.bind("<Button-1>", _on_tree_click)
+        tree.bind("<Double-Button-1>", _on_tree_double)
+
+        def _wheel_tree(evt: tk.Event) -> None:
+            if evt.delta:
+                tree.yview_scroll(int(-evt.delta / 120), "units")
+
+        tree.bind("<MouseWheel>", _wheel_tree)
+        ys = ttk.Scrollbar(tree_fr, orient="vertical", command=tree.yview)
+        xs = ttk.Scrollbar(tree_fr, orient="horizontal", command=tree.xview)
+        tree.configure(yscrollcommand=ys.set, xscrollcommand=xs.set)
+        tree.grid(row=0, column=0, sticky="nsew")
+        ys.grid(row=0, column=1, sticky="ns")
+        xs.grid(row=1, column=0, sticky="ew")
+        tree_fr.rowconfigure(0, weight=1)
+        tree_fr.columnconfigure(0, weight=1)
+        self._guardrails_detail_text = None
+        self._guardrails_rebuild_list()
+
+    def _guardrails_open_result_detail(self, item_id: str) -> None:
+        """Popup full result (진행 로그는 Logs 창)."""
+        store = getattr(self, "_guardrails_detail_by_id", None) or {}
+        full = store.get(item_id) or ""
+        if not full:
+            rv = self.guardrails_result_vars.get(item_id)
+            full = (rv.get() if rv is not None else "") or "(결과 없음)"
+        pcap = store.get(f"{item_id}__pcap") or ""
+        saved_txt = store.get(f"{item_id}__txt") or ""
+        body = full
+        if pcap:
+            body = body + f"\n\nlocal pcap:\n{pcap}"
+        if saved_txt:
+            body = body + f"\n\nresult txt:\n{saved_txt}"
+
+        win = tk.Toplevel(self)
+        win.title(f"M-Plane Test 상세 — {item_id}")
+        try:
+            win.geometry(getattr(self, "guardrails_detail_win_geometry", None) or "900x520")
+        except Exception:
+            win.geometry("900x520")
+        win.minsize(480, 280)
+        fr = ttk.Frame(win, padding=8)
+        fr.pack(fill="both", expand=True)
+        txt = tk.Text(fr, wrap="none", font=("Consolas", 10))
+        ys = ttk.Scrollbar(fr, orient="vertical", command=txt.yview)
+        xs = ttk.Scrollbar(fr, orient="horizontal", command=txt.xview)
+        txt.configure(yscrollcommand=ys.set, xscrollcommand=xs.set)
+        txt.grid(row=0, column=0, sticky="nsew")
+        ys.grid(row=0, column=1, sticky="ns")
+        xs.grid(row=1, column=0, sticky="ew")
+        fr.rowconfigure(0, weight=1)
+        fr.columnconfigure(0, weight=1)
+        txt.insert("1.0", body)
+        txt.configure(state="disabled")
+        btn = ttk.Frame(win, padding=(8, 0, 8, 8))
+        btn.pack(fill="x")
+        if pcap:
+
+            def _open_pcap_dir() -> None:
+                try:
+                    d = str(Path(pcap).parent)
+                    if sys.platform.startswith("win"):
+                        os.startfile(d)  # type: ignore[attr-defined]
+                    else:
+                        subprocess.Popen(["xdg-open", d])
+                except Exception as exc:
+                    messagebox.showerror("M-Plane Test", str(exc), parent=win)
+
+            ttk.Button(btn, text="pcap 폴더 열기", command=_open_pcap_dir).pack(side="left")
+
+        def _save_txt_now() -> None:
+            path = self._guardrails_save_result_txt(item_id, full)
+            if path:
+                try:
+                    if not hasattr(self, "_guardrails_detail_by_id") or self._guardrails_detail_by_id is None:
+                        self._guardrails_detail_by_id = {}
+                    self._guardrails_detail_by_id[f"{item_id}__txt"] = path
+                except Exception:
+                    pass
+                messagebox.showinfo("M-Plane Test", f"저장됨\n{path}", parent=win)
+            else:
+                messagebox.showerror("M-Plane Test", "txt 저장 실패", parent=win)
+
+        def _open_txt_dir() -> None:
+            self._guardrails_open_local_results_folder()
+
+        ttk.Button(btn, text="txt로 저장", command=_save_txt_now).pack(side="left", padx=(8, 0))
+        ttk.Button(btn, text="결과 txt 폴더", command=_open_txt_dir).pack(side="left", padx=(8, 0))
+        ttk.Button(btn, text="닫기", command=win.destroy).pack(side="right")
+
+        def _save_geo(_evt: tk.Event | None = None) -> None:
+            try:
+                self.guardrails_detail_win_geometry = win.geometry()
+            except Exception:
+                pass
+
+        win.bind("<Configure>", _save_geo)
+
+    def _guardrails_selected_item_id(self) -> str:
+        tree = getattr(self, "guardrails_list_tree", None)
+        if tree is not None:
+            sel = tree.selection()
+            if sel:
+                return str(sel[0])
+        for i in self._guardrails_catalog():
+            bv = self.guardrails_check_vars.get(i["id"])
+            if bv is not None and bv.get():
+                return i["id"]
+        return "dhcp_v4"
+
+    def _guardrails_btn_apply_acl(self) -> None:
+        messagebox.showinfo(
+            "M-Plane Test",
+            "ACL 수동 적용은 항목 ⚙ 설정 창의「ACL만 적용(테스트)」를 사용하세요.\n"
+            "정상 시험은「선택 항목 검증 실행」이 자동으로 ACL을 적용/원복합니다.",
+        )
+
+    def _guardrails_btn_remove_acl(self) -> None:
+        messagebox.showinfo(
+            "M-Plane Test",
+            "ACL 수동 제거는 항목 ⚙ 설정 창의「ACL만 제거」를 사용하세요.",
+        )
+
+    def _guardrails_btn_probe(self) -> None:
+        iid = self._guardrails_selected_item_id()
+        self._guardrails_settings_item_id = iid
+        self._guardrails_fill_defaults_from_context(iid)
+        if iid in self._GUARDRAILS_DHCP_ITEM_IDS or iid == "vlan_discovery":
+            fam = self._guardrails_resolve_ssh_family(iid)
+        else:
+            fam = self._guardrails_item_family(iid)
+
+        def work() -> None:
+            up, detail = self._guardrails_probe_once(fam)
+            msg = f"[{fam}] {'HEALTHY' if up else 'UNHEALTHY'}: {detail}"
+            self.after(0, self.append_log, f"[M-Plane Test] SSH check → {msg}\n")
+            self.after(0, lambda: messagebox.showinfo("M-Plane Test Probe", msg))
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _guardrails_local_pcap_dir(self) -> Path:
+        d = self.config_path.parent / "pcaps"
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
+    def _guardrails_local_results_dir(self) -> Path:
+        d = self.config_path.parent / "mplane_results"
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
+    def _guardrails_save_result_txt(
+        self,
+        item_id: str,
+        detail: str,
+        *,
+        iteration: int | None = None,
+    ) -> str:
+        """Save M-Plane Test detail text next to pcaps (AppData …/mplane_results/)."""
+        try:
+            d = self._guardrails_local_results_dir()
+            stamp = time.strftime("%Y%m%d_%H%M%S")
+            safe = re.sub(r"[^\w.\-]+", "_", str(item_id or "item")).strip("_") or "item"
+            iter_part = f"_r{iteration}" if iteration is not None and iteration != 1 else ""
+            path = d / f"mplane_{safe}{iter_part}_{stamp}.txt"
+            title = ""
+            try:
+                for it in self._guardrails_catalog():
+                    if it.get("id") == item_id:
+                        title = str(it.get("title") or it.get("ref") or "")
+                        break
+            except Exception:
+                title = ""
+            header = [
+                f"M-Plane Test 상세결과",
+                f"item_id : {item_id}",
+            ]
+            if title:
+                header.append(f"title   : {title}")
+            header.append(f"saved   : {time.strftime('%Y-%m-%d %H:%M:%S')}")
+            if iteration is not None:
+                header.append(f"repeat  : {iteration}")
+            header.append("=" * 60)
+            body = (detail or "").rstrip() + "\n"
+            path.write_text("\n".join(header) + "\n" + body, encoding="utf-8")
+            return str(path)
+        except Exception as exc:
+            self._guardrails_log(f"결과 txt 저장 실패: {exc}")
+            return ""
+
+    def _guardrails_open_local_pcap_folder(self) -> None:
+        d = self._guardrails_local_pcap_dir()
+        try:
+            if sys.platform.startswith("win"):
+                os.startfile(str(d))  # type: ignore[attr-defined]
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", str(d)])
+            else:
+                subprocess.Popen(["xdg-open", str(d)])
+        except Exception as exc:
+            messagebox.showerror("M-Plane Test", f"폴더 열기 실패:\n{d}\n{exc}")
+
+    def _guardrails_open_local_results_folder(self) -> None:
+        d = self._guardrails_local_results_dir()
+        try:
+            if sys.platform.startswith("win"):
+                os.startfile(str(d))  # type: ignore[attr-defined]
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", str(d)])
+            else:
+                subprocess.Popen(["xdg-open", str(d)])
+        except Exception as exc:
+            messagebox.showerror("M-Plane Test", f"폴더 열기 실패:\n{d}\n{exc}")
+
+    def _guardrails_rebuild_list(self) -> None:
+        tree = getattr(self, "guardrails_list_tree", None)
+        if tree is None:
+            return
+        for child in tree.get_children():
+            tree.delete(child)
+        self.guardrails_check_vars.clear()
+        # keep result text across rebuild if possible
+        prev_results = {k: v.get() for k, v in self.guardrails_result_vars.items()}
+        self.guardrails_result_vars.clear()
+
+        for idx, item in enumerate(self._guardrails_catalog()):
+            iid = item["id"]
+            bv = tk.BooleanVar(value=True)
+            rv = tk.StringVar(value=prev_results.get(iid) or "—")
+            self.guardrails_check_vars[iid] = bv
+            self.guardrails_result_vars[iid] = rv
+            has_cfg = iid in self._GUARDRAILS_PER_TEST_SCHEMA
+            sk = self._guardrails_store_key(iid) if has_cfg else iid
+            store = getattr(self, "_guardrails_per_test_settings", {}) or {}
+            stored = store.get(sk) or store.get(iid) or {}
+            cfg_mark = "⚙✓" if (has_cfg and stored) else ("⚙" if has_cfg else "")
+            result = rv.get() or "—"
+            short = result if len(result) <= 48 else result[:45] + "..."
+            parity = "row_odd" if idx % 2 else "row_even"
+            tag = self._guardrails_result_tag(result)
+            tree.insert(
+                "",
+                "end",
+                iid=iid,
+                values=(
+                    "☑",
+                    item.get("ref", iid),
+                    item.get("scope", ""),
+                    item.get("title", iid),
+                    cfg_mark,
+                    short,
+                ),
+                tags=(parity, tag),
+            )
+
+    def _guardrails_select_all(self) -> None:
+        for iid, bv in self.guardrails_check_vars.items():
+            bv.set(True)
+            self._guardrails_sync_tree_row(iid)
+        self._on_any_setting_changed()
+
+    def _guardrails_clear_all(self) -> None:
+        for iid, bv in self.guardrails_check_vars.items():
+            bv.set(False)
+            self._guardrails_sync_tree_row(iid)
+        self._on_any_setting_changed()
+
+    def _guardrails_stop(self) -> None:
+        self._guardrails_cancel.set()
+        # ORU reset(v6) 헬퍼는 conformance_cancel 만 보고 있었음 → 중지가 안 먹힘
+        try:
+            self._conformance_cancel_event.set()
+        except Exception:
+            pass
+        try:
+            with self._conformance_run_transport_lock:
+                ch = getattr(self, "_conformance_run_script_channel", None)
+            if ch is not None:
+                try:
+                    ch.close()
+                except Exception:
+                    pass
+        except Exception:
+            pass
+        self._guardrails_log("검증 중지 요청 — 대기 중 작업 건너뛰고 빠른 정리로 종료합니다")
+
+    def _guardrails_parse_repeat_count(self) -> int | None:
+        """Return repeat count: 0=infinite, 1+=finite. None if invalid."""
+        raw = (self.guardrails_run_repeat_var.get() or "").strip()
+        if not raw:
+            return 1
+        try:
+            n = int(raw)
+        except ValueError:
+            return None
+        if n < 0:
+            return None
+        return n
+
+    def _guardrails_run_checked(self) -> None:
+        if self.guardrails_busy:
+            messagebox.showwarning("M-Plane Test", "이미 검증 중입니다.")
+            return
+        repeat_count = self._guardrails_parse_repeat_count()
+        if repeat_count is None:
+            messagebox.showwarning("M-Plane Test", "반복 횟수는 0(무한) 이상의 정수로 입력하세요.")
+            return
+        selected = [
+            i["id"]
+            for i in self._guardrails_catalog()
+            if self.guardrails_check_vars.get(i["id"], tk.BooleanVar(value=False)).get()
+        ]
+        if not selected:
+            messagebox.showwarning("M-Plane Test", "검증할 항목을 하나 이상 선택하세요.")
+            return
+        dhcp_sel = [i for i in selected if i in self._GUARDRAILS_DHCP_ITEM_IDS]
+        vlan_sel = [i for i in selected if i == "vlan_discovery"]
+        if dhcp_sel or vlan_sel:
+            for iid in dhcp_sel + vlan_sel:
+                self._guardrails_settings_item_id = iid
+                self._guardrails_fill_defaults_from_context(iid)
+                if iid in self._GUARDRAILS_DHCP_ITEM_IDS:
+                    fam = self._guardrails_item_family(iid)
+                    mode = self._guardrails_item_mode(iid)
+                    if self._guardrails_gf("dhcp_host") and not self._guardrails_gf("dhcp_id"):
+                        messagebox.showwarning("M-Plane Test", "DHCP SSH host가 있으면 DHCP SSH ID도 필요합니다.")
+                        self._guardrails_open_settings(iid)
+                        return
+                    if mode == "vlan":
+                        if not self._guardrails_gf("l2sw_ip") or not self._guardrails_gf("l2sw_id"):
+                            messagebox.showwarning("M-Plane Test", "VLAN Discovery: ⚙ L2SW IP/ID 필요.")
+                            self._guardrails_open_settings(iid)
+                            return
+                        if not (self._guardrails_gf("vlan_discovery_vid") or "").strip():
+                            messagebox.showwarning("M-Plane Test", "VLAN Discovery: ⚙ ★ 시험 VLAN ID 필요.")
+                            self._guardrails_open_settings(iid)
+                            return
+                    # Capture IF / L2SW IF / RU MAC 은 실행 시 자동 조회
+                    host, how = self._guardrails_ru_ssh_target(fam)
+                    if not host:
+                        messagebox.showwarning(
+                            "M-Plane Test",
+                            f"[{fam}] SSH 대상 불가: {how}\n⚙ 확인.",
+                        )
+                        self._guardrails_open_settings(iid)
+                        return
+                    if not self._guardrails_gf("oru_cli_id"):
+                        messagebox.showwarning("M-Plane Test", "RU SSH ID가 필요합니다 (Settings ★ RU SSH ID).")
+                        self._guardrails_open_settings(iid)
+                        return
+                    if fam == "v6":
+                        try:
+                            self._apply_lab_controller_listen_ips("untag")
+                        except Exception:
+                            pass
+                        lv6 = ""
+                        av6 = ""
+                        try:
+                            lv6 = (self.fields.get("LOCAL_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+                            av6 = (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+                        except Exception:
+                            pass
+                        if not lv6:
+                            lv6 = self._lab_controller_listen_ip("v6", "untag")
+                        rmode = (self._guardrails_gf("reset_mode", "auto") or "auto").strip().lower()
+                        if rmode not in ("0", "manual", "prompt", "none", "off") and (
+                            not lv6 or not av6 or ":" not in lv6 or ":" not in av6
+                        ):
+                            messagebox.showwarning(
+                                "M-Plane Test",
+                                f"{iid} M-Plane reset(IPv6)에는 Settings의\n"
+                                "★ ALLOWED_IP_V6 (global IPv6)가 필요합니다.\n"
+                                "(LOCAL_IP_V6는 untag/tag 자동)\n"
+                                "또는 항목 ⚙ Reset mode=manual.",
+                            )
+                            return
+                else:
+                    fam = self._guardrails_resolve_ssh_family(iid)
+                    if iid == "vlan_discovery" and not self._guardrails_gf("expected_vid"):
+                        messagebox.showwarning("M-Plane Test", "VLAN Discovery: ⚙ Expected VID를 입력하세요.")
+                        self._guardrails_open_settings(iid)
+                        return
+                    host, how = self._guardrails_ru_ssh_target(fam)
+                    if not host:
+                        messagebox.showwarning(
+                            "M-Plane Test",
+                            f"SSH 대상 불가: {how}\n⚙ 확인.",
+                        )
+                        self._guardrails_open_settings(iid)
+                        return
+                    if not self._guardrails_gf("oru_cli_id"):
+                        messagebox.showwarning("M-Plane Test", "RU SSH ID가 필요합니다 (Settings ★ RU SSH ID).")
+                        self._guardrails_open_settings(iid)
+                        return
+            labels = [i for i in self._guardrails_catalog() if i["id"] in (dhcp_sel + vlan_sel)]
+            label_txt = ", ".join(x.get("ref") or x["id"] for x in labels)
+            tips = []
+            boot_sel = [i for i in dhcp_sel if self._guardrails_item_mode(i) == "boot"]
+            vlan_dhcp_sel = [i for i in dhcp_sel if self._guardrails_item_mode(i) == "vlan"]
+            if boot_sel:
+                tips.append(
+                    "Boot: 재부팅 → 주소 복구 + tcpdump Option → pcap을 LOG_PATH 저장"
+                )
+            if vlan_dhcp_sel:
+                tips.append(
+                    "VLAN Discovery: ACL + vlan/trunk → Discovery → renew/원복 + Option tcpdump"
+                )
+            if vlan_sel and (self._guardrails_gf("require_reboot") or "1") not in ("0", "false"):
+                tips.append("VLAN(legacy): SKIP — MP-DHCPv*-VLAN 항목 사용")
+            if repeat_count == 0:
+                tips.append("반복: 무한(중지 버튼으로 종료)")
+            elif repeat_count > 1:
+                tips.append(f"반복: {repeat_count}회")
+            if not messagebox.askokcancel(
+                "M-Plane Test",
+                f"선택: {label_txt}\n\n" + "\n".join(f"· {t}" for t in tips) + "\n\n실행할까요?",
+            ):
+                return
+        elif repeat_count == 0 or repeat_count > 1:
+            rep_txt = "무한" if repeat_count == 0 else f"{repeat_count}회"
+            if not messagebox.askokcancel(
+                "M-Plane Test",
+                f"선택 {len(selected)}항목 · 반복 {rep_txt}\n\n실행할까요?",
+            ):
+                return
+        self.guardrails_busy = True
+        self._guardrails_cancel.clear()
+        try:
+            self.guardrails_stop_btn.configure(state="normal")
+        except tk.TclError:
+            pass
+        try:
+            self.open_log_window()
+        except Exception:
+            pass
+        rep_note = "무한" if repeat_count == 0 else str(repeat_count)
+        self._guardrails_log(
+            f"검증 시작: {', '.join(selected)}  반복={rep_note}  "
+            "(진행은 Logs의 Live Output에 표시됩니다. Log Load는 원격 *.log 전용)"
+        )
+        try:
+            self._on_any_setting_changed()
+        except Exception:
+            pass
+
+        def worker() -> None:
+            iteration = 0
+            while True:
+                iteration += 1
+                if self._guardrails_cancel.is_set():
+                    self._guardrails_log("사용자 중지")
+                    break
+                if repeat_count == 0:
+                    self._guardrails_log(f"=== M-Plane Test 반복 {iteration} (0=무한) ===")
+                elif repeat_count > 1:
+                    self._guardrails_log(f"=== M-Plane Test 반복 {iteration}/{repeat_count} ===")
+
+                aborted = False
+                for iid in selected:
+                    if self._guardrails_cancel.is_set():
+                        self._guardrails_log("사용자 중지")
+                        aborted = True
+                        break
+                    self.after(
+                        0,
+                        lambda i=iid: self.guardrails_result_vars.get(i)
+                        and self.guardrails_result_vars[i].set("RUN…"),
+                    )
+                    self.after(0, lambda i=iid: self._guardrails_sync_tree_row(i))
+                    tag = (
+                        f"{iid} [{iteration}]"
+                        if repeat_count != 1
+                        else iid
+                    )
+                    self._guardrails_log(f"—— 실행 중: {tag} ——")
+                    st, detail = self._guardrails_run_one(iid)
+                    # 상세 팝업은 줄바꿈 유지 (한 줄 | 로 합치지 않음)
+                    full = detail if (detail or "").strip() else st
+                    if not full.lstrip().startswith(st):
+                        full = f"{st}\n{full}"
+                    if repeat_count != 1:
+                        suffix = f"\n(반복 {iteration}" + (
+                            "" if repeat_count == 0 else f"/{repeat_count}"
+                        ) + ")"
+                        full = full + suffix
+                    try:
+                        if not hasattr(self, "_guardrails_detail_by_id") or self._guardrails_detail_by_id is None:
+                            self._guardrails_detail_by_id = {}
+                        self._guardrails_detail_by_id[iid] = full
+                    except Exception:
+                        pass
+                    saved = self._guardrails_save_result_txt(
+                        iid,
+                        full,
+                        iteration=iteration if repeat_count != 1 else None,
+                    )
+                    if saved:
+                        try:
+                            self._guardrails_detail_by_id[f"{iid}__txt"] = saved
+                        except Exception:
+                            pass
+                        self._guardrails_log(f"{tag}: 상세결과 txt 저장 → {saved}")
+                    # 목록 표시용은 판정만; 전체 문구는 detail store + Logs
+                    one = st
+                    if repeat_count != 1:
+                        one = f"{st} ({iteration}" + ("" if repeat_count == 0 else f"/{repeat_count}") + ")"
+                    rv = self.guardrails_result_vars.get(iid)
+                    if rv is not None:
+                        self.after(0, rv.set, one)
+                    self.after(0, lambda i=iid: self._guardrails_sync_tree_row(i))
+                    # Logs 는 첫 줄 요약 + 나머지는 들여쓰기
+                    d_first = (detail or "").splitlines()[0] if detail else ""
+                    self._guardrails_log(f"{tag} → {st}: {d_first}")
+                    for dline in (detail or "").splitlines()[1:]:
+                        if dline.strip():
+                            self._guardrails_log(f"  {dline}")
+
+                if aborted or self._guardrails_cancel.is_set():
+                    break
+                if repeat_count == 1:
+                    break
+                if repeat_count > 1 and iteration >= repeat_count:
+                    break
+                self._guardrails_log(
+                    f"다음 반복 준비 (완료 {iteration}"
+                    + ("" if repeat_count == 0 else f"/{repeat_count}")
+                    + ")"
+                )
+
+            def _done() -> None:
+                self.guardrails_busy = False
+                try:
+                    self.guardrails_stop_btn.configure(state="disabled")
+                except tk.TclError:
+                    pass
+                self._save_current_config()
+                self._guardrails_log("검증 종료")
+
+            self.after(0, _done)
+
+        threading.Thread(target=worker, daemon=True).start()
 
     def _load_saved_config(self) -> None:
         self.append_log(f"[GUI] Config file: {self.config_path}\n")
@@ -5521,6 +12645,11 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             return
 
         self._save_current_config()
+        # Start/CallHome listen = lab untag controller
+        try:
+            self._apply_lab_controller_listen_ips("untag")
+        except Exception:
+            pass
         self.remote_cfg_cache.clear()
         env = os.environ.copy()
         field_values: dict[str, str] = {}

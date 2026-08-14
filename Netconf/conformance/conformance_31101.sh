@@ -112,8 +112,10 @@ if [[ "${CONFORMANCE_GUI_NETCONF:-0}" == "1" ]]; then
 		exit 1
 	fi
 	RESULT1="NOK"
-	PAT_ACCEPT="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
-	if grep -a -F "$PAT_ACCEPT" "$LOG" >/dev/null 2>&1; then
+	PAT_ACCEPT_OLD="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+	PAT_ACCEPT_NEW="Accepted a new connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+	PAT_ACCEPT="$PAT_ACCEPT_OLD"
+	if grep -a -F -e "$PAT_ACCEPT_OLD" -e "$PAT_ACCEPT_NEW" "$LOG" >/dev/null 2>&1; then
 		RESULT1="OK"
 	fi
 	echo "[$RESULT1]	STEP 1.	The Netconf Client receive the CallHome from ORU"
@@ -163,9 +165,11 @@ send_cmd "knownhosts --mode skip"
 send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login $USER --timeout 300"
 
 RESULT1="NOK"
-PAT_ACCEPT="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+PAT_ACCEPT_OLD="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+PAT_ACCEPT_NEW="Accepted a new connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+PAT_ACCEPT="$PAT_ACCEPT_OLD"
 for _w in $(seq 1 1500); do
-	if grep -a -F "$PAT_ACCEPT" "$LOG" >/dev/null 2>&1; then
+	if grep -a -F -e "$PAT_ACCEPT_OLD" -e "$PAT_ACCEPT_NEW" "$LOG" >/dev/null 2>&1; then
 		RESULT1="OK"
 		break
 	fi

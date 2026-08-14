@@ -302,6 +302,7 @@ _CONFORMANCE_HELPER_SCRIPTS: tuple[str, ...] = (
     "conformance_315x_common.sh",
     "conformance_netpeer_uplane_init.sh",
     "conformance_oru_reboot.sh",
+    "conformance_oru_reboot_v6.sh",
 )
 
 _CONFORMANCE_315X_SCRIPTS: frozenset[str] = frozenset(
@@ -1141,6 +1142,8 @@ class ConformanceMixin:
                 "NETCONF-PW": gv("PASSWORD"),
                 "SERVER-IP": gv("ALLOWED_IP"),
                 "LOCAL-IP": gv("LOCAL_IP"),
+                "SERVER-IP-V6": gv("ALLOWED_IP_V6"),
+                "LOCAL-IP-V6": gv("LOCAL_IP_V6"),
                 "PORT": gv("NETCONF_PORT"),
                 "PRODUCT-CODE": gv("PRODUCT"),
                 "CLI-ID": gv("CLI-ID"),
@@ -2789,9 +2792,18 @@ class ConformanceMixin:
         log_q = shlex.quote(host_log)
         rp_q = shlex.quote(rp)
         cfg_q = shlex.quote(cfg_remote)
+        listen_to = 90
+        try:
+            # M-Plane ⚙ reset_listen_sec 있으면 사용
+            gf = getattr(self, "_guardrails_gf", None)
+            if callable(gf):
+                listen_to = max(30, int(gf("reset_listen_sec", "90") or "90"))
+        except Exception:
+            listen_to = 90
         runner = (
             f"{envp}"
             f"export CONFORMANCE_SCRIPT_BASENAME={shlex.quote(helper)} ; "
+            f"export CALLHOME_LISTEN_TIMEOUT={int(listen_to)} ; "
             f"chmod +x {rp_q} 2>/dev/null ; bash {rp_q} --config {cfg_q}"
         )
         wrapped = (
@@ -2805,21 +2817,51 @@ class ConformanceMixin:
         log_line(f"---- START {helper} (ORU reset) ----")
         log_line(f"remote host log file: {host_log}")
         log_line(
-            "[INFO] 헬퍼가 Call Home listen → login → <reset/> 전송 "
-            "(Start/miniDU listen이 있으면 잠시 끊길 수 있음)"
+            "[INFO] 순서: CallHome 로그인 성공 → "
+            "<reset xmlns=\"urn:o-ran:operations:1.0\"/> 전송. "
+            f"listen≤{listen_to}s (이 단계 전에는 reset 미전송)"
         )
         try:
             _stdin, stdout, stderr = client.exec_command(cmd_remote, get_pty=True)
             ch = stdout.channel
             with self._conformance_run_transport_lock:
                 self._conformance_run_script_channel = ch
+            t_listen0 = time.monotonic()
+            hard_cap = float(listen_to) + 45.0
             while not ch.exit_status_ready():
-                if self._conformance_cancel_event.is_set():
+                cancel = bool(self._conformance_cancel_event.is_set())
+                try:
+                    if getattr(self, "_guardrails_cancel", None) is not None:
+                        cancel = cancel or bool(self._guardrails_cancel.is_set())
+                except Exception:
+                    pass
+                if cancel:
                     try:
                         ch.close()
                     except Exception:
                         pass
+                    try:
+                        client.exec_command(
+                            f"pkill -f {shlex.quote(helper)} 2>/dev/null; "
+                            f"fuser -k 4334/tcp 2>/dev/null || true"
+                        )
+                    except Exception:
+                        pass
                     log_line("재부팅 헬퍼 실행 중 사용자 중지")
+                    with self._conformance_run_transport_lock:
+                        self._conformance_run_script_channel = None
+                    return False
+                if time.monotonic() - t_listen0 > hard_cap:
+                    try:
+                        ch.close()
+                    except Exception:
+                        pass
+                    log_line(
+                        f"재부팅 헬퍼 타임아웃 ({hard_cap:.0f}s) — "
+                        "CallHome 미수신. LOCAL_IP:4334 / ALLOWED_IP·iptables 확인"
+                    )
+                    with self._conformance_run_transport_lock:
+                        self._conformance_run_script_channel = None
                     return False
                 if ch.recv_ready():
                     chunk = ch.recv(4096).decode(errors="ignore")
@@ -3157,24 +3199,24 @@ class ConformanceMixin:
                         self._conformance_record_session_run_result(fname, 1, "FAIL")
                         self._conformance_commit_final_result(fname, 1, "FAIL")
                         self.after(0, self._conformance_refresh_row_result_labels)
-                        if self._conformance_maybe_reboot_after_test(
+                        log_line(f"FAIL — 후속·반복 시험 중단 ({fname}, SWM PKG 업로드)")
+                        self._conformance_maybe_reboot_after_test(
                             fname, ordered_fnames, client, sftp, opts, remote_dir, cfg_remote, log_line
-                        ):
-                            abort_all = True
-                            break
-                        continue
+                        )
+                        abort_all = True
+                        break
 
                     if not self._conformance_prepare_mplane_bundle(fname, log_line):
                         self._conformance_progress[fname] = {"rc": 1, "status": "FAIL"}
                         self._conformance_record_session_run_result(fname, 1, "FAIL")
                         self._conformance_commit_final_result(fname, 1, "FAIL")
                         self.after(0, self._conformance_refresh_row_result_labels)
-                        if self._conformance_maybe_reboot_after_test(
+                        log_line(f"FAIL — 후속·반복 시험 중단 ({fname}, M-Plane bundle)")
+                        self._conformance_maybe_reboot_after_test(
                             fname, ordered_fnames, client, sftp, opts, remote_dir, cfg_remote, log_line
-                        ):
-                            abort_all = True
-                            break
-                        continue
+                        )
+                        abort_all = True
+                        break
                     if fname in _CONFORMANCE_MPLANE_SCRIPTS and getattr(self, "is_running", False) and getattr(
                         self, "session_established", False
                     ):
@@ -3184,12 +3226,12 @@ class ConformanceMixin:
                         self._conformance_record_session_run_result(fname, 1, "FAIL")
                         self._conformance_commit_final_result(fname, 1, "FAIL")
                         self.after(0, self._conformance_refresh_row_result_labels)
-                        if self._conformance_maybe_reboot_after_test(
+                        log_line(f"FAIL — 후속·반복 시험 중단 ({fname}, M-Plane assets)")
+                        self._conformance_maybe_reboot_after_test(
                             fname, ordered_fnames, client, sftp, opts, remote_dir, cfg_remote, log_line
-                        ):
-                            abort_all = True
-                            break
-                        continue
+                        )
+                        abort_all = True
+                        break
 
                     spec_ref = spec_map.get(fname, "")
                     host_log = self._conformance_host_run_log_path(fname)
@@ -3251,6 +3293,18 @@ class ConformanceMixin:
                         )
                         post_3180_after_3186 = True
 
+                    if st == "FAIL":
+                        log_line(
+                            f"FAIL — 후속·반복 시험 중단 ({fname}, exit={rc}, 반복 {iteration}"
+                            + ("" if repeat_count == 0 else f"/{repeat_count}")
+                            + ")"
+                        )
+                        self._conformance_maybe_reboot_after_test(
+                            fname, ordered_fnames, client, sftp, opts, remote_dir, cfg_remote, log_line
+                        )
+                        abort_all = True
+                        break
+
                     if self._conformance_maybe_reboot_after_test(
                         fname, ordered_fnames, client, sftp, opts, remote_dir, cfg_remote, log_line
                     ):
@@ -3269,7 +3323,7 @@ class ConformanceMixin:
                         + ("" if repeat_count == 0 else f"/{repeat_count}")
                         + ")"
                     )
-                # repeat_count == 0 → loop until cancel
+                # repeat_count == 0 → loop until cancel (or FAIL above sets abort_all)
 
             if (
                 ran_318x_pass

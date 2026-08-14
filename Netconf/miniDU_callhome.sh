@@ -7,7 +7,8 @@ NETCONF_USER="${NETCONF_USER:-${USER:-oranuser}}"
 # 하위 호환: 기존 코드/GUI 필드명 USER 유지
 USER="$NETCONF_USER"
 PASSWORD="${PASSWORD:-o-ran-password}"
-# ALLOWED_IP = RU M-Plane IP (CallHome 출발지). 틀리면 iptables DROP 으로 콜홈이 아예 안 들어온다.
+# ALLOWED_IP = RU M-Plane IP(s) CallHome source. Comma-separated OK: 10.0.30.103,10.0.30.104
+# Start only *adds* ACCEPT for these IPs — never deletes other RU ACCEPTs / never kills their sessions.
 ALLOWED_IP="${ALLOWED_IP:-10.0.20.128}"
 LOCAL_IP="${LOCAL_IP:-10.0.20.254}"
 CALLHOME_PORT="${CALLHOME_PORT:-${PORT:-4334}}"
@@ -37,6 +38,9 @@ NETCONF_IDLE_TIMEOUT="${NETCONF_IDLE_TIMEOUT:-120}"
 SUPERVISION_INTERVAL="${SUPERVISION_INTERVAL:-60}"
 SUPERVISION_EARLY_RESET=$((SUPERVISION_INTERVAL - 10))
 SSH_KEEPALIVE_INTERVAL="${SSH_KEEPALIVE_INTERVAL:-30}"
+# Old netopeer2-cli (no knownhosts --mode): PTY + send "yes" only if host-key prompt appears.
+# Set 0 to disable and use the previous setsid launch (easy revert).
+NP2_HOSTKEY_AUTOYES="${NP2_HOSTKEY_AUTOYES:-1}"
 CMD_LOCK_FILE="/var/tmp/netconf_tmp/netconf_cmd.lock"
 SUPPRESS_NP2_RPC_DUMP_FILE="/var/tmp/netconf_tmp/.suppress_np2_rpc_dump"
 EDIT_RPC_CAPTURE_PTR="/var/tmp/netconf_tmp/.edit_rpc_capture_ptr"
@@ -462,133 +466,6 @@ wait_for_response() {
     done
 }
 
-# Old netopeer2-cli (e.g. 2.1.71): knownhosts has no --mode; hostkey ASK uses /dev/tty.
-# Prefer strings(1) — launching netopeer just to probe can hang on YANG preload.
-_np2_supports_knownhosts_mode() {
-    if [[ -n "${_NP2_HAS_KH_MODE:-}" ]]; then
-        [[ "$_NP2_HAS_KH_MODE" == "1" ]]
-        return
-    fi
-    local bin help
-    bin=$(command -v netopeer2-cli 2>/dev/null || true)
-    if [[ -n "$bin" ]] && strings "$bin" 2>/dev/null | grep -qF '--mode <accept|accept-new|ask|skip|strict>'; then
-        _NP2_HAS_KH_MODE=1
-    elif [[ -n "$bin" ]] && strings "$bin" 2>/dev/null | grep -qF 'knownhosts (--help | --del'; then
-        _NP2_HAS_KH_MODE=1
-    else
-        # Fallback: short interactive probe (may be slow on first YANG load).
-        help=$(printf 'knownhosts --help\nquit\n' | timeout 25 netopeer2-cli 2>&1 || true)
-        if echo "$help" | grep -qiE -- '--mode'; then
-            _NP2_HAS_KH_MODE=1
-        else
-            _NP2_HAS_KH_MODE=0
-        fi
-    fi
-    [[ "$_NP2_HAS_KH_MODE" == "1" ]]
-}
-
-# PTY proxy for old netopeer: hostkey ASK reads /dev/tty (not the coproc pipe).
-# Relays stdin/stdout and auto-answers yes/no on the same PTY master.
-_np2_write_pty_proxy() {
-    local dest="${1:-/var/tmp/netconf_tmp/np2_pty_proxy.py}"
-    mkdir -p "$(dirname "$dest")" 2>/dev/null || true
-    cat >"$dest" <<'PY'
-#!/usr/bin/env python3
-"""Run netopeer2-cli on a PTY; auto-yes hostkey + password; relay stdin/stdout."""
-import errno
-import os
-import pty
-import re
-import select
-import sys
-
-CMD = ["netopeer2-cli"]
-YES_RE = re.compile(
-    rb"Are you sure you want to continue connecting \(yes/no\)\?\s*"
-    rb"|Please type 'yes' or 'no':\s*"
-)
-# libnetconf2 / libssh password prompts (Call Home)
-PASS_RE = re.compile(
-    rb"(?i)(?:password:|enter password|passphrase for key)\s*$"
-)
-
-def main() -> int:
-    password = os.environ.get("SSHPASS", "")
-    pid, master = pty.fork()
-    if pid == 0:
-        os.execvp(CMD[0], CMD)
-        os._exit(127)
-
-    sent_yes = 0
-    sent_pass = 0
-    tail = b""
-    stdin_fd = sys.stdin.fileno()
-    stdout = sys.stdout.buffer
-    try:
-        while True:
-            rlist = [master]
-            if stdin_fd >= 0:
-                rlist.append(stdin_fd)
-            try:
-                readable, _, _ = select.select(rlist, [], [], 1.0)
-            except (InterruptedError, select.error):
-                continue
-            if master in readable:
-                try:
-                    data = os.read(master, 4096)
-                except OSError as exc:
-                    if exc.errno == errno.EIO:
-                        break
-                    raise
-                if not data:
-                    break
-                stdout.write(data)
-                stdout.flush()
-                tail = (tail + data)[-4096:]
-                if sent_yes < 3 and YES_RE.search(tail):
-                    os.write(master, b"yes\n")
-                    sent_yes += 1
-                    sys.stderr.write(
-                        "[INFO] np2_pty_proxy: auto-answered host-key prompt with yes\n"
-                    )
-                    sys.stderr.flush()
-                    tail = b""
-                elif password and sent_pass < 3 and PASS_RE.search(tail):
-                    os.write(master, password.encode() + b"\n")
-                    sent_pass += 1
-                    sys.stderr.write(
-                        "[INFO] np2_pty_proxy: auto-answered password prompt\n"
-                    )
-                    sys.stderr.flush()
-                    tail = b""
-            if stdin_fd >= 0 and stdin_fd in readable:
-                try:
-                    data = os.read(stdin_fd, 4096)
-                except OSError:
-                    data = b""
-                if not data:
-                    stdin_fd = -1
-                    continue
-                os.write(master, data)
-    finally:
-        try:
-            os.close(master)
-        except OSError:
-            pass
-    try:
-        _, status = os.waitpid(pid, 0)
-    except ChildProcessError:
-        return 1
-    if os.WIFEXITED(status):
-        return os.WEXITSTATUS(status)
-    return 1
-
-if __name__ == "__main__":
-    sys.exit(main())
-PY
-    chmod 755 "$dest" 2>/dev/null || true
-}
-
 # 세션만 재시작 (iptables·tail·로그 파일 유지). 재연결 루프에서 사용.
 teardown_netopeer_for_reconnect() {
     log_script_info "[INFO] netopeer2-cli 세션 종료 — 브리지·프로세스 정리 중..."
@@ -625,28 +502,55 @@ teardown_netopeer_for_reconnect() {
 #   1) ALLOWED_IP(RU) 만 ACCEPT
 #   2) 그 외 동일 포트 DROP
 # -------------------------------------------------------
-# ALLOWED_IP may be comma/space-separated.
+# ALLOWED_IP may be a single IP or comma/space-separated list (e.g. 10.0.30.103,10.0.30.104).
 _allowed_ip_list() {
     echo "${ALLOWED_IP}" | tr ',;' ' ' | xargs -n1 echo 2>/dev/null
 }
 
 _callhome_iptables_reset() {
-    local _i
-    for _i in 1 2 3 4 5 6 7 8 9 10; do
-        sudo iptables -D INPUT -p tcp --dport "$CALLHOME_PORT" -j DROP >/dev/null 2>&1 || true
-    done
-    # 이전에 다른 ALLOWED_IP 로 넣었던 ACCEPT 도 포트 기준으로 최대한 제거
-    while read -r _line; do
-        [[ -z "$_line" ]] && continue
-        # shellcheck disable=SC2086
-        sudo iptables -D INPUT $_line >/dev/null 2>&1 || true
-    done < <(sudo iptables -S INPUT 2>/dev/null | sed -n "s/^-A INPUT \(.*-p tcp .*--dport ${CALLHOME_PORT} .* -j ACCEPT\)$/\1/p")
-    sudo iptables -I INPUT -p tcp --dport "$CALLHOME_PORT" -s "$ALLOWED_IP" -j ACCEPT
-    sudo iptables -A INPUT -p tcp --dport "$CALLHOME_PORT" -j DROP
+    local _ip _rules _has_drop=0 _dup_drop _ok=0
+    # Additive only: never delete other RU ACCEPT rules, never kill other sessions.
+    _rules=$(sudo -n iptables -S INPUT 2>/dev/null | grep -E -- "--dport[= ]${CALLHOME_PORT}([[:space:]]|$)" || true)
+    while read -r _ip; do
+        [[ -z "$_ip" ]] && continue
+        if echo "$_rules" | grep -Fq -- "-s ${_ip}/32" || echo "$_rules" | grep -Fq -- "-s ${_ip} "; then
+            _ok=1
+            continue
+        fi
+        if sudo -n iptables -I INPUT -p tcp --dport "$CALLHOME_PORT" -s "$_ip" -j ACCEPT; then
+            _ok=1
+            log_script_info "[INFO] iptables: added ACCEPT tcp/${CALLHOME_PORT} from ${_ip}"
+        fi
+    done < <(_allowed_ip_list)
+    _rules=$(sudo -n iptables -S INPUT 2>/dev/null | grep -E -- "--dport[= ]${CALLHOME_PORT}([[:space:]]|$)" || true)
+    if echo "$_rules" | grep -q -- '-j DROP'; then
+        _has_drop=1
+    fi
+    if [[ $_has_drop -eq 0 ]]; then
+        sudo -n iptables -A INPUT -p tcp --dport "$CALLHOME_PORT" -j DROP || true
+    else
+        # Collapse duplicate DROP lines only (keep a single DROP). Do not touch ACCEPTs.
+        _dup_drop=0
+        while read -r _line; do
+            [[ "$_line" == *"-j DROP"* ]] || continue
+            _dup_drop=$((_dup_drop + 1))
+            if [[ $_dup_drop -gt 1 ]]; then
+                _spec=${_line#-A INPUT }
+                # shellcheck disable=SC2086
+                sudo -n iptables -D INPUT ${_spec} >/dev/null 2>&1 || true
+            fi
+        done <<< "$_rules"
+    fi
+    if [[ $_ok -ne 1 ]]; then
+        log_script_info "[WARN] iptables CallHome ACCEPT add failed (sudo -n?). Check ALLOWED_IP=${ALLOWED_IP}."
+        return 1
+    fi
+    log_script_info "[INFO] iptables ${CALLHOME_PORT} now: $(sudo -n iptables -S INPUT 2>/dev/null | grep -E -- "--dport[= ]${CALLHOME_PORT}" | tr '\n' ' ' | head -c 400)"
+    return 0
 }
 
 _callhome_iptables_reset
-log_script_info "[INFO] iptables CallHome: ACCEPT tcp/${CALLHOME_PORT} from ${ALLOWED_IP}, DROP other src on tcp/${CALLHOME_PORT}"
+log_script_info "[INFO] iptables CallHome: ensure ACCEPT for ${ALLOWED_IP} on tcp/${CALLHOME_PORT} (other RU rules kept)"
 
 echo "[INFO] USER=$USER, ALLOWED_IP=$ALLOWED_IP, LOCAL_IP=$LOCAL_IP, CALLHOME_PORT=$CALLHOME_PORT, CONN_DELAY=${CONN_DELAY}s"
 log_script_info "[INFO] CallHome expect: RU(${ALLOWED_IP}) -> client(${LOCAL_IP}:${CALLHOME_PORT}), login=${USER}"
@@ -706,10 +610,9 @@ noise_filter() {
                     ;;
             esac
         fi
-        # Drop SSH transport chatter only. Keep auth/hello/rpc lines even under "nc DEBUG: SSH:"
-        # (netopeer often prints "nc DEBUG: SSH: Authentication successful").
+        # Keep auth / host-key prompt lines even under "nc DEBUG: SSH:" (needed for LOGIN=OK).
         case "$line" in
-            *[Aa]uthenticat*|*[Aa]ccess\ granted*|*Permission\ denied*|*auth\ fail*|*auth\ success*)
+            *[Aa]uthenticat*|*[Aa]ccess\ granted*|*Permission\ denied*|*authenticity\ of\ the\ host*|*Are\ you\ sure\ you\ want\ to\ continue\ connecting*)
                 echo "$line"
                 continue
                 ;;
@@ -719,20 +622,29 @@ noise_filter() {
             *"nc DEBUG: SSH:"*)
                 continue
                 ;;
-            *"nc DEBUG:"*|*"nc VERBOSE:"*|*"nc ERROR:"*|*"nc WARNING:"*)
+            *"nc DEBUG:"*|*"nc VERBOSE:"*)
                 case "$line" in
-                    *hello*|*Hello*|*rpc-reply*|*Accepted\ a\ connection*|*[Cc]all*[Hh]ome*|*host\ key*|*known_hosts*|*Unable\ to*|*authenticity*|*Are\ you\ sure*|*terminal*)
+                    *hello*|*Hello*|*rpc-reply*|*Accepted\ a\ connection*|*[Cc]all*[Hh]ome*|*authenticity*|*Are\ you\ sure*)
                         ;; # keep
                     *)
                         continue
                         ;;
                 esac
                 ;;
-            *authenticity\ of\ the\ host*|*Are\ you\ sure\ you\ want\ to\ continue\ connecting*|*Please\ type\ \'yes\'\ or\ \'no\'*)
-                ;; # keep host-key prompts (old cli ASK mode)
         esac
         echo "$line"
     done
+}
+
+# true = old cli needs host-key yes (no --mode skip). Normal server with --mode → false.
+_np2_needs_hostkey_autoyes() {
+    [[ "${NP2_HOSTKEY_AUTOYES:-1}" == "1" ]] || return 1
+    local bin
+    bin=$(command -v netopeer2-cli 2>/dev/null) || return 1
+    if strings "$bin" 2>/dev/null | grep -qF '--mode <accept|accept-new|ask|skip|strict>'; then
+        return 1
+    fi
+    return 0
 }
 
 # stdin 복사는 프로세스당 한 번 (재연결 시 브리지만 다시 띄움)
@@ -745,35 +657,22 @@ while true; do
     log_script_info "[INFO] ========== Call Home session round ${SESSION_ROUND} (pid $$) =========="
 
     _np2_since=$(_log_line_count)
-    # netopeer2-cli 2.1.x: main() takes no argv — OpenSSH -o StrictHostKeyChecking is ignored.
-    # Without knownhosts --mode skip, hostkey ASK opens /dev/tty; under setsid/pipe that fails
-    # after "No key found in known_hosts". Use PTY (script) + auto-yes on old CLI only.
-    _NP2_KNOWN_HOSTS="${HOME}/.ssh/known_hosts"
-    mkdir -p "${HOME}/.ssh" 2>/dev/null || true
-    touch "${_NP2_KNOWN_HOSTS}" "${HOME}/.ssh/netconf_known_hosts" 2>/dev/null || true
-    chmod 700 "${HOME}/.ssh" 2>/dev/null || true
-    chmod 600 "${_NP2_KNOWN_HOSTS}" "${HOME}/.ssh/netconf_known_hosts" 2>/dev/null || true
-
-    _NP2_USE_PTY=0
-    _NP2_PTY_PROXY="/var/tmp/netconf_tmp/np2_pty_proxy.py"
-    if ! _np2_supports_knownhosts_mode; then
-        if command -v python3 >/dev/null 2>&1; then
-            _np2_write_pty_proxy "$_NP2_PTY_PROXY"
-            _NP2_USE_PTY=1
-            log_script_info "[INFO] Old netopeer2-cli (no knownhosts --mode) — PTY proxy will auto-yes host keys"
-        else
-            log_script_info "[WARN] Old netopeer2-cli and python3 missing — host-key ASK will hang after CallHome TCP"
-        fi
-    fi
-
-    if [[ "$_NP2_USE_PTY" == "1" ]]; then
-        # PTY proxy: same tty for hostkey yes/no + sshpass password (no setsid).
+    # Old cli: no setsid so sshpass PTY stays controlling tty (host-key yes/no + password).
+    # New cli (--mode skip): keep setsid for SIGHUP resilience on normal server.
+    _NP2_HK_AUTOYES=0
+    if _np2_needs_hostkey_autoyes; then
+        _NP2_HK_AUTOYES=1
+        log_script_info "[INFO] Host-key auto-yes: ON (old cli, no --mode skip). Revert: NP2_HOSTKEY_AUTOYES=0"
         coproc NP2 {
-            SSHPASS="$PASSWORD" stdbuf -oL -eL python3 "$_NP2_PTY_PROXY" 2>&1 | noise_filter
+            stdbuf -oL -eL sshpass -p "$PASSWORD" netopeer2-cli 2>&1 | noise_filter
         } >> "$LOG" 2>&1
     else
         coproc NP2 {
-            stdbuf -oL -eL setsid sshpass -p "$PASSWORD" netopeer2-cli 2>&1 | noise_filter
+            stdbuf -oL -eL setsid sshpass -p "$PASSWORD" netopeer2-cli \
+                -o "ServerAliveInterval=$SSH_KEEPALIVE_INTERVAL" \
+                -o "ServerAliveCountMax=3" \
+                -o "TCPKeepAlive=yes" \
+                2>&1 | noise_filter
         } >> "$LOG" 2>&1
     fi
     NP2_PID=$!
@@ -807,53 +706,8 @@ while true; do
         sleep "$INIT_GAP_VERB"
     fi
 
-    # slab/old netopeer: `knownhosts --mode skip` may be unsupported. Seed host keys so
-    # CallHome does not die at: "No key found in known_hosts" (ssh_client_select_hostkeys).
-    _seed_ru_known_hosts() {
-        local _ip _kh _nkh _tmp _n=0
-        mkdir -p "$HOME/.ssh" 2>/dev/null || true
-        chmod 700 "$HOME/.ssh" 2>/dev/null || true
-        _kh="$HOME/.ssh/known_hosts"
-        _nkh="$HOME/.ssh/netconf_known_hosts"
-        touch "$_kh" "$_nkh" 2>/dev/null || true
-        chmod 600 "$_kh" "$_nkh" 2>/dev/null || true
-        while read -r _ip; do
-            [[ -z "$_ip" ]] && continue
-            _tmp=$(mktemp 2>/dev/null || echo "/var/tmp/netconf_tmp/.kh_$_ip")
-            # RU SSH host key (port 22) + NETCONF port if different
-            ssh-keyscan -T 5 -t rsa,ecdsa,ed25519 "$_ip" 2>/dev/null >"$_tmp" || true
-            ssh-keyscan -T 5 -p "${NETCONF_PORT:-830}" -t rsa,ecdsa,ed25519 "$_ip" 2>/dev/null >>"$_tmp" || true
-            if [[ -s "$_tmp" ]]; then
-                # Drop stale lines for this IP then append fresh keys
-                if [[ -f "$_kh" ]]; then
-                    grep -v -F "$_ip" "$_kh" >"${_kh}.tmp" 2>/dev/null || true
-                    mv -f "${_kh}.tmp" "$_kh" 2>/dev/null || true
-                fi
-                if [[ -f "$_nkh" ]]; then
-                    grep -v -F "$_ip" "$_nkh" >"${_nkh}.tmp" 2>/dev/null || true
-                    mv -f "${_nkh}.tmp" "$_nkh" 2>/dev/null || true
-                fi
-                cat "$_tmp" >>"$_kh"
-                cat "$_tmp" >>"$_nkh"
-                _n=$((_n + 1))
-                log_script_info "[INFO] Seeded SSH host keys for ${_ip} into ~/.ssh/known_hosts and netconf_known_hosts"
-            else
-                log_script_info "[WARN] ssh-keyscan produced no keys for ${_ip} — CallHome may stall at known_hosts"
-            fi
-            rm -f "$_tmp" 2>/dev/null || true
-        done < <(_allowed_ip_list)
-        if [[ $_n -eq 0 ]]; then
-            log_script_info "[WARN] No RU host keys seeded (ALLOWED_IP=${ALLOWED_IP})"
-        fi
-    }
-    _seed_ru_known_hosts
-
-    # Newer cli: skip hostkey checks. Old 2.1.71: only --help/--del (PTY+autoyes above).
-    if _np2_supports_knownhosts_mode; then
-        send_cmd "knownhosts --mode skip"
-    else
-        log_script_info "[INFO] Skipping knownhosts --mode (unsupported on this netopeer2-cli)"
-    fi
+    # Newer cli: skip hostkey checks. Old 2.1.71 has no --mode (error is harmless).
+    send_cmd "knownhosts --mode skip"
     if [[ "$INIT_GAP_KNOWNHOSTS" != "0" && -n "$INIT_GAP_KNOWNHOSTS" ]]; then
         sleep "$INIT_GAP_KNOWNHOSTS"
     fi
@@ -931,22 +785,28 @@ while true; do
     LOGIN_FAIL_REASON="timeout"
     login_deadline=$(( $(date +%s) + LOGIN_WAIT_SEC ))
     # netopeer2 / libnetconf2 버전별 성공 문구 차이 흡수
-    # NOTE: do NOT use a pattern that matches our own "[INFO] ... Authentication successful..."
-    # wait line — that caused false LOGIN=OK while RU still had No active session.
+    # NOTE: do not match our own "[INFO] ... Authentication successful" wait text.
     AUTH_OK_RE='Authentication successful|User authenticated successfully|Authenticated successfully|Access granted'
     AUTH_FAIL_RE='authentication failed|Authentication failed|Permission denied|auth fail'
-    ACCEPT_RE="Accepted a connection on ${LOCAL_IP}:${CALLHOME_PORT}|Accepted a connection|Incoming connection|call.?home"
+    ACCEPT_RE="Accepted a (new )?connection on ${LOCAL_IP}:${CALLHOME_PORT}|Accepted a (new )?connection|Incoming connection|call.?home"
 
     _ss_has_estab_from_ru() {
-        # RU(ALLOWED_IP) 가 이 서버:CALLHOME_PORT 로 ESTAB 이면 CallHome TCP로 본다.
-        ss -tn 2>/dev/null | grep -E "ESTAB" | grep -qE "${ALLOWED_IP}.*:${CALLHOME_PORT}|:${CALLHOME_PORT}.*${ALLOWED_IP}"
+        # Any ALLOWED_IP (comma-list OK) ESTAB to CallHome port.
+        local _ip
+        while read -r _ip; do
+            [[ -z "$_ip" ]] && continue
+            if ss -tn 2>/dev/null | grep -E "ESTAB" | grep -qE "${_ip}.*:${CALLHOME_PORT}|:${CALLHOME_PORT}.*${_ip}"; then
+                return 0
+            fi
+        done < <(_allowed_ip_list)
+        return 1
     }
 
-    # Auth phrases only from netopeer/libssh lines — never from our [INFO]/[WARN] wrappers.
     _slice_has_auth_ok() {
         echo "$1" | grep -a -viE '^\s*\[(INFO|WARN|ERROR|GUI|Conformance)' | grep -a -qiE "$AUTH_OK_RE"
     }
 
+    _hostkey_yes_sent=0
     while [[ $(date +%s) -lt $login_deadline ]]; do
         if ! kill -0 "$NP2_PID" 2>/dev/null; then
             log_script_info "[WARN] netopeer2-cli died during CallHome login wait."
@@ -974,22 +834,26 @@ while true; do
 
         if [[ $CALLHOME_SEEN -eq 0 ]] && echo "$_slice" | grep -a -qiE "$ACCEPT_RE"; then
             CALLHOME_SEEN=1
-            # Wording must NOT contain AUTH_OK_RE substrings (false LOGIN match).
+            # Wording must NOT contain AUTH_OK_RE (false LOGIN match).
             log_script_info "[INFO] CallHome TCP accepted — waiting for netopeer auth OK..."
+            # Old cli often prompts host-key right after accept; prompt may stay on pty.
+            if [[ "${_NP2_HK_AUTOYES:-0}" == "1" && $_hostkey_yes_sent -eq 0 ]]; then
+                sleep 0.3
+                log_script_info "[INFO] Host-key auto-yes: sending yes after CallHome accept"
+                printf 'yes\n' >&5 2>/dev/null || true
+                _hostkey_yes_sent=1
+            fi
         fi
 
-        # Old cli ASK hostkey: answer yes as soon as prompt appears (watcher may race).
-        if echo "$_slice" | grep -a -qiE 'Are you sure you want to continue connecting|authenticity of the host'; then
+        # If prompt text appears later in log, send yes once (idempotent).
+        if [[ "${_NP2_HK_AUTOYES:-0}" == "1" && $_hostkey_yes_sent -eq 0 ]] \
+            && echo "$_slice" | grep -aqiE 'Are you sure you want to continue connecting'; then
+            log_script_info "[INFO] Host-key prompt detected — sending yes"
             printf 'yes\n' >&5 2>/dev/null || true
-        fi
-        if echo "$_slice" | grep -a -qiE 'Unable to open terminal|Unable to get input from user'; then
-            log_script_info "[ERROR] Host-key check failed: no TTY for yes/no (upgrade cli or ensure PTY launch)."
-            LOGIN="NOK"
-            LOGIN_FAIL_REASON="hostkey_no_tty"
-            break
+            _hostkey_yes_sent=1
         fi
 
-        # ESTAB only marks CallHome seen — never LOGIN=OK by itself (TCP!=NETCONF session).
+        # ESTAB = CallHome TCP only. Never LOGIN=OK by itself (TCP != NETCONF session).
         if _ss_has_estab_from_ru; then
             CALLHOME_SEEN=1
         fi

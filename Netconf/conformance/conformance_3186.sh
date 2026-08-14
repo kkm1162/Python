@@ -114,9 +114,11 @@ send_cmd "knownhosts --mode skip"
 send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login $USER --timeout 300"
 
 RESULT1="NOK"
-PAT_ACCEPT="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+PAT_ACCEPT_OLD="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+PAT_ACCEPT_NEW="Accepted a new connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+PAT_ACCEPT="$PAT_ACCEPT_OLD"
 for _w in $(seq 1 1500); do
-	if grep -a -F "$PAT_ACCEPT" "$LOG" >/dev/null 2>&1; then
+	if grep -a -F -e "$PAT_ACCEPT_OLD" -e "$PAT_ACCEPT_NEW" "$LOG" >/dev/null 2>&1; then
 		RESULT1="OK"
 		break
 	fi
@@ -466,8 +468,8 @@ send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login oranuser2 --timeou
 
 RESULT5="NOK"
 for _w in $(seq 1 1500); do
-	if grep -a -F "$PAT_ACCEPT" "$LOG" >/dev/null 2>&1; then
-		ACCEPT_COUNT=$(grep -c -a -F "$PAT_ACCEPT" "$LOG" 2>/dev/null) || ACCEPT_COUNT=0
+	if grep -a -F -e "$PAT_ACCEPT_OLD" -e "$PAT_ACCEPT_NEW" "$LOG" >/dev/null 2>&1; then
+		ACCEPT_COUNT=$(grep -c -a -F -e "$PAT_ACCEPT_OLD" -e "$PAT_ACCEPT_NEW" "$LOG" 2>/dev/null) || ACCEPT_COUNT=0
 		if (( ACCEPT_COUNT >= 2 )); then
 			RESULT5="OK"
 			break
@@ -542,7 +544,7 @@ send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login oranuser3 --timeou
 
 RESULT8="NOK"
 for _w in $(seq 1 1500); do
-	ACCEPT_COUNT=$(grep -c -a -F "$PAT_ACCEPT" "$LOG" 2>/dev/null) || ACCEPT_COUNT=0
+	ACCEPT_COUNT=$(grep -c -a -F -e "$PAT_ACCEPT_OLD" -e "$PAT_ACCEPT_NEW" "$LOG" 2>/dev/null) || ACCEPT_COUNT=0
 	if (( ACCEPT_COUNT >= 3 )); then
 		RESULT8="OK"
 		break

@@ -120,9 +120,11 @@ send_cmd "listen --host $LOCAL_IP --port $LISTEN_PORT --login $USER --timeout 30
 
 # tail -F 는 기본으로 마지막 10줄만 먼저 보여 줘서, verbose 로그 뒤에 남은 "Authentication successful" 등을 놓침 → 파일 전체 grep 폴링.
 RESULT1="NOK"
-PAT_ACCEPT="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+PAT_ACCEPT_OLD="Accepted a connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+PAT_ACCEPT_NEW="Accepted a new connection on ${LOCAL_IP}:${LISTEN_PORT} from ${ALLOWED_IP}"
+PAT_ACCEPT="$PAT_ACCEPT_OLD"
 for _w in $(seq 1 300); do
-	if grep -a -F "$PAT_ACCEPT" "$LOG" >/dev/null 2>&1; then
+	if grep -a -F -e "$PAT_ACCEPT_OLD" -e "$PAT_ACCEPT_NEW" "$LOG" >/dev/null 2>&1; then
 		RESULT1="OK"
 		break
 	fi
