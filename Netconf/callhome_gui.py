@@ -5696,7 +5696,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "key": "ru_mac",
             "label": "RU MAC",
             "default": "",
-            "hint": "ALLOWED_IP ping→ip neigh 자동 (숨김)",
+            "hint": "시험 family IP ping→neigh 자동 (v4=ALLOWED_IP / v6=ALLOWED_IP_V6, 숨김)",
             "wide": True,
             "hidden": True,
         },
@@ -5740,7 +5740,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "key": "ru_mac",
             "label": "RU MAC",
             "default": "",
-            "hint": "ALLOWED_IP ping→ip neigh 자동 (숨김)",
+            "hint": "시험 family IP ping→neigh 자동 (v4=ALLOWED_IP / v6=ALLOWED_IP_V6, 숨김)",
             "wide": True,
             "hidden": True,
         },
@@ -5871,7 +5871,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             "key": "ru_mac",
             "label": "RU MAC",
             "default": "",
-            "hint": "ALLOWED_IP ping→ip neigh 자동 (숨김)",
+            "hint": "시험 family IP ping→neigh 자동 (v4=ALLOWED_IP / v6=ALLOWED_IP_V6, 숨김)",
             "wide": True,
             "hidden": True,
         },
@@ -6384,17 +6384,144 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 },
             ],
         },
-        "config_states": {
-            "title": "admin/oper/availability/usage-state",
-            "settings_key": "config_states",
+        "config_admin_state": {
+            "title": "admin-state",
+            "settings_key": "config_admin_state",
             "family": "v4",
             "fields": list(_GUARDRAILS_RU_SSH_FIELDS) + [
                 {
                     "key": "note",
                     "label": "상태",
                     "default": "추후 구현 (목록 등록만)",
-                    "hint": "상태 전이 검증 예정",
+                    "hint": "admin-state 전이 검증 예정",
                     "wide": True,
+                },
+            ],
+        },
+        "config_oper_state": {
+            "title": "oper-state",
+            "settings_key": "config_oper_state",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_RU_SSH_FIELDS) + [
+                {
+                    "key": "note",
+                    "label": "상태",
+                    "default": "추후 구현 (목록 등록만)",
+                    "hint": "oper-state 검증 예정",
+                    "wide": True,
+                },
+            ],
+        },
+        "config_availability_state": {
+            "title": "availability-state",
+            "settings_key": "config_availability_state",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_RU_SSH_FIELDS) + [
+                {
+                    "key": "note",
+                    "label": "상태",
+                    "default": "추후 구현 (목록 등록만)",
+                    "hint": "availability-state 검증 예정",
+                    "wide": True,
+                },
+            ],
+        },
+        "config_usage_state": {
+            "title": "usage-state",
+            "settings_key": "config_usage_state",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_RU_SSH_FIELDS) + [
+                {
+                    "key": "note",
+                    "label": "상태",
+                    "default": "추후 구현 (목록 등록만)",
+                    "hint": "usage-state 검증 예정",
+                    "wide": True,
+                },
+            ],
+        },
+        # legacy combined (catalog 미등록)
+        "config_states": {
+            "title": "admin/oper/availability/usage-state (legacy)",
+            "settings_key": "config_states",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_RU_SSH_FIELDS) + [
+                {
+                    "key": "note",
+                    "label": "상태",
+                    "default": "분리됨 — config_admin/oper/availability/usage_state 사용",
+                    "hint": "legacy",
+                    "wide": True,
+                },
+            ],
+        },
+        "fault_alarm": {
+            "title": "Fault Alarm (test-alarm batch)",
+            "settings_key": "fault_alarm",
+            "family": "v4",
+            "fields": list(_GUARDRAILS_RU_SSH_FIELDS) + [
+                {
+                    "key": "source_id",
+                    "label": "source-id",
+                    "default": "0",
+                    "hint": "CLI source-id (템플릿 {source_id})",
+                    "wide": False,
+                },
+                {
+                    "key": "show_cmd",
+                    "label": "조회 CLI",
+                    "default": "show alarm information oran",
+                    "hint": "전체 Alarm Id 목록 조회 (전부 시험)",
+                    "wide": True,
+                },
+                {
+                    "key": "active_show_cmd",
+                    "label": "Active 조회 CLI",
+                    "default": "show alarm active-alarms",
+                    "hint": "시험 전 기존 active 요약만 로그",
+                    "wide": True,
+                },
+                {
+                    "key": "raise_tmpl",
+                    "label": "발생 CLI",
+                    "default": "test alarm alarm-id {alarm_id} source-id {source_id} start-alarm",
+                    "hint": "{alarm_id}|{fault_id} {source_id} 치환",
+                    "wide": True,
+                },
+                {
+                    "key": "clear_tmpl",
+                    "label": "클리어 CLI",
+                    "default": "no test alarm alarm-id {alarm_id} source-id {source_id}",
+                    "hint": "cancel = no test alarm …",
+                    "wide": True,
+                },
+                {
+                    "key": "alarm_timeout_sec",
+                    "label": "noti 대기 초",
+                    "default": "60",
+                    "hint": "alarm당 raise/clear 각각 noti 대기",
+                    "wide": False,
+                },
+                {
+                    "key": "listen_timeout_sec",
+                    "label": "CallHome 대기 초",
+                    "default": "180",
+                    "hint": "세션 listen 타임아웃",
+                    "wide": False,
+                },
+                {
+                    "key": "require_noti",
+                    "label": "noti 필수",
+                    "default": "1",
+                    "hint": "1=raise/clear alarm-notif 없으면 FAIL",
+                    "wide": False,
+                },
+                {
+                    "key": "skip_normal",
+                    "label": "NORMAL 제외",
+                    "default": "1",
+                    "hint": "1=Fault Id 0 / NORMAL 행 스킵",
+                    "wide": False,
                 },
             ],
         },
@@ -6406,8 +6533,8 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 {
                     "key": "note",
                     "label": "상태",
-                    "default": "추후 구현 (목록 등록만)",
-                    "hint": "PM activation/reporting 예정",
+                    "default": "추후 구현 (O-RAN Player 연동)",
+                    "hint": "PM activation/reporting — Player와 함께 실행",
                     "wide": True,
                 },
             ],
@@ -6422,7 +6549,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 "scope": "DHCP",
                 "ref": "MP-DHCPv4-Boot",
                 "title": "DHCP v4 Boot (재시작 후 IPv4 재수신)",
-                "detail": "재부팅→IPv4 복구 + Option 60 tcpdump. 연속 시험 가능.",
+                "detail": "ACL로 v6 DHCP 차단(단일 v4) → 재부팅→IPv4 복구 + Option 60. 연속 시험 가능.",
             },
             {
                 "id": "dhcp_v4_vlan",
@@ -6436,7 +6563,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 "scope": "DHCP",
                 "ref": "MP-DHCPv6-Boot",
                 "title": "DHCP v6 Boot (재시작 후 IPv6 재수신)",
-                "detail": "재부팅→inet6 복구 + Option 16·IA_NA. 연속 시험 가능.",
+                "detail": "ACL로 v4 DHCP 차단(단일 v6) → 재부팅→inet6 복구 + Option 16·IA_NA. 연속 시험 가능.",
             },
             {
                 "id": "dhcp_v6_vlan",
@@ -6446,13 +6573,6 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 "detail": "ACL + vlan DB/trunk → Discovery → renew/원복. 연속 시험 가능.",
             },
             {
-                "id": "vlan_discovery",
-                "scope": "VLAN",
-                "ref": "MP-VLAN-1",
-                "title": "M-Plane VLAN Discovery (legacy)",
-                "detail": "MP-DHCPv4-VLAN / MP-DHCPv6-VLAN 항목으로 분리됨. 단독 항목은 SKIP.",
-            },
-            {
                 "id": "netconf_capability",
                 "scope": "NETCONF",
                 "ref": "MP-CAP-1",
@@ -6460,18 +6580,46 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 "detail": "목록 등록. 실행은 추후 (yang-library/xpath/rollback 등).",
             },
             {
-                "id": "config_states",
+                "id": "config_admin_state",
                 "scope": "Config",
-                "ref": "MP-STATE-1",
-                "title": "admin/oper/availability/usage-state",
+                "ref": "MP-STATE-admin",
+                "title": "admin-state",
+                "detail": "목록 등록. 실행은 추후. (필요 시 다른 state와 통합 가능)",
+            },
+            {
+                "id": "config_oper_state",
+                "scope": "Config",
+                "ref": "MP-STATE-oper",
+                "title": "oper-state",
                 "detail": "목록 등록. 실행은 추후.",
+            },
+            {
+                "id": "config_availability_state",
+                "scope": "Config",
+                "ref": "MP-STATE-avail",
+                "title": "availability-state",
+                "detail": "목록 등록. 실행은 추후.",
+            },
+            {
+                "id": "config_usage_state",
+                "scope": "Config",
+                "ref": "MP-STATE-usage",
+                "title": "usage-state",
+                "detail": "목록 등록. 실행은 추후.",
+            },
+            {
+                "id": "fault_alarm",
+                "scope": "FM",
+                "ref": "MP-FM-alarm",
+                "title": "Fault Alarm (세션 유지 · 일괄 raise/clear)",
+                "detail": "show alarm information oran → Alarm Id로 test start/cancel + noti. 상세에 조회·발생 정리.",
             },
             {
                 "id": "performance_mgmt",
                 "scope": "PM",
                 "ref": "MP-PM-1",
-                "title": "Performance Management",
-                "detail": "목록 등록. 실행은 추후.",
+                "title": "Performance Management (O-RAN Player)",
+                "detail": "맨 마지막 실행. O-RAN Player와 연동 후 구현.",
             },
         ]
         items.extend(getattr(self, "_guardrails_user_items", None) or [])
@@ -8230,25 +8378,34 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self._guardrails_sync_oru_cli_from_settings(item_id)
         fam = self._guardrails_resolve_ssh_family(item_id)
         enable_vlan_disc = self._guardrails_item_mode(item_id) == "vlan"
+        mac_src = (
+            self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v6"))
+            if fam == "v6"
+            else self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v4"))
+        )
         self._guardrails_log(
             f"{item_id}: mode={'vlan' if enable_vlan_disc else 'boot'} — Settings/probe "
             f"v4={self._guardrails_gf('probe_v4') or '-'} "
             f"v6={self._guardrails_gf('probe_v6') or '-'} "
-            f"l2sw={self._guardrails_gf('l2sw_ip') or '-'}"
+            f"l2sw={self._guardrails_gf('l2sw_ip') or '-'} "
+            f"| MAC조회IP[{fam}]={mac_src or '-'}"
         )
+
+        # Boot/VLAN 공통: BPF ether host 용 RU MAC 은 매번 neigh 로 갱신
+        # (Boot 에서 생략하면 예전 00:90:… 같은 stale MAC 으로 pcap 0패킷 발생)
+        st_mac, det_mac = self._guardrails_ensure_ru_mac(item_id, force=True)
+        if st_mac == "FAIL":
+            return "FAIL", f"RU MAC 자동 조회 실패: {det_mac}"
+        if st_mac == "WARN":
+            self._guardrails_log(f"{item_id}: RU MAC WARN — {det_mac}")
+        else:
+            self._guardrails_log(f"{item_id}: RU MAC OK — {det_mac}")
 
         if enable_vlan_disc:
             if not self._guardrails_gf("l2sw_ip") or not self._guardrails_gf("l2sw_id"):
                 return "FAIL", "⚙ L2SW IP/ID 필요 (VLAN Discovery)"
 
-            # 1) RU MAC (ALLOWED_IP → dhcp_host ping → ip neigh)
-            st_mac, det_mac = self._guardrails_ensure_ru_mac(item_id, force=True)
-            if st_mac == "FAIL":
-                return "FAIL", f"RU MAC 자동 조회 실패: {det_mac}"
-            if st_mac == "WARN":
-                self._guardrails_log(f"{item_id}: RU MAC WARN — {det_mac}")
-
-            # 2) L2SW IF (enable → show mac → 해당 MAC 포트)
+            # L2SW IF (enable → show mac → 해당 MAC 포트)
             st_if, det_if = self._guardrails_ensure_l2sw_if_from_mac(item_id, force=True)
             if st_if == "FAIL":
                 return "FAIL", f"L2SW IF 자동 조회 실패: {det_if}"
@@ -8260,7 +8417,24 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             if ll0:
                 self._guardrails_log(f"{item_id}: 사전 LL(계산) — {how_ll0}")
         else:
-            self._guardrails_log(f"{item_id}: Boot 모드 — L2SW/ACL/MAC 조회 생략")
+            # Boot도 단일 스택: 반대 계열 DHCP ACL 필요 → L2SW IF 확보
+            if not self._guardrails_gf("l2sw_ip") or not self._guardrails_gf("l2sw_id"):
+                return "FAIL", "⚙ L2SW IP/ID 필요 (Boot 단일스택 ACL)"
+            st_if, det_if = self._guardrails_ensure_l2sw_if_from_mac(item_id, force=True)
+            if st_if == "FAIL":
+                return "FAIL", f"L2SW IF 자동 조회 실패 (Boot ACL): {det_if}"
+            if st_if == "WARN":
+                self._guardrails_log(f"{item_id}: L2SW IF 조회 WARN — {det_if}")
+            if not self._guardrails_l2sw_normalize_if():
+                return "FAIL", "L2SW IF 없음 — Boot ACL 적용 불가"
+            self._guardrails_log(
+                f"{item_id}: Boot 단일스택 — L2SW IF OK ({det_if}); "
+                + (
+                    "v4 DHCP 차단 → v6만"
+                    if fam == "v6"
+                    else "v6 DHCP 차단 → v4만"
+                )
+            )
 
         # Capture IF (dhcp_host ifconfig → 10.0.60.x)
         st_cap, det_cap = self._guardrails_ensure_capture_if(item_id, prefer_tag=False)
@@ -8336,6 +8510,8 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         vlan_needs_cleanup = False
         solid_vlan_owned = False  # GUI가 solid에 임시 만든 IF만 종료 시 삭제
         solid_vlan_if = ""
+        reset_completed = False  # CallHome reset RPC/헬퍼 성공 후 True — 중지 시 LL renew 분기
+        acl_applied = False  # Boot/VLAN 공통 단일스택 ACL — 종료 시 원복
         pass_sec = self._guardrails_int("pass_sec", 240)
         timeout_sec = self._guardrails_int("timeout_sec", 540)
         poll_sec = self._guardrails_int("poll_sec", 5)
@@ -8633,9 +8809,57 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 time.sleep(min(0.2, end - time.monotonic()))
 
         def _abort_fast(msg: str) -> tuple[str, str]:
-            """사용자 중지: renew/긴 VLAN cleanup 생략 → tcpdump+ACL만 짧게, VLAN은 버튼 원복."""
-            nonlocal vlan_needs_cleanup, learned_ip
-            self._guardrails_log(f"{item_id}: {msg} — 빠른 정리 (renew 생략)")
+            """사용자 중지 정리.
+
+            - reset 이전: renew/LL 생략 (빠른 정리만)
+            - reset 완료 후: link-local 로 renew 명령 후 VLAN은 버튼 원복
+            """
+            nonlocal vlan_needs_cleanup, learned_ip, reset_completed, acl_applied
+            do_ll_renew = bool(reset_completed) and bool(enable_vlan_disc)
+            if do_ll_renew:
+                self._guardrails_log(
+                    f"{item_id}: {msg} — reset 이후 중지 → link-local renew 시도"
+                )
+                renewed = False
+                try:
+                    for tag_ll in (True, False):
+                        ll, how_ll = self._guardrails_ru_linklocal_scoped(tag=tag_ll)
+                        if not ll:
+                            continue
+                        label = "LL/tag" if tag_ll else "LL/untag"
+                        self._guardrails_log(
+                            f"{item_id}: 중지 시 renew `{renew_cmd}` → {ll} ({label}) — {how_ll}"
+                        )
+                        ok_r, det_r = self._guardrails_ru_force_dhcp_renew(
+                            ll,
+                            fam,
+                            command=renew_cmd,
+                            via_dhcp_host=True,
+                            vlan_bind=tag_ll,
+                        )
+                        notes.append(
+                            f"abort_ll_renew:{'OK' if ok_r else 'WARN'}@{ll}/{label}"
+                        )
+                        self._guardrails_log(
+                            f"{item_id}: 중지 LL renew → {'OK' if ok_r else 'WARN'}: "
+                            f"{(det_r or '')[:200]}"
+                        )
+                        if ok_r:
+                            renewed = True
+                            break
+                except Exception as exc:
+                    notes.append(f"abort_ll_renew:ERR:{exc}")
+                    self._guardrails_log(f"{item_id}: 중지 LL renew 예외: {exc}")
+                if not renewed:
+                    notes.append("abort_ll_renew:SKIP/FAIL")
+                    self._guardrails_log(
+                        f"{item_id}: 중지 LL renew 미성공 — VLAN 원복은 버튼으로"
+                    )
+            else:
+                self._guardrails_log(
+                    f"{item_id}: {msg} — 빠른 정리 "
+                    f"({'reset 이전' if not reset_completed else 'Boot'} · renew/LL 생략)"
+                )
             try:
                 _stop_tcpdump()
             except Exception:
@@ -8682,6 +8906,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                     ),
                     "renew_cmd": renew_cmd,
                     "ru_mac": mac_colon,
+                    "abort_ll_renew_done": do_ll_renew,
                 }
                 _defer_solid_vlan_to_pending(pending)  # Discovery SSH용 IF는 버튼 원복까지 유지
                 self.after(0, lambda p=pending: self._guardrails_arm_vlan_restore(p))
@@ -8690,23 +8915,26 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 lip = (learned_ip or "").strip() or "-"
                 self._guardrails_log(
                     f"{item_id}: VLAN/solid IF 원복은 「VLAN untag 원복」 버튼으로 "
-                    f"(중지 시 renew 생략, 저장 IP={lip})"
+                    f"(저장 IP={lip}"
+                    + (", LL renew 시도함" if do_ll_renew else ", reset 전·renew 생략")
+                    + ")"
                 )
-                if lip == "-":
+                if lip == "-" and not do_ll_renew:
                     self._guardrails_log(
                         f"{item_id}: ⚠ Discovery IP 미저장 — 원복 시 tag renew 실패 가능 "
                         "(RU show dhcp IP를 ⚙에 없으므로 neigh/pcap 재시도는 버튼에서)"
                     )
             else:
                 _teardown_solid_vlan_if()
-            if enable_vlan_disc:
+            if acl_applied:
                 try:
                     rm_st, rm_detail = self._guardrails_remove_acl(timeout=40)
                     notes.append(f"acl_abort:{rm_st}:{rm_detail[:80]}")
+                    acl_applied = False
                 except Exception as exc:
                     notes.append(f"acl_abort:ERR:{exc}")
             else:
-                notes.append("acl_abort:SKIP(boot)")
+                notes.append("acl_abort:SKIP")
             return "INFO", f"{msg} | " + " | ".join(notes)
 
         def _stop_tcpdump() -> tuple[bool, str]:
@@ -8732,17 +8960,20 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         notes.append("tcpdump started")
         self._guardrails_log(f"{item_id}: tcpdump 시작 OK (if={iface}, bpf={bpf})")
 
-        if enable_vlan_disc:
-            self._guardrails_log(f"{item_id}: L2SW ACL 적용 중 ({fam})…")
-            st, detail = self._guardrails_apply_acl(fam)
-            if st != "PASS":
-                _stop_tcpdump()
-                self._guardrails_log(f"{item_id}: ACL 실패 — {detail}")
-                return st, detail + " | " + " | ".join(notes)
-            notes.append(detail)
-        else:
-            notes.append("acl:SKIP(boot)")
-            self._guardrails_log(f"{item_id}: Boot — ACL 적용 생략")
+        # Boot/VLAN 공통: 단일 스택 — 시험 계열만 DHCP 통과 (반대 계열 ACL)
+        # v4 시험: v6-dhcp-block / v6 시험: acl 110(67/68 drop)
+        self._guardrails_log(
+            f"{item_id}: L2SW ACL 적용 중 ({fam}"
+            + (", Boot 단일스택" if not enable_vlan_disc else ", VLAN Discovery")
+            + ")…"
+        )
+        st, detail = self._guardrails_apply_acl(fam)
+        if st != "PASS":
+            _stop_tcpdump()
+            self._guardrails_log(f"{item_id}: ACL 실패 — {detail}")
+            return st, detail + " | " + " | ".join(notes)
+        notes.append(detail)
+        acl_applied = True
 
         # VLAN Discovery 초반: vlan 생성 + trunk add 만 (base remove는 reset 직후)
         if enable_vlan_disc:
@@ -8781,22 +9012,35 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 )
 
         expect = "IPv4 inet" if fam == "v4" else "global inet6"
+        if self._guardrails_cancel.is_set():
+            return _abort_fast("사용자 중지 (reset 이전)")
         rst_ok, rst_how = self._guardrails_trigger_ru_reset(fam)
         t_reset = time.monotonic()
         notes.append(f"reset:{rst_how}")
         mode = (self._guardrails_gf("reset_mode", "auto") or "auto").strip().lower()
+        if self._guardrails_cancel.is_set() and not rst_ok:
+            # 헬퍼 도중 중지·실패 — reset 미완료로 간주 (LL renew 안 함)
+            return _abort_fast("사용자 중지 (reset 이전/미완료)")
+        if rst_ok:
+            reset_completed = True
+            self._guardrails_log(
+                f"{item_id}: reset 완료 표시 ({rst_how}) — 이후 중지 시 LL renew"
+            )
         if not rst_ok and mode in ("auto", "mplane"):
             if mode == "mplane":
                 _stop_tcpdump()
                 _cleanup_vlan_discovery()
-                if enable_vlan_disc:
+                if acl_applied:
                     self._guardrails_remove_acl()
+                    acl_applied = False
                 return "FAIL", f"ORU reset 실패 ({rst_how}) | " + " | ".join(notes)
             self._guardrails_log(
                 f"자동 reset 실패({rst_how}) — 수동 재부팅 후 복구 감시 계속"
             )
             rst_how = "manual-fallback"
             t_reset = time.monotonic()
+            # 수동 폴백은 reset RPC 미전송 — LL renew 조건에서 제외 유지
+            reset_completed = False
 
         # reset 직후 바로 base(vlan1) remove — Discovery 강제
         if enable_vlan_disc and vlan_needs_cleanup:
@@ -8843,8 +9087,9 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 return _abort_fast("사용자 중지")
             _stop_tcpdump()
             _cleanup_vlan_discovery()
-            if enable_vlan_disc:
+            if acl_applied:
                 self._guardrails_remove_acl()
+                acl_applied = False
             self._guardrails_log(f"{item_id}: FAIL — 재부팅(SSH down) 미감지")
             return "FAIL", "재부팅(SSH unhealthy) 미감지. ACL/tcpdump 정리. | " + " | ".join(notes)
 
@@ -9232,7 +9477,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 vlan_needs_cleanup = False
         else:
             _cleanup_vlan_discovery()
-        if enable_vlan_disc:
+        if acl_applied:
             rm_st, rm_detail = self._guardrails_remove_acl()
             # ACL 잔존은 시험 결과에 반영 (v4 leasefail 등 현장 장애의 대표 원인)
             if rm_st == "PASS":
@@ -9240,10 +9485,11 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             else:
                 notes.append(f"ACL원복FAIL:{rm_detail}")
             self._guardrails_log(f"{item_id}: ACL 원복 → {rm_st}: {rm_detail[:160]}")
+            acl_applied = False
         else:
-            rm_st, rm_detail = "PASS", "acl:SKIP(boot)"
+            rm_st, rm_detail = "PASS", "acl:SKIP"
             notes.append(rm_detail)
-            self._guardrails_log(f"{item_id}: Boot — ACL 원복 생략")
+            self._guardrails_log(f"{item_id}: ACL 원복 생략 (미적용)")
 
         self._guardrails_log(
             f"{item_id}: 최종판정 boot(ping)={'OK' if boot_ok else 'FAIL'} "
@@ -9895,25 +10141,48 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
     def _guardrails_ensure_ru_mac(
         self, item_id: str | None = None, *, force: bool = True
     ) -> tuple[str, str]:
-        """RU MAC 자동: Settings ALLOWED_IP → dhcp_host ping → ip neigh (UI 숨김)."""
+        """RU MAC 자동: 시험 family IP → dhcp_host ping → neigh (UI 숨김).
+
+        v4 시험: Settings ALLOWED_IP / probe_v4 + ping/arp/ip -4 neigh
+        v6 시험: Settings ALLOWED_IP_V6 / probe_v6 + ping6/ip -6 neigh
+        """
         iid = item_id or getattr(self, "_guardrails_settings_item_id", None) or "dhcp_v4"
         self._guardrails_fill_defaults_from_context(iid)
+        self._guardrails_sync_probe_from_settings(iid)
         cur = self._guardrails_normalize_mac(self._guardrails_gf("ru_mac"))
+        fam = self._guardrails_resolve_ssh_family(iid)
 
         ru_ip = ""
-        try:
-            ru_ip = self._guardrails_strip_ip_cidr(
-                (self.fields.get("ALLOWED_IP").get() or "").strip()  # type: ignore[union-attr]
-            )
-        except Exception:
-            ru_ip = ""
-        if not ru_ip:
-            ru_ip = self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v4"))
-        if not ru_ip or ":" in ru_ip:
-            if cur and not force:
-                colon = ":".join(cur[i : i + 2] for i in range(0, 12, 2))
-                return "WARN", f"ALLOWED_IP 없음 · 기존 MAC={colon}"
-            return "FAIL", "RU MAC 조회용 Settings ★ RU IPv4(ALLOWED_IP) 필요"
+        if fam == "v6":
+            try:
+                ru_ip = self._guardrails_strip_ip_cidr(
+                    (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+                )
+            except Exception:
+                ru_ip = ""
+            if not ru_ip:
+                ru_ip = self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v6"))
+            # strip scope if present for neigh lookup
+            ru_ip = (ru_ip or "").split("%", 1)[0].strip()
+            if not ru_ip or ":" not in ru_ip:
+                if cur and not force:
+                    colon = ":".join(cur[i : i + 2] for i in range(0, 12, 2))
+                    return "WARN", f"ALLOWED_IP_V6 없음 · 기존 MAC={colon}"
+                return "FAIL", "RU MAC 조회용 Settings ★ RU IPv6(ALLOWED_IP_V6) 필요"
+        else:
+            try:
+                ru_ip = self._guardrails_strip_ip_cidr(
+                    (self.fields.get("ALLOWED_IP").get() or "").strip()  # type: ignore[union-attr]
+                )
+            except Exception:
+                ru_ip = ""
+            if not ru_ip:
+                ru_ip = self._guardrails_strip_ip_cidr(self._guardrails_gf("probe_v4"))
+            if not ru_ip or ":" in ru_ip:
+                if cur and not force:
+                    colon = ":".join(cur[i : i + 2] for i in range(0, 12, 2))
+                    return "WARN", f"ALLOWED_IP 없음 · 기존 MAC={colon}"
+                return "FAIL", "RU MAC 조회용 Settings ★ RU IPv4(ALLOWED_IP) 필요"
 
         cache = getattr(self, "_guardrails_ru_mac_cache", None)
         now = time.monotonic()
@@ -9921,6 +10190,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             not force
             and isinstance(cache, dict)
             and cache.get("ip") == ru_ip
+            and cache.get("fam") == fam
             and cache.get("mac")
             and (now - float(cache.get("ts") or 0)) < 90.0
         ):
@@ -9934,16 +10204,28 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                     )
                     blob["ru_mac"] = colon
                     self._guardrails_set_vals(iid, blob)
-                return "PASS", f"cached neigh {ru_ip}→{colon}"
+                return "PASS", f"cached neigh [{fam}] {ru_ip}→{colon}"
 
-        self._guardrails_log(f"{iid}: RU MAC 자동 조회 (ping → ip neigh {ru_ip})…")
-        cmd = (
-            f"ping -c 2 -W 1 {shlex.quote(ru_ip)} >/dev/null 2>&1 || "
-            f"ping -c 1 -w 2 {shlex.quote(ru_ip)} >/dev/null 2>&1 || true; "
-            f"ip -4 neigh show {shlex.quote(ru_ip)} 2>/dev/null; "
-            f"ip neigh show {shlex.quote(ru_ip)} 2>/dev/null; "
-            f"arp -n {shlex.quote(ru_ip)} 2>/dev/null || true"
+        self._guardrails_log(
+            f"{iid}: RU MAC 자동 조회 [{fam}] (ping → neigh {ru_ip})…"
         )
+        if fam == "v6":
+            cmd = (
+                f"ping -6 -c 2 -W 1 {shlex.quote(ru_ip)} >/dev/null 2>&1 || "
+                f"ping6 -c 2 -W 1 {shlex.quote(ru_ip)} >/dev/null 2>&1 || "
+                f"ping -6 -c 1 -w 2 {shlex.quote(ru_ip)} >/dev/null 2>&1 || true; "
+                f"ip -6 neigh show {shlex.quote(ru_ip)} 2>/dev/null; "
+                f"ip neigh show {shlex.quote(ru_ip)} 2>/dev/null || true"
+            )
+        else:
+            cmd = (
+                f"ping -4 -c 2 -W 1 {shlex.quote(ru_ip)} >/dev/null 2>&1 || "
+                f"ping -c 2 -W 1 {shlex.quote(ru_ip)} >/dev/null 2>&1 || "
+                f"ping -c 1 -w 2 {shlex.quote(ru_ip)} >/dev/null 2>&1 || true; "
+                f"ip -4 neigh show {shlex.quote(ru_ip)} 2>/dev/null; "
+                f"ip neigh show {shlex.quote(ru_ip)} 2>/dev/null; "
+                f"arp -n {shlex.quote(ru_ip)} 2>/dev/null || true"
+            )
         _ok, out = self._guardrails_dhcp_server_run(cmd, timeout=25)
         mac_n = ""
         for m in re.finditer(
@@ -9964,20 +10246,26 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 colon = ":".join(cur[i : i + 2] for i in range(0, 12, 2))
                 return "WARN", f"neigh MAC 미발견 · 기존={colon}"
             snip = re.sub(r"\s+", " ", (out or "")[:180]).strip()
+            need = "ALLOWED_IP_V6" if fam == "v6" else "ALLOWED_IP"
             return (
                 "FAIL",
-                f"RU MAC neigh 미발견 ({ru_ip}) — dhcp_host에서 ping/reachability 확인"
+                f"RU MAC neigh 미발견 [{fam}] ({ru_ip}) — dhcp_host에서 {need} reachability 확인"
                 + (f": {snip}" if snip else ""),
             )
 
         colon = ":".join(mac_n[i : i + 2] for i in range(0, 12, 2))
-        self._guardrails_ru_mac_cache = {"ip": ru_ip, "mac": mac_n, "ts": now}
+        self._guardrails_ru_mac_cache = {
+            "ip": ru_ip,
+            "mac": mac_n,
+            "fam": fam,
+            "ts": now,
+        }
         sk = self._guardrails_store_key(iid)
         blob = dict((getattr(self, "_guardrails_per_test_settings", {}) or {}).get(sk) or {})
         blob["ru_mac"] = colon
         self._guardrails_set_vals(iid, blob)
-        self._guardrails_log(f"{iid}: RU MAC ← ping/neigh {ru_ip} ({colon})")
-        return "PASS", f"neigh {ru_ip}→{colon}"
+        self._guardrails_log(f"{iid}: RU MAC ← [{fam}] ping/neigh {ru_ip} ({colon})")
+        return "PASS", f"neigh [{fam}] {ru_ip}→{colon}"
 
     def _guardrails_acl_apply_cmds(self, family: str = "v6") -> list[str]:
         """Dasan ACL — 포트에 access-group 만 적용 (ACL 본문은 스위치에 유지).
@@ -11668,6 +11956,649 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self._guardrails_log(f"[L2SW] ok, out={out[-400:].replace(chr(10), ' | ')}")
         return True, out or "(ok)"
 
+    @staticmethod
+    def _guardrails_parse_oran_alarm_table(query: str) -> dict[str, dict[str, str]]:
+        """Parse `show alarm information oran` rows → {alarm_id: fields}."""
+        out: dict[str, dict[str, str]] = {}
+        for raw in (query or "").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#") or line.startswith("---"):
+                continue
+            # skip banners / headers
+            low = line.lower()
+            if "alarm id" in low and "fault" in low:
+                continue
+            if low.startswith(("alarm oper", "alarm detection", "alarm notification", "total count")):
+                continue
+            # Typical: AlarmId FaultId Severity Name... Source Config Interval Related
+            m = re.match(
+                r"^(\d+)\s+(\d+)\s+(CRITICAL|MAJOR|MINOR|WARNING|NORMAL|INDETERMINATE)\s+(.+)$",
+                line,
+                re.I,
+            )
+            if not m:
+                # looser: leading alarm-id then rest
+                m2 = re.match(r"^(\d+)\s+(\S+)\s+(\S+)\s+(.+)$", line)
+                if not m2:
+                    continue
+                aid, fid, sev, rest = m2.group(1), m2.group(2), m2.group(3), m2.group(4)
+            else:
+                aid, fid, sev, rest = m.group(1), m.group(2), m.group(3), m.group(4)
+            # peel source/config from the rightish tokens when possible
+            toks = rest.split()
+            source = ""
+            config = ""
+            name = rest
+            # source keywords often: module, ecpri, ant-line-tx, ...
+            for i, t in enumerate(toks):
+                if t.lower() in (
+                    "module",
+                    "ecpri",
+                    "ant-line-tx",
+                    "ant-line-rx",
+                    "carrier-tx",
+                    "carrier-rx",
+                ) or t.lower().startswith("ant-") or t.lower().startswith("carrier-"):
+                    source = t
+                    name = " ".join(toks[:i]).strip()
+                    rem = toks[i + 1 :]
+                    if rem:
+                        config = rem[0]
+                    break
+            out[aid] = {
+                "alarm_id": aid,
+                "fault_id": fid,
+                "severity": sev,
+                "name": name or rest[:60],
+                "source": source,
+                "config": config,
+                "raw": line,
+            }
+        return out
+
+    @staticmethod
+    def _guardrails_format_fault_alarm_detail(raw: str) -> str:
+        """Parse mplane_fault_alarm.sh markers → detail (noti 중심, CLI 표 전문 없음)."""
+        text = raw or ""
+        lines_out: list[str] = []
+
+        def _between(a: str, b: str) -> str:
+            i = text.find(a)
+            if i < 0:
+                return ""
+            i += len(a)
+            j = text.find(b, i)
+            if j < 0:
+                return text[i:].strip()
+            return text[i:j].strip()
+
+        query = _between("===ALARM_QUERY_BEGIN===", "===ALARM_QUERY_END===")
+        active = _between("===ACTIVE_ALARMS_BEGIN===", "===ACTIVE_ALARMS_END===")
+        # Prefer compact alarm_row: from new script; fall back to full CLI parse
+        table: dict[str, dict[str, str]] = {}
+        for ln in (query or "").splitlines():
+            s = ln.strip()
+            if not s.startswith("alarm_row:"):
+                continue
+            parts = s[len("alarm_row:") :].split("|")
+            if len(parts) < 3:
+                continue
+            aid = parts[0].strip()
+            table[aid] = {
+                "alarm_id": aid,
+                "fault_id": parts[1].strip() if len(parts) > 1 else "",
+                "severity": parts[2].strip() if len(parts) > 2 else "",
+                "name": parts[3].strip() if len(parts) > 3 else "",
+                "source": parts[4].strip() if len(parts) > 4 else "",
+                "config": parts[5].strip() if len(parts) > 5 else "",
+            }
+        if not table:
+            table = CallhomeGUI._guardrails_parse_oran_alarm_table(query)
+
+        active_present = "—"
+        active_ids = ""
+        active_count = ""
+        m_ap = re.search(r"(?m)^active_present:\s*(\S+)", active)
+        if m_ap:
+            active_present = m_ap.group(1).strip().upper()
+        m_ai = re.search(r"(?m)^active_ids:\s*(.*)$", active)
+        if m_ai:
+            active_ids = (m_ai.group(1) or "").strip()
+        m_ac = re.search(r"(?m)^active_count:\s*(\S+)", active)
+        if m_ac:
+            active_count = m_ac.group(1).strip()
+
+        lines_out.extend(
+            [
+                "[0] 시험 전 Active (요약만 — CLI 표는 로그 생략)",
+                "------------------------------------------------------------",
+                f"  active_present: {active_present}"
+                + (f"  count={active_count}" if active_count else "")
+                + (f"  ids={active_ids}" if active_ids else ""),
+            ]
+        )
+        if active_present == "YES":
+            lines_out.append(
+                "  ※ 이미 active 인 Alarm Id 는 시험에서 제외 (아래 [1.5])"
+            )
+
+        skipped = _between("===SKIPPED_ACTIVE_BEGIN===", "===SKIPPED_ACTIVE_END===")
+        skip_ids = ""
+        skip_count = ""
+        m_sc = re.search(r"(?m)^skipped_count:\s*(\S+)", skipped)
+        if m_sc:
+            skip_count = m_sc.group(1).strip()
+        m_si = re.search(r"(?m)^skipped_ids:\s*(.*)$", skipped)
+        if m_si:
+            skip_ids = (m_si.group(1) or "").strip()
+
+        alarm_count = ""
+        alarm_ids = ""
+        m_n = re.search(r"(?m)^alarm_count:\s*(\S+)", query)
+        if m_n:
+            alarm_count = m_n.group(1).strip()
+        m_ids = re.search(r"(?m)^alarm_ids:\s*(.*)$", query)
+        if m_ids:
+            alarm_ids = (m_ids.group(1) or "").strip()
+
+        lines_out.extend(
+            [
+                "",
+                "[1] Catalog (information → Alarm Id 목록)",
+                "------------------------------------------------------------",
+                f"  alarm_count: {alarm_count or len(table)}",
+                f"  alarm_ids: {alarm_ids or ','.join(table.keys()) or '(없음)'}",
+            ]
+        )
+
+        lines_out.extend(
+            [
+                "",
+                "[1.5] 시험 제외 (이미 active)",
+                "------------------------------------------------------------",
+                f"  skipped_count: {skip_count or ('0' if not skip_ids else len([x for x in skip_ids.split(',') if x]))}",
+                f"  skipped_ids: {skip_ids or '(없음)'}",
+            ]
+        )
+        skip_rows = [
+            ln.strip()
+            for ln in (skipped or "").splitlines()
+            if ln.strip().startswith("skip_row:")
+        ]
+        if skip_rows:
+            for ln in skip_rows:
+                parts = ln[len("skip_row:") :].split("|")
+                aid = parts[0] if parts else "?"
+                fid = parts[1] if len(parts) > 1 else ""
+                sev = parts[2] if len(parts) > 2 else ""
+                name = parts[3] if len(parts) > 3 else ""
+                reason = parts[4] if len(parts) > 4 else "already_active"
+                extra = f" fault-id={fid}" if fid else ""
+                extra2 = f"  {sev}" if sev else ""
+                extra3 = f"  {name}" if name else ""
+                lines_out.append(f"  SKIP alarm-id {aid}:{extra}{extra2}{extra3}  ({reason})")
+        elif active_ids:
+            for aid in [x.strip() for x in active_ids.split(",") if x.strip()]:
+                info = table.get(aid) or {}
+                name = info.get("name") or ""
+                fid = info.get("fault_id") or ""
+                sev = info.get("severity") or ""
+                lines_out.append(
+                    f"  SKIP alarm-id {aid}:"
+                    + (f" fault-id={fid}" if fid else "")
+                    + (f"  {sev}" if sev else "")
+                    + (f"  {name}" if name else "")
+                    + "  (already_active)"
+                )
+
+        lines_out.extend(
+            [
+                "",
+                "[2] 시험 결과 (결과 | alarm | fault | severity | name | 발생(s) | 해지(s))",
+                "------------------------------------------------------------",
+                "  발생(s)=test alarm CLI → raise noti 수신까지",
+                "  해지(s)=no test alarm CLI → clear noti 수신까지",
+            ]
+        )
+
+        def _parse_wall(s: str):
+            s = (s or "").strip()
+            if not s or s == "—":
+                return None
+            s = s.replace("T", " ").replace("Z", "")
+            s = re.sub(r"\.\d+$", "", s)
+            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"):
+                try:
+                    return datetime.strptime(s[:19], fmt)
+                except Exception:
+                    continue
+            return None
+
+        def _delta_sec(t0: str, t1: str, noti_ok: str) -> str:
+            if (noti_ok or "").strip().upper() != "OK":
+                return "TIMEOUT"
+            a = _parse_wall(t0)
+            b = _parse_wall(t1)
+            if a is None or b is None:
+                return "—"
+            sec = (b - a).total_seconds()
+            if sec < 0:
+                sec = 0.0
+            if sec == int(sec):
+                return str(int(sec))
+            return f"{sec:.1f}"
+
+        parts = re.split(r"===ALARM alarm_id=|===FAULT fault_id=", text)
+        result_rows: list[tuple[str, str, str, str, str, str, str]] = []
+        for part in parts[1:]:
+            m_id = re.match(r"([^\s=]+)===\s*", part)
+            if not m_id:
+                continue
+            aid = m_id.group(1).strip()
+            body = part[m_id.end() :]
+            end = body.find("===FAULT_END===")
+            if end < 0:
+                end = body.find("===ALARM_END===")
+            if end >= 0:
+                body = body[:end]
+
+            def _kv(key: str, _body: str = body) -> str:
+                mm = re.search(rf"(?m)^{re.escape(key)}:\s*(.*)$", _body)
+                return (mm.group(1).strip() if mm else "") or "—"
+
+            info = table.get(aid) or {}
+            name = (info.get("name") or "").strip()
+            fid = (info.get("fault_id") or _kv("yang_fault_id") or "").strip()
+            sev = (info.get("severity") or "").strip()
+            fr = (_kv("fault_result") or "—").strip().upper()
+            if fr not in ("PASS", "FAIL"):
+                fr = "FAIL" if "FAIL" in fr else (fr or "—")
+            raise_sec = _delta_sec(_kv("raise_sent"), _kv("raise_noti_wall"), _kv("raise_noti"))
+            clear_sec = _delta_sec(_kv("clear_sent"), _kv("clear_noti_wall"), _kv("clear_noti"))
+            result_rows.append((fr, aid, fid, sev, name, raise_sec, clear_sec))
+
+        lines_out.append("===RESULT_TABLE_BEGIN===")
+        lines_out.append("# result|alarm_id|fault_id|severity|name|raise_sec|clear_sec")
+        if not result_rows:
+            lines_out.append("  (시험 결과 행 없음)")
+        else:
+            lines_out.append(
+                f"  {'결과':<6} {'alarm-id':<12} {'fault-id':<12} {'severity':<10} "
+                f"{'name':<34} {'발생(s)':>8} {'해지(s)':>8}"
+            )
+            for fr, aid, fid, sev, name, rs, cs in result_rows:
+                nm = (name or "")[:34]
+                lines_out.append(
+                    f"  {fr:<6} {aid:<12} {fid:<12} {sev:<10} "
+                    f"{nm:<34} {rs:>8} {cs:>8}"
+                )
+                safe_name = (name or "").replace("|", "/")
+                lines_out.append(f"RESULT_ROW|{fr}|{aid}|{fid}|{sev}|{safe_name}|{rs}|{cs}")
+        lines_out.append("===RESULT_TABLE_END===")
+
+        summ = _between("===SUMMARY===", "===SUMMARY_END===")
+        lines_out.extend(["", "[요약]", f"  {(summ or '(없음)').strip()}"])
+
+        if "===ALARM alarm_id=" not in text and "===FAULT fault_id=" not in text and text.strip():
+            lines_out.extend(["", "[원본 출력 일부]", text[-2500:]])
+
+        return "\n".join(lines_out).rstrip() + "\n"
+
+    def _guardrails_run_fault_alarm(self) -> tuple[str, str]:
+        """CallHome session held; batch ORU test-alarm raise/clear + noti; structured detail."""
+        self._guardrails_fill_defaults_from_context("fault_alarm")
+        helper = "mplane_fault_alarm.sh"
+        # Alarm IDs 설정 없음 — 항상 show alarm information oran 전체
+        try:
+            sk = self._guardrails_store_key("fault_alarm")
+            blob = dict(
+                (getattr(self, "_guardrails_per_test_settings", {}) or {}).get(sk) or {}
+            )
+            if "fault_ids" in blob:
+                blob.pop("fault_ids", None)
+                self._guardrails_set_vals("fault_alarm", blob)
+                self._guardrails_log("[fault_alarm] 저장값 fault_ids 제거 → information 전체 시험")
+        except Exception:
+            pass
+
+        show_cmd = (self._guardrails_gf("show_cmd") or "show alarm information oran").strip()
+        active_show_cmd = (
+            self._guardrails_gf("active_show_cmd") or "show alarm active-alarms"
+        ).strip()
+        _canon_raise = "test alarm alarm-id {alarm_id} source-id {source_id} start-alarm"
+        _canon_clear = "no test alarm alarm-id {alarm_id} source-id {source_id}"
+        raise_tmpl = (self._guardrails_gf("raise_tmpl") or _canon_raise).strip()
+        clear_tmpl = (self._guardrails_gf("clear_tmpl") or _canon_clear).strip()
+        source_id = (self._guardrails_gf("source_id") or "0").strip() or "0"
+
+        def _sanitize_alarm_tmpl(s: str, canon: str, *, expect_start: bool) -> str:
+            """Reject broken templates (duplicated source-id / trailing })."""
+            t = re.sub(r"\}+\s*$", "", (s or "").strip()).strip()
+            bad = (
+                not t
+                or t.count("source-id") != 1
+                or (t.count("{alarm_id}") + t.count("{fault_id}")) < 1
+                or t.count("{source_id}") != 1
+                or "start-alarm source-id" in t
+                or t.endswith("}")
+            )
+            if expect_start and "start-alarm" not in t:
+                bad = True
+            if (not expect_start) and not t.lower().startswith("no "):
+                # clear must be `no test alarm ...`
+                if "cancel-alarm" in t or "stop-alarm" in t:
+                    bad = True
+            if bad:
+                return canon
+            return t
+
+        raise_tmpl = _sanitize_alarm_tmpl(raise_tmpl, _canon_raise, expect_start=True)
+        clear_tmpl = _sanitize_alarm_tmpl(clear_tmpl, _canon_clear, expect_start=False)
+        # persist cleaned templates so ⚙ 재실행 때도 깨진 값 안 씀
+        try:
+            sk = self._guardrails_store_key("fault_alarm")
+            blob = dict(
+                (getattr(self, "_guardrails_per_test_settings", {}) or {}).get(sk) or {}
+            )
+            if blob.get("raise_tmpl") != raise_tmpl or blob.get("clear_tmpl") != clear_tmpl:
+                blob["raise_tmpl"] = raise_tmpl
+                blob["clear_tmpl"] = clear_tmpl
+                blob["source_id"] = source_id
+                blob.pop("fault_ids", None)
+                self._guardrails_set_vals("fault_alarm", blob)
+                self._guardrails_log(
+                    f"[fault_alarm] 템플릿 정리 저장 RAISE={raise_tmpl!r} CLEAR={clear_tmpl!r}"
+                )
+        except Exception:
+            pass
+        self._guardrails_log(
+            f"[fault_alarm] RAISE_TMPL={raise_tmpl!r} CLEAR_TMPL={clear_tmpl!r} "
+            f"SOURCE_ID={source_id!r} (ids=show information oran 전체)"
+        )
+        try:
+            alarm_to = max(10, int(self._guardrails_gf("alarm_timeout_sec", "60") or "60"))
+        except Exception:
+            alarm_to = 60
+        try:
+            listen_to = max(30, int(self._guardrails_gf("listen_timeout_sec", "180") or "180"))
+        except Exception:
+            listen_to = 180
+        require_noti = "1" if (self._guardrails_gf("require_noti", "1") or "1").strip() not in (
+            "0",
+            "false",
+            "no",
+            "n",
+        ) else "0"
+        skip_normal = "1" if (self._guardrails_gf("skip_normal", "1") or "1").strip() not in (
+            "0",
+            "false",
+            "no",
+            "n",
+        ) else "0"
+
+        fam = self._guardrails_resolve_ssh_family("fault_alarm")
+        oru_host, how = self._guardrails_ru_ssh_target(fam)
+        if not oru_host:
+            return "FAIL", f"RU SSH 대상 없음: {how}"
+        oru_id = self._guardrails_gf("oru_cli_id")
+        oru_pw = self._guardrails_gf("oru_cli_pw")
+        if not oru_id:
+            return "FAIL", "RU SSH ID 필요 (Settings)"
+
+        # CallHome listen plane: untag controller
+        try:
+            self._apply_lab_controller_listen_ips("untag")
+        except Exception:
+            pass
+
+        local_ip = ""
+        allowed_ip = ""
+        try:
+            if fam == "v6":
+                local_ip = self._guardrails_strip_ip_cidr(
+                    (self.fields.get("LOCAL_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+                )
+                allowed_ip = self._guardrails_strip_ip_cidr(
+                    (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+                )
+            else:
+                local_ip = self._guardrails_strip_ip_cidr(
+                    (self.fields.get("LOCAL_IP").get() or "").strip()  # type: ignore[union-attr]
+                )
+                allowed_ip = self._guardrails_strip_ip_cidr(
+                    (self.fields.get("ALLOWED_IP").get() or "").strip()  # type: ignore[union-attr]
+                )
+        except Exception:
+            pass
+        if not local_ip:
+            local_ip = self._lab_controller_listen_ip(fam, "untag")
+        if not allowed_ip:
+            allowed_ip = oru_host
+        if not local_ip or not allowed_ip:
+            return "FAIL", "LOCAL_IP / ALLOWED_IP(또는 RU IP) 필요"
+
+        ssh_user = self.remote_user.get().strip()
+        ssh_host = self.remote_host.get().strip()
+        ssh_port = self.remote_port.get().strip() or "22"
+        ssh_password = self.remote_password.get()
+        key_path = (self.remote_key_path.get() or "").strip()
+        if not ssh_user or not ssh_host:
+            return "FAIL", "Settings SSH_USER/SSH_HOST 필요"
+
+        try:
+            import paramiko  # type: ignore
+        except Exception as exc:
+            return "FAIL", f"paramiko 필요: {exc}"
+
+        opts = self._conformance_default_run_options()
+        remote_dir = opts.remote_dir.rstrip("/")
+        cfg_remote = f"{remote_dir}/{_conf_manifest.CONFORMANCE_REMOTE_GUI_CONFIG_NAME}"
+        lp = self._conformance_script_local_path(helper)
+        if lp is None:
+            cand = self._conformance_local_dir() / helper
+            if cand.is_file():
+                lp = cand
+        if lp is None:
+            return "FAIL", f"로컬 헬퍼 없음: {helper}"
+
+        n_faults = 40  # information 표 기준 상한 (실제 개수는 remote catalog)
+        hard_cap = float(listen_to) + float(alarm_to) * max(1, n_faults) * 2.5 + 120.0
+
+        self._guardrails_log(
+            f"[fault_alarm] session batch ALL from information oran fam={fam} "
+            f"oru={oru_host} listen={local_ip}:{4334} ≤{listen_to}s hard={hard_cap:.0f}s "
+            f"(PASS=raise/clear NETCONF noti)"
+        )
+        if getattr(self, "is_running", False):
+            self._guardrails_log(
+                "[fault_alarm] 경고: GUI Start(CallHome)가 켜져 있으면 포트 충돌 가능 — 중지 권장"
+            )
+
+        client: Any = None
+        captured: list[str] = []
+        try:
+            try:
+                self._conformance_cancel_event.clear()
+            except Exception:
+                pass
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(
+                hostname=ssh_host,
+                port=int(ssh_port),
+                username=ssh_user,
+                password=ssh_password if ssh_password else None,
+                key_filename=key_path if key_path else None,
+                timeout=20,
+                auth_timeout=20,
+                banner_timeout=20,
+                look_for_keys=not bool(ssh_password),
+                allow_agent=True,
+            )
+            _stdin, _stdout, _stderr = client.exec_command(f"mkdir -p {shlex.quote(remote_dir)}")
+            _stdout.channel.recv_exit_status()
+            sftp = client.open_sftp()
+            rp = f"{remote_dir}/{helper}"
+            try:
+                raw = lp.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+                sftp.putfo(io.BytesIO(raw), rp, len(raw))
+                try:
+                    sftp.chmod(rp, 0o755)
+                except OSError:
+                    pass
+                self._guardrails_log(f"uploaded {helper}")
+            except Exception as exc:
+                return "FAIL", f"업로드 실패: {exc}"
+            try:
+                cfg_payload = self._conformance_effective_config_json_text()
+                sftp.putfo(io.BytesIO(cfg_payload.encode("utf-8")), cfg_remote, len(cfg_payload.encode("utf-8")))
+            except Exception as exc:
+                self._guardrails_log(f"[WARN] config 갱신 실패: {exc}")
+            # 템플릿 {source_id} 는 bash 인용에서 깨짐 → base64 로 env 파일 전달
+            import base64 as _b64
+
+            env_remote = f"{remote_dir}/mplane_fault_alarm.env.sh"
+            raise_b64 = _b64.b64encode(raise_tmpl.encode("utf-8")).decode("ascii")
+            clear_b64 = _b64.b64encode(clear_tmpl.encode("utf-8")).decode("ascii")
+            env_lines = [
+                "#!/usr/bin/env bash",
+                f"export LOCAL_IP={shlex.quote(local_ip)}",
+                f"export ALLOWED_IP={shlex.quote(allowed_ip)}",
+                f"export FAULT_IDS=all",
+                f"export SHOW_CMD={shlex.quote(show_cmd)}",
+                f"export ACTIVE_SHOW_CMD={shlex.quote(active_show_cmd)}",
+                f"export RAISE_TMPL_B64={shlex.quote(raise_b64)}",
+                f"export CLEAR_TMPL_B64={shlex.quote(clear_b64)}",
+                f"export SOURCE_ID={shlex.quote(source_id)}",
+                f"export ALARM_TIMEOUT_SEC={int(alarm_to)}",
+                f"export CALLHOME_LISTEN_TIMEOUT={int(listen_to)}",
+                f"export ORU_CLI_ID={shlex.quote(oru_id)}",
+                f"export ORU_CLI_PW={shlex.quote(oru_pw)}",
+                f"export ORU_SSH_IP={shlex.quote(oru_host)}",
+                f"export SSH_FAMILY={shlex.quote(fam)}",
+                f"export REQUIRE_NOTI={shlex.quote(require_noti)}",
+                f"export SKIP_NORMAL={shlex.quote(skip_normal)}",
+                "",
+            ]
+            env_body = "\n".join(env_lines).replace("\r\n", "\n").replace("\r", "\n")
+            env_bytes = env_body.encode("utf-8")
+            try:
+                sftp.putfo(io.BytesIO(env_bytes), env_remote, len(env_bytes))
+                try:
+                    sftp.chmod(env_remote, 0o644)
+                except OSError:
+                    pass
+                self._guardrails_log(f"uploaded mplane_fault_alarm.env.sh (tmpl via base64)")
+            except Exception as exc:
+                return "FAIL", f"env 업로드 실패: {exc}"
+            try:
+                sftp.close()
+            except Exception:
+                pass
+
+            envp = self._conformance_bash_env_exports(opts, None)
+            host_log = self._conformance_host_run_log_path(helper)
+            dir_q = shlex.quote(str(PurePosixPath(host_log).parent))
+            log_q = shlex.quote(host_log)
+            rp_q = shlex.quote(rp)
+            cfg_q = shlex.quote(cfg_remote)
+            env_q = shlex.quote(env_remote)
+            runner = (
+                f"{envp}"
+                f"set -a ; . {env_q} ; set +a ; "
+                f"export CONFORMANCE_SCRIPT_BASENAME={shlex.quote(helper)} ; "
+                f"chmod +x {rp_q} 2>/dev/null ; bash {rp_q} --config {cfg_q}"
+            )
+            wrapped = (
+                f"set -o pipefail; "
+                f"mkdir -p {dir_q} && : > {log_q} && chmod 0644 {log_q} || exit 1; "
+                f"( {runner} ) 2>&1 | tee -a {log_q}; "
+                "_cf_rc=${PIPESTATUS[0]}; "
+                'exit "${_cf_rc:-0}"'
+            )
+            cmd_remote = "bash -lc " + shlex.quote(wrapped)
+            self._guardrails_log(f"---- START {helper} ----")
+            self._guardrails_log(f"remote host log: {host_log}")
+            self._guardrails_log(
+                f"[fault_alarm] env RAISE={raise_tmpl!r} CLEAR={clear_tmpl!r} "
+                f"ids=information-oran-all SKIP_NORMAL={skip_normal} (noti-only pass)"
+            )
+            _stdin, stdout, stderr = client.exec_command(cmd_remote, get_pty=True)
+            ch = stdout.channel
+            with self._conformance_run_transport_lock:
+                self._conformance_run_script_channel = ch
+            t0 = time.monotonic()
+            while not ch.exit_status_ready():
+                if self._guardrails_cancel.is_set() or self._conformance_cancel_event.is_set():
+                    try:
+                        ch.close()
+                    except Exception:
+                        pass
+                    try:
+                        client.exec_command(
+                            f"pkill -f {shlex.quote(helper)} 2>/dev/null; "
+                            f"fuser -k 4334/tcp 2>/dev/null || true"
+                        )
+                    except Exception:
+                        pass
+                    with self._conformance_run_transport_lock:
+                        self._conformance_run_script_channel = None
+                    return "FAIL", "사용자 중지"
+                if time.monotonic() - t0 > hard_cap:
+                    try:
+                        ch.close()
+                    except Exception:
+                        pass
+                    with self._conformance_run_transport_lock:
+                        self._conformance_run_script_channel = None
+                    detail = self._guardrails_format_fault_alarm_detail("\n".join(captured))
+                    return "FAIL", f"타임아웃 ({hard_cap:.0f}s)\n\n{detail}"
+                if ch.recv_ready():
+                    chunk = ch.recv(4096).decode(errors="ignore")
+                    if chunk:
+                        for line in chunk.splitlines():
+                            captured.append(line)
+                            self._guardrails_log(line)
+                else:
+                    time.sleep(0.15)
+            # drain
+            try:
+                rest = stdout.read().decode(errors="ignore")
+                if rest:
+                    for line in rest.splitlines():
+                        captured.append(line)
+                        self._guardrails_log(line)
+            except Exception:
+                pass
+            rc = ch.recv_exit_status()
+            with self._conformance_run_transport_lock:
+                self._conformance_run_script_channel = None
+            raw_out = "\n".join(captured)
+            detail = self._guardrails_format_fault_alarm_detail(raw_out)
+            status = "PASS" if rc == 0 and "PASS" in raw_out else "FAIL"
+            # prefer SUMMARY line
+            msum = re.search(r"===SUMMARY===\s*\n([^\n]+)", raw_out)
+            if msum:
+                head = msum.group(1).strip()
+                if head.upper().startswith("PASS"):
+                    status = "PASS"
+                elif head.upper().startswith("FAIL"):
+                    status = "FAIL"
+                detail = f"{head}\n\n{detail}"
+            else:
+                detail = f"rc={rc}\n\n{detail}"
+            return status, detail
+        except Exception as exc:
+            return "FAIL", f"fault_alarm 실행 오류: {exc}\n\n" + self._guardrails_format_fault_alarm_detail(
+                "\n".join(captured)
+            )
+        finally:
+            try:
+                if client is not None:
+                    client.close()
+            except Exception:
+                pass
+
     def _guardrails_run_one(self, item_id: str) -> tuple[str, str]:
         """Return (PASS|FAIL|INFO|SKIP, detail)."""
         self._guardrails_settings_item_id = item_id
@@ -11689,7 +12620,19 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             return self._guardrails_run_dhcp_boot()
         if item_id == "vlan_discovery":
             return self._guardrails_run_vlan_discovery()
-        if item_id in ("netconf_capability", "config_states", "performance_mgmt"):
+        if item_id == "fault_alarm":
+            return self._guardrails_run_fault_alarm()
+        if item_id in (
+            "netconf_capability",
+            "config_states",
+            "config_admin_state",
+            "config_oper_state",
+            "config_availability_state",
+            "config_usage_state",
+            "performance_mgmt",
+        ):
+            if item_id == "performance_mgmt":
+                return "SKIP", "목록 등록만 — O-RAN Player 연동 후 구현"
             return "SKIP", "목록 등록만 — 추후 구현"
         return "SKIP", f"미정의 항목: {item_id}"
 
@@ -11878,6 +12821,64 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         self._guardrails_detail_text = None
         self._guardrails_rebuild_list()
 
+    @staticmethod
+    def _guardrails_fault_alarm_rows_from_legacy_detail(full: str) -> list[tuple[str, ...]]:
+        """Parse old multi-line raise/clear detail → Treeview rows."""
+        rows: list[tuple[str, ...]] = []
+
+        def _parse_wall(s: str):
+            s = (s or "").strip().replace("T", " ").replace("Z", "")
+            s = re.sub(r"\.\d+$", "", s)
+            try:
+                return datetime.strptime(s[:19], "%Y-%m-%d %H:%M:%S")
+            except Exception:
+                return None
+
+        def _delta(a: str, b: str, ok: str) -> str:
+            if (ok or "").upper() != "OK":
+                return "TIMEOUT"
+            ta, tb = _parse_wall(a), _parse_wall(b)
+            if ta is None or tb is None:
+                return "—"
+            sec = max(0.0, (tb - ta).total_seconds())
+            return str(int(sec)) if sec == int(sec) else f"{sec:.1f}"
+
+        # catalog map from "[2] ..." lines if present
+        names: dict[str, tuple[str, str, str]] = {}
+        for ln in (full or "").splitlines():
+            m = re.search(
+                r"alarm-id\s+(\d+)\s*:\s*fault-id=(\S+)\s+(\S+)\s+(.+)$",
+                ln.strip(),
+            )
+            if m:
+                names[m.group(1)] = (m.group(2), m.group(3), m.group(4).strip())
+
+        blocks = re.split(r"(?m)^\s*alarm-id\s+(\d+)\s*(?:\([^)]*\))?\s*:\s*(PASS|FAIL)\s*$", full or "")
+        # split → [pre, id, result, body, id, result, body, ...]
+        i = 1
+        while i + 2 <= len(blocks):
+            aid = blocks[i].strip()
+            fr = blocks[i + 1].strip().upper()
+            body = blocks[i + 2] if i + 2 < len(blocks) else ""
+            i += 3
+            m_r = re.search(
+                r"raise\s+noti=(\S+)\s+sent=(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+wall=(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})",
+                body,
+            )
+            m_c = re.search(
+                r"clear\s+noti=(\S+)\s+sent=(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+wall=(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})",
+                body,
+            )
+            rs = _delta(m_r.group(2), m_r.group(3), m_r.group(1)) if m_r else "—"
+            cs = _delta(m_c.group(2), m_c.group(3), m_c.group(1)) if m_c else "—"
+            fid, sev, name = names.get(aid, ("", "", ""))
+            if not name:
+                m_n = re.search(rf"alarm-id\s+{re.escape(aid)}\s*\(([^)]+)\)\s*:\s*{fr}", full or "")
+                if m_n:
+                    name = m_n.group(1).strip()
+            rows.append((fr, aid, fid, sev, name, rs, cs))
+        return rows
+
     def _guardrails_open_result_detail(self, item_id: str) -> None:
         """Popup full result (진행 로그는 Logs 창)."""
         store = getattr(self, "_guardrails_detail_by_id", None) or {}
@@ -11896,20 +12897,85 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         win = tk.Toplevel(self)
         win.title(f"M-Plane Test 상세 — {item_id}")
         try:
-            win.geometry(getattr(self, "guardrails_detail_win_geometry", None) or "900x520")
+            win.geometry(getattr(self, "guardrails_detail_win_geometry", None) or "980x560")
         except Exception:
-            win.geometry("900x520")
-        win.minsize(480, 280)
+            win.geometry("980x560")
+        win.minsize(520, 300)
         fr = ttk.Frame(win, padding=8)
         fr.pack(fill="both", expand=True)
+
+        # fault_alarm: 표(결과/발생/해지) + 아래 요약 텍스트
+        result_rows: list[tuple[str, ...]] = []
+        if item_id == "fault_alarm":
+            for ln in (full or "").splitlines():
+                if not ln.startswith("RESULT_ROW|"):
+                    continue
+                parts = ln.split("|")
+                if len(parts) >= 8:
+                    result_rows.append(
+                        (
+                            parts[1],
+                            parts[2],
+                            parts[3],
+                            parts[4],
+                            parts[5],
+                            parts[6],
+                            parts[7],
+                        )
+                    )
+            # 구 포맷(다줄 raise/clear) 폴백
+            if not result_rows:
+                result_rows = self._guardrails_fault_alarm_rows_from_legacy_detail(full)
+
+        row0 = 0
+        if result_rows:
+            treef = ttk.Frame(fr)
+            treef.grid(row=0, column=0, columnspan=2, sticky="nsew", pady=(0, 8))
+            cols = ("result", "aid", "fid", "sev", "name", "raise_s", "clear_s")
+            tv = ttk.Treeview(treef, columns=cols, show="headings", height=min(18, max(6, len(result_rows))))
+            tv.heading("result", text="결과")
+            tv.heading("aid", text="alarm-id")
+            tv.heading("fid", text="fault-id")
+            tv.heading("sev", text="severity")
+            tv.heading("name", text="name")
+            tv.heading("raise_s", text="발생(s)")
+            tv.heading("clear_s", text="해지(s)")
+            tv.column("result", width=64, anchor="center", stretch=False)
+            tv.column("aid", width=72, anchor="center", stretch=False)
+            tv.column("fid", width=72, anchor="center", stretch=False)
+            tv.column("sev", width=88, anchor="center", stretch=False)
+            tv.column("name", width=280, anchor="w", stretch=True)
+            tv.column("raise_s", width=72, anchor="e", stretch=False)
+            tv.column("clear_s", width=72, anchor="e", stretch=False)
+            tv.tag_configure("PASS", foreground="#15803d")
+            tv.tag_configure("FAIL", foreground="#b91c1c")
+            for r in result_rows:
+                tv.insert("", "end", values=r, tags=(r[0],))
+            ys_t = ttk.Scrollbar(treef, orient="vertical", command=tv.yview)
+            tv.configure(yscrollcommand=ys_t.set)
+            tv.grid(row=0, column=0, sticky="nsew")
+            ys_t.grid(row=0, column=1, sticky="ns")
+            treef.rowconfigure(0, weight=1)
+            treef.columnconfigure(0, weight=1)
+            row0 = 1
+            # hide RESULT_ROW noise from text body
+            body_lines = [
+                ln
+                for ln in body.splitlines()
+                if not ln.startswith("RESULT_ROW|")
+                and ln.strip() not in ("===RESULT_TABLE_BEGIN===", "===RESULT_TABLE_END===")
+                and not ln.strip().startswith("# result|alarm_id|")
+            ]
+            body = "\n".join(body_lines)
+
         txt = tk.Text(fr, wrap="none", font=("Consolas", 10))
         ys = ttk.Scrollbar(fr, orient="vertical", command=txt.yview)
         xs = ttk.Scrollbar(fr, orient="horizontal", command=txt.xview)
         txt.configure(yscrollcommand=ys.set, xscrollcommand=xs.set)
-        txt.grid(row=0, column=0, sticky="nsew")
-        ys.grid(row=0, column=1, sticky="ns")
-        xs.grid(row=1, column=0, sticky="ew")
-        fr.rowconfigure(0, weight=1)
+        txt.grid(row=row0, column=0, sticky="nsew")
+        ys.grid(row=row0, column=1, sticky="ns")
+        xs.grid(row=row0 + 1, column=0, sticky="ew")
+        fr.rowconfigure(row0, weight=1)
         fr.columnconfigure(0, weight=1)
         txt.insert("1.0", body)
         txt.configure(state="disabled")
@@ -11986,7 +13052,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         iid = self._guardrails_selected_item_id()
         self._guardrails_settings_item_id = iid
         self._guardrails_fill_defaults_from_context(iid)
-        if iid in self._GUARDRAILS_DHCP_ITEM_IDS or iid == "vlan_discovery":
+        if iid in self._GUARDRAILS_DHCP_ITEM_IDS:
             fam = self._guardrails_resolve_ssh_family(iid)
         else:
             fam = self._guardrails_item_family(iid)
@@ -12174,85 +13240,65 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             messagebox.showwarning("M-Plane Test", "검증할 항목을 하나 이상 선택하세요.")
             return
         dhcp_sel = [i for i in selected if i in self._GUARDRAILS_DHCP_ITEM_IDS]
-        vlan_sel = [i for i in selected if i == "vlan_discovery"]
-        if dhcp_sel or vlan_sel:
-            for iid in dhcp_sel + vlan_sel:
+        if dhcp_sel:
+            for iid in dhcp_sel:
                 self._guardrails_settings_item_id = iid
                 self._guardrails_fill_defaults_from_context(iid)
-                if iid in self._GUARDRAILS_DHCP_ITEM_IDS:
-                    fam = self._guardrails_item_family(iid)
-                    mode = self._guardrails_item_mode(iid)
-                    if self._guardrails_gf("dhcp_host") and not self._guardrails_gf("dhcp_id"):
-                        messagebox.showwarning("M-Plane Test", "DHCP SSH host가 있으면 DHCP SSH ID도 필요합니다.")
+                fam = self._guardrails_item_family(iid)
+                mode = self._guardrails_item_mode(iid)
+                if self._guardrails_gf("dhcp_host") and not self._guardrails_gf("dhcp_id"):
+                    messagebox.showwarning("M-Plane Test", "DHCP SSH host가 있으면 DHCP SSH ID도 필요합니다.")
+                    self._guardrails_open_settings(iid)
+                    return
+                if mode == "vlan":
+                    if not self._guardrails_gf("l2sw_ip") or not self._guardrails_gf("l2sw_id"):
+                        messagebox.showwarning("M-Plane Test", "VLAN Discovery: ⚙ L2SW IP/ID 필요.")
                         self._guardrails_open_settings(iid)
                         return
-                    if mode == "vlan":
-                        if not self._guardrails_gf("l2sw_ip") or not self._guardrails_gf("l2sw_id"):
-                            messagebox.showwarning("M-Plane Test", "VLAN Discovery: ⚙ L2SW IP/ID 필요.")
-                            self._guardrails_open_settings(iid)
-                            return
-                        if not (self._guardrails_gf("vlan_discovery_vid") or "").strip():
-                            messagebox.showwarning("M-Plane Test", "VLAN Discovery: ⚙ ★ 시험 VLAN ID 필요.")
-                            self._guardrails_open_settings(iid)
-                            return
-                    # Capture IF / L2SW IF / RU MAC 은 실행 시 자동 조회
-                    host, how = self._guardrails_ru_ssh_target(fam)
-                    if not host:
+                    if not (self._guardrails_gf("vlan_discovery_vid") or "").strip():
+                        messagebox.showwarning("M-Plane Test", "VLAN Discovery: ⚙ ★ 시험 VLAN ID 필요.")
+                        self._guardrails_open_settings(iid)
+                        return
+                # Capture IF / L2SW IF / RU MAC 은 실행 시 자동 조회
+                host, how = self._guardrails_ru_ssh_target(fam)
+                if not host:
+                    messagebox.showwarning(
+                        "M-Plane Test",
+                        f"[{fam}] SSH 대상 불가: {how}\n⚙ 확인.",
+                    )
+                    self._guardrails_open_settings(iid)
+                    return
+                if not self._guardrails_gf("oru_cli_id"):
+                    messagebox.showwarning("M-Plane Test", "RU SSH ID가 필요합니다 (Settings ★ RU SSH ID).")
+                    self._guardrails_open_settings(iid)
+                    return
+                if fam == "v6":
+                    try:
+                        self._apply_lab_controller_listen_ips("untag")
+                    except Exception:
+                        pass
+                    lv6 = ""
+                    av6 = ""
+                    try:
+                        lv6 = (self.fields.get("LOCAL_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+                        av6 = (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
+                    except Exception:
+                        pass
+                    if not lv6:
+                        lv6 = self._lab_controller_listen_ip("v6", "untag")
+                    rmode = (self._guardrails_gf("reset_mode", "auto") or "auto").strip().lower()
+                    if rmode not in ("0", "manual", "prompt", "none", "off") and (
+                        not lv6 or not av6 or ":" not in lv6 or ":" not in av6
+                    ):
                         messagebox.showwarning(
                             "M-Plane Test",
-                            f"[{fam}] SSH 대상 불가: {how}\n⚙ 확인.",
+                            f"{iid} M-Plane reset(IPv6)에는 Settings의\n"
+                            "★ ALLOWED_IP_V6 (global IPv6)가 필요합니다.\n"
+                            "(LOCAL_IP_V6는 untag/tag 자동)\n"
+                            "또는 항목 ⚙ Reset mode=manual.",
                         )
-                        self._guardrails_open_settings(iid)
                         return
-                    if not self._guardrails_gf("oru_cli_id"):
-                        messagebox.showwarning("M-Plane Test", "RU SSH ID가 필요합니다 (Settings ★ RU SSH ID).")
-                        self._guardrails_open_settings(iid)
-                        return
-                    if fam == "v6":
-                        try:
-                            self._apply_lab_controller_listen_ips("untag")
-                        except Exception:
-                            pass
-                        lv6 = ""
-                        av6 = ""
-                        try:
-                            lv6 = (self.fields.get("LOCAL_IP_V6").get() or "").strip()  # type: ignore[union-attr]
-                            av6 = (self.fields.get("ALLOWED_IP_V6").get() or "").strip()  # type: ignore[union-attr]
-                        except Exception:
-                            pass
-                        if not lv6:
-                            lv6 = self._lab_controller_listen_ip("v6", "untag")
-                        rmode = (self._guardrails_gf("reset_mode", "auto") or "auto").strip().lower()
-                        if rmode not in ("0", "manual", "prompt", "none", "off") and (
-                            not lv6 or not av6 or ":" not in lv6 or ":" not in av6
-                        ):
-                            messagebox.showwarning(
-                                "M-Plane Test",
-                                f"{iid} M-Plane reset(IPv6)에는 Settings의\n"
-                                "★ ALLOWED_IP_V6 (global IPv6)가 필요합니다.\n"
-                                "(LOCAL_IP_V6는 untag/tag 자동)\n"
-                                "또는 항목 ⚙ Reset mode=manual.",
-                            )
-                            return
-                else:
-                    fam = self._guardrails_resolve_ssh_family(iid)
-                    if iid == "vlan_discovery" and not self._guardrails_gf("expected_vid"):
-                        messagebox.showwarning("M-Plane Test", "VLAN Discovery: ⚙ Expected VID를 입력하세요.")
-                        self._guardrails_open_settings(iid)
-                        return
-                    host, how = self._guardrails_ru_ssh_target(fam)
-                    if not host:
-                        messagebox.showwarning(
-                            "M-Plane Test",
-                            f"SSH 대상 불가: {how}\n⚙ 확인.",
-                        )
-                        self._guardrails_open_settings(iid)
-                        return
-                    if not self._guardrails_gf("oru_cli_id"):
-                        messagebox.showwarning("M-Plane Test", "RU SSH ID가 필요합니다 (Settings ★ RU SSH ID).")
-                        self._guardrails_open_settings(iid)
-                        return
-            labels = [i for i in self._guardrails_catalog() if i["id"] in (dhcp_sel + vlan_sel)]
+            labels = [i for i in self._guardrails_catalog() if i["id"] in dhcp_sel]
             label_txt = ", ".join(x.get("ref") or x["id"] for x in labels)
             tips = []
             boot_sel = [i for i in dhcp_sel if self._guardrails_item_mode(i) == "boot"]
@@ -12265,8 +13311,6 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 tips.append(
                     "VLAN Discovery: ACL + vlan/trunk → Discovery → renew/원복 + Option tcpdump"
                 )
-            if vlan_sel and (self._guardrails_gf("require_reboot") or "1") not in ("0", "false"):
-                tips.append("VLAN(legacy): SKIP — MP-DHCPv*-VLAN 항목 사용")
             if repeat_count == 0:
                 tips.append("반복: 무한(중지 버튼으로 종료)")
             elif repeat_count > 1:
