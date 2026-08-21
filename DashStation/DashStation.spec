@@ -5,7 +5,7 @@ a = Analysis(
     ['Dashstation_final.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('app_icon1.ico', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

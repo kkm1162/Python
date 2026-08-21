@@ -159,17 +159,27 @@ if [[ "$RESULT3" != "OK" ]]; then
 	exit 1
 fi
 
-# 부정 시험: 1회 supervision 알림 + watchdog → STEP4 OK, 이후 watchdog 안 보내서 세션 끊김 기대
+# 부정 시험: N회 supervision 알림 + watchdog → STEP4 OK, 이후 watchdog 안 보내서 세션 끊김 기대
 # pretty-print body 줄 "^<supervision-notification" 으로 1건당 1줄만 카운트
 NEEDED="${SUPERVISION_NEEDED:-1}"
+SUPERVISION_INTERVAL="${SUPERVISION_INTERVAL:-60}"
+[[ "${NEEDED}" =~ ^[0-9]+$ ]] || NEEDED=1
+[[ "${SUPERVISION_INTERVAL}" =~ ^[0-9]+$ ]] || SUPERVISION_INTERVAL=60
+_per_cycle=$(( SUPERVISION_INTERVAL + 130 ))
+_max_sec=$(( NEEDED * _per_cycle + 120 ))
+if (( _max_sec < 600 )); then
+	_max_sec=600
+fi
+_to_iter=$(( _max_sec * 4 ))
+echo "[INFO] SUPERVISION_NEEDED=${NEEDED} interval=${SUPERVISION_INTERVAL}s wait_max=${_max_sec}s (phase=watchdog)"
 notif_seen=0
 RESULT4="NOK"
-for _w in $(seq 1 2400); do
+for _w in $(seq 1 "$_to_iter"); do
 	_cnt=$(grep -acE '^\s*<supervision-notification' "$LOG" 2>/dev/null)
 	if [[ "${_cnt:-0}" =~ ^[0-9]+$ ]] && (( _cnt > notif_seen )); then
 		send_cmd "user-rpc --content $WT_XML --out ${NETCONF_TMP}/watchdog_rpc_reply.xml"
 		notif_seen=$_cnt
-		echo "[INFO] supervision notification #${notif_seen} detected, watchdog sent"
+		echo "[INFO] supervision notification #${notif_seen}/${NEEDED} detected, watchdog sent"
 		if (( notif_seen >= NEEDED )); then
 			RESULT4="OK"
 			break
@@ -177,6 +187,9 @@ for _w in $(seq 1 2400); do
 	fi
 	sleep 0.25
 done
+if [[ "$RESULT4" != "OK" ]]; then
+	echo "[WARN] supervision incomplete: seen=${notif_seen} needed=${NEEDED} (wait_max=${_max_sec}s)"
+fi
 
 echo "STEP 4. Criteria : Supervision Notification"
 echo "STEP 4. Supervision : $RESULT4"
@@ -185,10 +198,16 @@ if [[ "$RESULT4" != "OK" ]]; then
 	exit 1
 fi
 
-# watchdog 안 보내면 ORU가 세션 끊음 → EOF 발생. supervision interval + guard 여유 시간
+# watchdog 안 보내면 ORU가 세션 끊음 → EOF 발생. supervision interval + guard 여유
+_eof_max_sec=$(( SUPERVISION_INTERVAL + 200 ))
+if (( _eof_max_sec < 600 )); then
+	_eof_max_sec=600
+fi
+_eof_iter=$(( _eof_max_sec * 4 ))
+echo "[INFO] waiting EOF after watchdog stop: max=${_eof_max_sec}s"
 RESULT5="NOK"
 EOF_PAT="SSH channel unexpected EOF."
-for _w in $(seq 1 2400); do
+for _w in $(seq 1 "$_eof_iter"); do
 	if grep -a -F "$EOF_PAT" "$LOG" >/dev/null 2>&1; then
 		RESULT5="OK"
 		break

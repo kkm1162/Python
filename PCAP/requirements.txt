@@ -1,0 +1,3 @@
+scapy>=2.5.0
+
+# EXE 빌드 (선택): pip install pyinstaller>=6.0 && build.bat

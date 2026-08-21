@@ -92,13 +92,61 @@ def build_packet(config, pkt_size):
         pad_len = max(0, pkt_size - l2_len - len(ptp_hdr))
         pkt = l2_ptp / Raw(load=ptp_hdr + (b'\x00' * pad_len))
 
-    elif 'NETCONF' in atype or 'TCP' in atype:
+    elif 'TCP SYN' in atype:
+        # 실제 TCP SYN 핸드셰이크와 유사한 구조:
+        # flags=SYN, Window=14600, Options(MSS/SACK/Timestamp/NOP/WScale), payload 없음
+        src_ip = config.get('src_ip', '192.168.11.100')
+        dst_ip = config.get('dst_ip', '192.168.11.2')
+        dst_port = int(config.get('dst_port', 80) or 80)
+        synack_only = bool(config.get('tcp_synack_only'))
+        tcp_flags = 'SA' if synack_only else 'S'
+        sport = random.randint(1024, 65535)
+        seq = random.randint(0, 0xFFFFFFFF)
+        tsval = random.randint(1, 0xFFFFFFFF)
+        tcp_kwargs = dict(
+            sport=sport,
+            dport=dst_port,
+            seq=seq,
+            ack=0,
+            flags=tcp_flags,
+            window=14600,
+        )
+        # Scapy 버전별 SAckOK 표현 차이 대응
+        for sack_val in (b'', '', None):
+            try:
+                tcp_opts = [
+                    ('MSS', 1460),
+                    ('SAckOK', sack_val),
+                    ('Timestamp', (tsval, 0)),
+                    ('NOP', None),
+                    ('WScale', 4),
+                ]
+                base_pkt = l2_ip / IP(src=src_ip, dst=dst_ip) / TCP(options=tcp_opts, **tcp_kwargs)
+                # 옵션 직렬화 검증
+                bytes(base_pkt)
+                break
+            except Exception:
+                base_pkt = None
+        if base_pkt is None:
+            base_pkt = l2_ip / IP(src=src_ip, dst=dst_ip) / TCP(**tcp_kwargs)
+        # SYN(또는 SYN-ACK only)는 TCP payload를 넣지 않음 (Wireshark Len=0)
+        pkt = base_pkt
+
+    elif 'NETCONF' in atype:
         src_ip = config.get('src_ip', '192.168.11.100')
         dst_ip = config.get('dst_ip', '192.168.11.2')
         dst_port = int(config.get('dst_port', 830) or 830)
-        base_pkt = l2_ip / IP(src=src_ip, dst=dst_ip) / TCP(dport=dst_port, flags='S')
-        pad_len = max(0, pkt_size - len(base_pkt))
-        pkt = base_pkt / Raw(load=b'\x00' * pad_len)
+        # tcp_synack_only: Wireshark Conversation Completeness에서
+        # SYN-ACK만 Present(1), RST/FIN/Data/ACK/SYN은 Absent(0)가 되도록
+        # TCP flags=SYN+ACK 이고 payload(Len=0)를 넣지 않는다.
+        synack_only = bool(config.get('tcp_synack_only'))
+        tcp_flags = 'SA' if synack_only else 'S'
+        base_pkt = l2_ip / IP(src=src_ip, dst=dst_ip) / TCP(dport=dst_port, flags=tcp_flags)
+        if synack_only:
+            pkt = base_pkt
+        else:
+            pad_len = max(0, pkt_size - len(base_pkt))
+            pkt = base_pkt / Raw(load=b'\x00' * pad_len)
 
     elif 'GTP' in atype:
         src_ip = config.get('src_ip', '192.168.11.100')
@@ -156,19 +204,46 @@ def apply_mutations(pkt, config):
             if hasattr(pkt[UDP], 'chksum'):
                 del pkt[UDP].chksum
 
+    # invalid_length / malformed_ecpri 는 "캡처 프레임 길이"를 바꾸지 않고
+    # 헤더 안의 length 필드만 실제 크기와 불일치하도록 변조한다.
+    if invalid_length:
+        actual_l3 = None
+        if pkt.haslayer(IP):
+            # IP Total Length 를 실제 L3 크기와 다른 값으로 설정
+            actual_l3 = len(pkt[IP])
+            wrong = actual_l3
+            while wrong == actual_l3:
+                wrong = random.choice([0, 1, 20, 40, 65535, random.randint(1, 65535)])
+            pkt[IP].len = wrong
+            del pkt[IP].chksum
+            if pkt.haslayer(TCP) and hasattr(pkt[TCP], 'chksum'):
+                del pkt[TCP].chksum
+            if pkt.haslayer(UDP):
+                # UDP Length 도 실제와 불일치시킴
+                actual_udp = len(pkt[UDP])
+                udp_wrong = actual_udp
+                while udp_wrong == actual_udp:
+                    udp_wrong = random.choice([0, 1, 8, 65535, random.randint(1, 65535)])
+                pkt[UDP].len = udp_wrong
+                if hasattr(pkt[UDP], 'chksum'):
+                    del pkt[UDP].chksum
+
     raw_bytes = bytearray(bytes(pkt))
+    l2_hlen = 18 if pkt.haslayer(Dot1Q) else 14
 
-    if malformed_ecpri and len(raw_bytes) > 20:
-        offset = 18 if pkt.haslayer(Dot1Q) else 14
-        if len(raw_bytes) > offset + 4:
-            raw_bytes[offset] = 0xFF
-            raw_bytes[offset + 1] = 0xFF
+    if malformed_ecpri and len(raw_bytes) > l2_hlen + 4:
+        # eCPRI common header: byte0/1 변조
+        raw_bytes[l2_hlen] = 0xFF
+        raw_bytes[l2_hlen + 1] = 0xFF
 
-    if invalid_length and len(raw_bytes) > 20:
-        offset = 18 if pkt.haslayer(Dot1Q) else 14
-        if len(raw_bytes) > offset + 4:
-            raw_bytes[offset + 2] = 0xFF
-            raw_bytes[offset + 3] = 0xFF
+    if invalid_length and not pkt.haslayer(IP) and len(raw_bytes) > l2_hlen + 4:
+        # eCPRI/L2 payload: common header payload length(2B)를 실제와 다르게
+        actual_payload = max(0, len(raw_bytes) - l2_hlen - 4)
+        wrong = actual_payload
+        while wrong == actual_payload:
+            wrong = random.choice([0, 1, 0xFFFF, random.randint(0, 0xFFFF)])
+        raw_bytes[l2_hlen + 2] = (wrong >> 8) & 0xFF
+        raw_bytes[l2_hlen + 3] = wrong & 0xFF
 
     return Ether(bytes(raw_bytes))
 

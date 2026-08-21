@@ -850,6 +850,12 @@ class ConformanceMixin:
                 pass
         envp = self._conformance_bash_env_exports(opts, fname)
         per_test_envp = self._conformance_per_test_env_exports(fname)
+        if fname == "conformance_3131.sh":
+            _sn = self._conformance_get_per_test_val(fname, "supervision_cycles").strip() or "3"
+            log_line(f"[INFO] 3.1.3.1 SUPERVISION_NEEDED={_sn} (⚙ Supervision 반복 횟수)")
+        if fname == "conformance_3132.sh":
+            _sn = self._conformance_get_per_test_val(fname, "supervision_cycles").strip() or "1"
+            log_line(f"[INFO] 3.1.3.2 SUPERVISION_NEEDED={_sn} (⚙ 초기 Supervision 횟수)")
         rp_q = shlex.quote(f"{remote_dir}/{fname}")
         cfg_q = shlex.quote(cfg_remote)
         log_q = shlex.quote(host_log_path)

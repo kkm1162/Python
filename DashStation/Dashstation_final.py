@@ -243,13 +243,11 @@ def format_wait_macro_value(target, timeout=10, error_msg=None):
     return target
 
 def macro_steps_define_loop_label(steps):
-    """매크로 단계에 loop 라벨이 이미 있는지 확인"""
+    """사용자가 원문 TTL로 :loop* 라벨을 직접 정의했는지 확인"""
     for step in steps:
         action = step.get("action", "")
         value = str(step.get("value", "")).strip().lower()
         if "원문 TTL" in action and value.startswith(":loop"):
-            return True
-        if "처음으로" in action:
             return True
     return False
 
@@ -294,6 +292,19 @@ def format_pause_display_value(value):
         return str(n)
     except (ValueError, TypeError):
         return str(value)
+
+def get_macro_loop_pause_seconds(session_data, default=2):
+    """매크로 반복(:macro_loop_start) 진입 시 pause 초"""
+    raw = session_data.get("macro_loop_pause", default)
+    return normalize_pause_seconds(raw, default=default)
+
+def write_macro_loop_entry(file_obj, label, pause_seconds=2):
+    """반복 루프 라벨 — 매 회차 flushrecv + pause로 즉시 재진입/잔여 수신 방지"""
+    file_obj.write(f":{label}\n")
+    file_obj.write("flushrecv\n")
+    pause_seconds = normalize_pause_seconds(pause_seconds, default=2)
+    if pause_seconds > 0:
+        file_obj.write(f"pause {pause_seconds}\n")
 
 def read_text_with_fallback(file_path):
     """텍스트 파일 인코딩을 자동 감지해 읽기"""
@@ -451,6 +462,7 @@ class SessionRow:
             'baud_rate': '115200', 'user': '', 'pw': '', 
             'ru_cmd': '', 'ru_pw': '', 'final_cmd': '', 
             'ssh_interval': '2.0', 'moba_interval': '3.0',
+            'macro_loop_pause': '2',
             'timestamp_enabled': False,
             'col_positions': {},  
             'macro_steps': [], 'folder': None
@@ -707,8 +719,9 @@ class SessionRow:
                 
                 with open(os.path.join(MACRO_DIR, f"{name}.ttl"), 'w', encoding='cp949', errors='replace') as f:
                     f.write("; Standalone TeraTerm Macro\n")
+                    loop_pause = get_macro_loop_pause_seconds(self.data)
                     if not macro_steps_define_loop_label(cur_steps):
-                        f.write(":loop_start\n")
+                        write_macro_loop_entry(f, "loop_start", loop_pause)
                     for s in cur_steps:
                         act, val = s['action'], s['value']
                         parsed = parse_macro_value(act, val)
@@ -1044,7 +1057,7 @@ class SessionRow:
         
         flds = [("이름", "name"), ("Moba 간격", "moba_interval"), ("IP / COM / 경로", "ip"), ("SSH 포트", "port"), 
                 ("Baud Rate", "baud_rate"), ("ID", "user"), ("PW", "pw"), ("RU 명령", "ru_cmd"), 
-                ("RU PW", "ru_pw"), ("SSH 간격", "ssh_interval"), ("추가 명령", "final_cmd")]
+                ("RU PW", "ru_pw"), ("SSH 간격", "ssh_interval"), ("반복 시작 대기(초)", "macro_loop_pause"), ("추가 명령", "final_cmd")]
         ents = {}
         v_type = tk.StringVar(value=TYPE_MAP.get(self.data['type']))
         tk.OptionMenu(win, v_type, *TYPE_MAP.values(), command=lambda _: upd()).pack(pady=10)
@@ -1061,7 +1074,7 @@ class SessionRow:
                 dis = (ct == 'C' and k in ['port','user','pw','ru_cmd','ru_pw','ssh_interval','moba_interval']) or \
                       (ct == 'M' and k not in ['name','moba_interval']) or \
                       (ct == 'S' and k in ['baud_rate','moba_interval']) or \
-                      (ct in ['R','P'] and k in ['port','baud_rate','ru_cmd','ru_pw','ssh_interval','moba_interval'])
+                      (ct in ['R','P'] and k in ['port','baud_rate','ru_cmd','ru_pw','ssh_interval','moba_interval','macro_loop_pause'])
                 e.config(state='disabled', bg='#eeeeee') if dis else e.config(state='normal', bg='white')
             
             # '찾기' 버튼 활성화/비활성화 로직
@@ -1236,7 +1249,8 @@ class SessionRow:
                                 f.write("pause 2\n")
                     
                     # 반복은 사용자 매크로 단계만 대상으로 한다.
-                    f.write(":macro_loop_start\n")
+                    loop_pause = get_macro_loop_pause_seconds(d)
+                    write_macro_loop_entry(f, "macro_loop_start", loop_pause)
                     
                     for s in steps:
                         act, val = s['action'], s['value']

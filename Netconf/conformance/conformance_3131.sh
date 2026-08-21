@@ -162,15 +162,25 @@ fi
 # pretty-print body 줄 "^<supervision-notification" 으로 1건당 1줄만 카운트
 # (raw XML 래퍼 줄은 "<notification ..." 으로 시작하므로 제외됨)
 NEEDED="${SUPERVISION_NEEDED:-3}"
+SUPERVISION_INTERVAL="${SUPERVISION_INTERVAL:-60}"
+[[ "${NEEDED}" =~ ^[0-9]+$ ]] || NEEDED=3
+[[ "${SUPERVISION_INTERVAL}" =~ ^[0-9]+$ ]] || SUPERVISION_INTERVAL=60
+# interval 최대 120s + guard — NEEDED 회수만큼 대기 (기존 600s 고정이면 ~10회에서 끊김)
+_per_cycle=$(( SUPERVISION_INTERVAL + 130 ))
+_max_sec=$(( NEEDED * _per_cycle + 120 ))
+if (( _max_sec < 600 )); then
+	_max_sec=600
+fi
+_to_iter=$(( _max_sec * 4 ))
+echo "[INFO] SUPERVISION_NEEDED=${NEEDED} interval=${SUPERVISION_INTERVAL}s wait_max=${_max_sec}s"
 notif_seen=0
 RESULT4="NOK"
-# supervision interval 이 최대 120초일 수 있으므로 넉넉히 600초(2400 * 0.25s)
-for _w in $(seq 1 2400); do
+for _w in $(seq 1 "$_to_iter"); do
 	_cnt=$(grep -acE '^\s*<supervision-notification' "$LOG" 2>/dev/null)
 	if [[ "${_cnt:-0}" =~ ^[0-9]+$ ]] && (( _cnt > notif_seen )); then
 		send_cmd "user-rpc --content $WT_XML --out ${NETCONF_TMP}/watchdog_rpc_reply.xml"
 		notif_seen=$_cnt
-		echo "[INFO] supervision notification #${notif_seen} detected, watchdog sent"
+		echo "[INFO] supervision notification #${notif_seen}/${NEEDED} detected, watchdog sent"
 		if (( notif_seen >= NEEDED )); then
 			RESULT4="OK"
 			break
@@ -178,6 +188,9 @@ for _w in $(seq 1 2400); do
 	fi
 	sleep 0.25
 done
+if [[ "$RESULT4" != "OK" ]]; then
+	echo "[WARN] supervision incomplete: seen=${notif_seen} needed=${NEEDED} (wait_max=${_max_sec}s)"
+fi
 
 echo "STEP 4. Criteria : Supervision Notification / reset"
 echo "STEP 4. Supervision : $RESULT4"

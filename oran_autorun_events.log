@@ -199,3 +199,4 @@
 [2026-04-30 12:38:51] Port 0 AUTO 절체 ready 대기 후 시작 재개
 [2026-04-30 12:38:52] Port 0 시험 시작 reason=auto-switch pcap=000a35000102_uplane_std_random_max_24g.pcap rate=24Gbps duration_min=0.0
 [2026-04-30 12:38:52] COORD 항목 절체(송출 유지) 14400.0초 (240.000분) port=0 idx=1
+[2026-07-24 19:08:51] AUTO 순서 저장 P0=0개 P1=0개

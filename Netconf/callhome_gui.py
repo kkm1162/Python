@@ -5467,6 +5467,10 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             for iid, vals in gfields.items():
                 if isinstance(vals, dict):
                     store[str(iid)] = {str(k): str(v) for k, v in vals.items() if v is not None}
+            try:
+                self._guardrails_migrate_untag_l2sw_ip()
+            except Exception:
+                pass
         for iid in list(getattr(self, "guardrails_check_vars", {}) or {}):
             try:
                 self._guardrails_sync_tree_row(str(iid))
@@ -5563,6 +5567,10 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
                 for iid, vals in gf.items():
                     if isinstance(vals, dict):
                         store[str(iid)] = {str(k): str(v) for k, v in vals.items() if v is not None}
+                try:
+                    self._guardrails_migrate_untag_l2sw_ip()
+                except Exception:
+                    pass
         finally:
             self._config_hydrating = was
             try:
@@ -6911,11 +6919,61 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         except ValueError:
             return default
 
+    def _guardrails_migrate_untag_l2sw_ip(self) -> None:
+        """untag lab (.60) 인데 L2SW 가 .20.50 으로 남은 구 설정 자동 교정."""
+        store = getattr(self, "_guardrails_per_test_settings", None)
+        if not isinstance(store, dict) or not store:
+            return
+        probe60 = False
+        try:
+            allowed = self._guardrails_strip_ip_cidr(
+                (self.fields.get("ALLOWED_IP").get() or "").strip()  # type: ignore[union-attr]
+            )
+            if allowed.startswith("10.0.60."):
+                probe60 = True
+        except Exception:
+            pass
+        if not probe60:
+            for blob in store.values():
+                if not isinstance(blob, dict):
+                    continue
+                pv4 = self._guardrails_strip_ip_cidr(str(blob.get("probe_v4") or ""))
+                if pv4.startswith("10.0.60."):
+                    probe60 = True
+                    break
+        if not probe60:
+            return
+        keys = set(self._GUARDRAILS_DHCP_ITEM_IDS) | {
+            "dhcp_boot_shared",
+            "dhcp_capture_shared",
+            "dhcp_v4_only_boot",
+            "dhcp_v6_only_boot",
+            "dhcp_options",
+            "dhcp_option_identity",
+        }
+        changed = False
+        for sk, blob in list(store.items()):
+            if sk not in keys or not isinstance(blob, dict):
+                continue
+            lip = (blob.get("l2sw_ip") or "").strip()
+            if lip != "10.0.20.50":
+                continue
+            blob["l2sw_ip"] = "10.0.60.50"
+            blob.pop("l2sw_if", None)
+            store[sk] = blob
+            changed = True
+        if changed:
+            self._guardrails_l2sw_if_cache = None
+
     def _guardrails_fill_defaults_from_context(self, item_id: str | None = None) -> None:
         """Prefill empty per-test fields from Settings / Conformance 3151 (in memory only)."""
         iid = item_id or getattr(self, "_guardrails_settings_item_id", None) or "dhcp_v4"
         if not hasattr(self, "_guardrails_per_test_settings") or self._guardrails_per_test_settings is None:
             self._guardrails_per_test_settings = {}
+        try:
+            self._guardrails_migrate_untag_l2sw_ip()
+        except Exception:
+            pass
         sk = self._guardrails_store_key(iid)
         # migrate old per-item blob → shared / merged keys
         if sk not in self._guardrails_per_test_settings:
@@ -9900,6 +9958,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
         )
         if not text or len(n) != 12:
             return ""
+        clean = (text or "").replace("\r", "")
         colon, hyphen, dotted, bare = self._guardrails_mac_display_forms(n)
         mac_pat = re.compile(
             rf"(?:{re.escape(colon)}|{re.escape(hyphen)}|{re.escape(dotted)}|{re.escape(bare)})",
@@ -9912,7 +9971,7 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             re.I,
         )
         hits: list[str] = []
-        for line in (text or "").splitlines():
+        for line in clean.splitlines():
             if not mac_pat.search(line):
                 continue
             if re.search(r"\bCPU\b", line, re.I):
@@ -9926,6 +9985,24 @@ class CallhomeGUI(tk.Tk, ConformanceMixin):
             ifc = self._guardrails_l2sw_normalize_if(f"ethernet {port}")
             if ifc and ifc not in hits:
                 hits.append(ifc)
+        # Some switches wrap MAC and port across adjacent lines.
+        # Fallback: search a nearby window around each MAC hit.
+        if not hits:
+            for mm in mac_pat.finditer(clean):
+                start = max(0, mm.start() - 80)
+                end = min(len(clean), mm.end() + 220)
+                chunk = clean[start:end]
+                if re.search(r"\bCPU\b", chunk, re.I):
+                    continue
+                m = if_pat.search(chunk)
+                if not m:
+                    continue
+                port = (m.group(1) or m.group(2) or m.group(3) or "").replace(" ", "")
+                if not port or not re.fullmatch(r"\d+/\d+", port):
+                    continue
+                ifc = self._guardrails_l2sw_normalize_if(f"ethernet {port}")
+                if ifc and ifc not in hits:
+                    hits.append(ifc)
         if not hits:
             return ""
         # Prefer first physical ethernet hit (usually the RU access port)

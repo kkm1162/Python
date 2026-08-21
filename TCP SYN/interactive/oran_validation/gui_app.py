@@ -429,8 +429,25 @@ class ORanValidationGUI:
         if use_presets:
             for w in self.mutation_widgets:
                 w.config(state=tk.DISABLED)
+            if hasattr(self, "chk_tcp_synack_only"):
+                self.chk_tcp_synack_only.config(state=tk.DISABLED)
         else:
             self._toggle_mutation_options()
+            self._update_tcp_synack_option_state()
+
+    def _update_tcp_synack_option_state(self):
+        """NETCONF/TCP Test Type일 때만 SYN-ACK only 옵션을 활성화한다."""
+        if not hasattr(self, "chk_tcp_synack_only"):
+            return
+        use_presets = hasattr(self, "var_use_presets") and self.var_use_presets.get()
+        atype = self.combo_attack.get().upper() if hasattr(self, "combo_attack") else ""
+        is_tcp = ("NETCONF" in atype) or ("TCP" in atype)
+        if use_presets or not is_tcp:
+            self.chk_tcp_synack_only.config(state=tk.DISABLED)
+            if not is_tcp:
+                self.var_tcp_synack_only.set(False)
+        else:
+            self.chk_tcp_synack_only.config(state=tk.NORMAL)
 
     def _validate_inputs(self, step=1):
         errors = []
@@ -725,7 +742,8 @@ class ORanValidationGUI:
             "eCPRI C-Plane (제어 평면 마비)",
             "PRACH Spoofing (무선 자원 고갈)",
             "F1-U GTP-U (비정상 패킷 필터링)",
-            "NETCONF Session (관리망 마비)"
+            "NETCONF Session (관리망 마비)",
+            "TCP SYN Flood (세션/메모리 고갈)",
         ]
 
         self.combo_attack = ttk.Combobox(manual_frame, width=38, state="readonly", values=attack_types)
@@ -817,7 +835,11 @@ class ORanValidationGUI:
         self.chk_rand_vlan = ttk.Checkbutton(mut_frame, text="Random VLAN", variable=self.var_rand_vlan)
         self.chk_rand_ethertype = ttk.Checkbutton(mut_frame, text="Random Ether Type", variable=self.var_rand_ethertype)
         self.chk_malformed_ecpri = ttk.Checkbutton(mut_frame, text="Malformed eCPRI Header", variable=self.var_malformed_ecpri)
-        self.chk_invalid_length = ttk.Checkbutton(mut_frame, text="Invalid Length Field", variable=self.var_invalid_length)
+        self.chk_invalid_length = ttk.Checkbutton(
+            mut_frame,
+            text="Invalid Length Field (헤더 length만 변조, 프레임 크기 고정)",
+            variable=self.var_invalid_length,
+        )
         self.chk_rand_l4_port = ttk.Checkbutton(mut_frame, text="Random TCP/UDP Port", variable=self.var_rand_l4_port)
 
         self.chk_rand_mac.grid(row=1, column=0, sticky="w", padx=10, pady=3)
@@ -838,6 +860,15 @@ class ORanValidationGUI:
             self.chk_invalid_length,
             self.chk_rand_l4_port,
         ]
+
+        # NETCONF/TCP 전용: Wireshark Conversation Completeness = SYN-ACK only
+        self.var_tcp_synack_only = tk.BooleanVar(value=False)
+        self.chk_tcp_synack_only = ttk.Checkbutton(
+            mut_frame,
+            text="TCP SYN-ACK only (Completeness: SYN-ACK=1, others=0)",
+            variable=self.var_tcp_synack_only,
+        )
+        self.chk_tcp_synack_only.grid(row=5, column=0, columnspan=2, sticky="w", padx=10, pady=(8, 3))
 
         sim_frame = ttk.LabelFrame(preset_frame, text="Expected Throughput Simulation", padding="8")
         sim_frame.pack(fill=tk.X, pady=(8, 0))
@@ -1879,11 +1910,25 @@ PY"""
             desc += "다수의 Master Clock 인가를 위해 Mutation 옵션을 병행할 수 있습니다."
         elif "NETCONF" in atype:
             desc += "관리 평면(M-Plane)에 대량의 TCP 세션 연결을 요청하여 O-RU 제어 리소스를 고갈시킵니다.\n"
-            desc += "O-RU IP를 정확히 기입하고 Port를 830으로 일치시키십시오."
+            desc += "O-RU IP를 정확히 기입하고 Port를 830으로 일치시키십시오.\n"
+            desc += "- TCP SYN-ACK only: Wireshark Conversation Completeness에서 SYN-ACK만 1,\n"
+            desc += "  나머지(RST/FIN/Data/ACK/SYN)는 0이 되도록 SYN+ACK(Len=0) 패킷을 생성합니다."
+        elif "TCP SYN" in atype:
+            desc += "[TCP SYN Flood / Half-Open 세션 고갈 검증]\n\n"
+            desc += "실제 TCP SYN과 동일한 구조의 패킷을 대량 전송합니다.\n"
+            desc += "  - Flags: SYN (또는 SYN-ACK only 옵션)\n"
+            desc += "  - Window: 14600\n"
+            desc += "  - Options: MSS=1460, SACK permitted, Timestamp, NOP, Window scale=4\n"
+            desc += "  - TCP payload 없음 (Len=0), sport/seq는 패킷마다 랜덤\n\n"
+            desc += "대상 IP/Port를 DUT 서비스 포트에 맞게 설정하십시오.\n"
+            desc += "권장 Packet Size: 74 (Ether+IP+TCP options, Fixed 모드 참고용)."
 
         desc += "\n\n[추가 옵션 가이드]\n"
         desc += "- Standard Random: 64~1500 바이트 범위를 3등분하여 랜덤 크기 생성\n"
         desc += "- Jumbo Random: 64~9000 바이트 범위를 3등분하여 랜덤 크기 생성\n"
+        desc += "- Invalid Length Field: 캡처 프레임 크기는 그대로 두고,\n"
+        desc += "  IP/UDP/eCPRI 헤더의 length 값만 실제와 다르게 변조합니다.\n"
+        desc += "  (프레임 길이 자체를 바꾸려면 Packet Size Mode를 Random으로 설정)\n"
         desc += "- Mutation / Randomization 옵션은 프로토콜 및 파서 견고성 검증에 사용됩니다.\n"
         desc += "- Jumbo Random 사용 시 DUT/TRex/NIC의 MTU 설정을 사전에 확인하십시오."
 
@@ -1907,6 +1952,18 @@ PY"""
             if "NETCONF" in atype:
                 self.ent_dst_port.delete(0, tk.END)
                 self.ent_dst_port.insert(0, "830")
+            elif "TCP SYN" in atype:
+                # 예시 SYN 구조 기준으로 일반 서비스 포트/크기 기본값
+                cur_port = self.ent_dst_port.get().strip()
+                if cur_port in ("", "830", "2152"):
+                    self.ent_dst_port.delete(0, tk.END)
+                    self.ent_dst_port.insert(0, "80")
+                if self.combo_pkt_mode.get().strip() == "Fixed":
+                    cur_size = self.ent_pkt_size.get().strip()
+                    if cur_size in ("", "64"):
+                        self.ent_pkt_size.config(state=tk.NORMAL)
+                        self.ent_pkt_size.delete(0, tk.END)
+                        self.ent_pkt_size.insert(0, "74")
             elif "GTP" in atype:
                 self.ent_dst_port.delete(0, tk.END)
                 self.ent_dst_port.insert(0, "2152")
@@ -1919,7 +1976,7 @@ PY"""
 
         atype_upper = atype.upper()
         is_ecpri = any(k in atype_upper for k in ["U-PLANE", "C-PLANE", "PRACH"])
-        is_l3l4 = any(k in atype_upper for k in ["NETCONF", "GTP"])
+        is_l3l4 = any(k in atype_upper for k in ["NETCONF", "GTP", "TCP SYN"])
 
         if is_ecpri:
             self.chk_malformed_ecpri.config(state=tk.NORMAL if self.var_mutation_enable.get() else tk.DISABLED)
@@ -1934,6 +1991,7 @@ PY"""
             self.chk_rand_l4_port.config(state=tk.DISABLED)
             self.chk_invalid_length.config(state=tk.NORMAL if self.var_mutation_enable.get() else tk.DISABLED)
 
+        self._update_tcp_synack_option_state()
         self._calculate_pps(None)
 
     def _calculate_pps(self, event=None):
@@ -2080,6 +2138,7 @@ PY"""
                 "malformed_ecpri": self.var_malformed_ecpri.get(),
                 "invalid_length": self.var_invalid_length.get(),
                 "rand_l4_port": self.var_rand_l4_port.get(),
+                "tcp_synack_only": self.var_tcp_synack_only.get(),
                 "pcap_ms": self.ent_pcap_ms.get().strip(),
                 "pcap_path": validators.validate_remote_path(self.ent_pcap_path.get(), "PCAP Save Path"),
             }
@@ -2254,6 +2313,8 @@ PY"""
                         attack_prefix = "prach"
                     elif "GTP" in atype_upper:
                         attack_prefix = "udp"
+                    elif "TCP SYN" in atype_upper:
+                        attack_prefix = "tcpsyn"
                     else:
                         # NETCONF/TCP 계열 기본값
                         attack_prefix = "tcp"
@@ -2314,7 +2375,7 @@ PY"""
                 # 사용자가 "직접 이름을 의도적으로 고정"한 경우만 유지하고,
                 # 기본/자동으로 생성된 형태(이전 규칙 포함)는 현재 설정 기준으로 다시 생성한다.
                 auto_name_regex = re.compile(
-                    r"^[0-9a-f]{4,}_(uplane|cplane|prach|udp|tcp)_(fixed\d+|std_random|jumbo_random|[a-z0-9_]+?)(?:_(manual|min|mid))?_[0-9p]+g\.pcap$",
+                    r"^[0-9a-f]{4,}_(uplane|cplane|prach|udp|tcp|tcpsyn)_(fixed\d+|std_random|jumbo_random|[a-z0-9_]+?)(?:_(manual|min|mid))?_[0-9p]+g\.pcap$",
                     re.IGNORECASE,
                 )
                 default_like = (
@@ -2334,6 +2395,8 @@ PY"""
                         attack_prefix = "prach"
                     elif "GTP" in atype_upper:
                         attack_prefix = "udp"
+                    elif "TCP SYN" in atype_upper:
+                        attack_prefix = "tcpsyn"
                     else:
                         attack_prefix = "tcp"
 
@@ -3479,6 +3542,7 @@ done
             "malformed_ecpri": False,
             "invalid_length": False,
             "rand_l4_port": False,
+            "tcp_synack_only": False,
             "fping_target": "192.168.11.2",
             "fping_interval": "1",
             "fping_size": "56"
@@ -3543,6 +3607,7 @@ done
         self.var_malformed_ecpri.set(defaults.get("malformed_ecpri", False))
         self.var_invalid_length.set(defaults.get("invalid_length", False))
         self.var_rand_l4_port.set(defaults.get("rand_l4_port", False))
+        self.var_tcp_synack_only.set(defaults.get("tcp_synack_only", False))
 
         self._toggle_mutation_options()
         self._on_pkt_mode_changed()
@@ -3588,6 +3653,7 @@ done
             "malformed_ecpri": self.var_malformed_ecpri.get(),
             "invalid_length": self.var_invalid_length.get(),
             "rand_l4_port": self.var_rand_l4_port.get(),
+            "tcp_synack_only": self.var_tcp_synack_only.get(),
             "fping_target": self.ent_fping_target.get(),
             "fping_interval": self.ent_fping_interval.get(),
             "fping_size": self.ent_fping_size.get()
