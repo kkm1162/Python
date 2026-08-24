@@ -161,9 +161,11 @@ fi
 
 # 부정 시험: N회 supervision 알림 + watchdog → STEP4 OK, 이후 watchdog 안 보내서 세션 끊김 기대
 # pretty-print body 줄 "^<supervision-notification" 으로 1건당 1줄만 카운트
-NEEDED="${SUPERVISION_NEEDED:-1}"
+# N회 watchdog 유지 후 중단 → RU supervision 실패(EOF) 유도
+# SUPERVISION_NEEDED(시험⚙) → SUPERVISION_RESET_CYCLES(전역) 순 (NEGATIVE_FAIL_ON_CYCLE=3 은 사용 안 함)
+NEEDED="${SUPERVISION_NEEDED:-${SUPERVISION_RESET_CYCLES:-30}}"
 SUPERVISION_INTERVAL="${SUPERVISION_INTERVAL:-60}"
-[[ "${NEEDED}" =~ ^[0-9]+$ ]] || NEEDED=1
+[[ "${NEEDED}" =~ ^[0-9]+$ ]] && (( NEEDED > 0 )) || NEEDED=30
 [[ "${SUPERVISION_INTERVAL}" =~ ^[0-9]+$ ]] || SUPERVISION_INTERVAL=60
 _per_cycle=$(( SUPERVISION_INTERVAL + 130 ))
 _max_sec=$(( NEEDED * _per_cycle + 120 ))
@@ -171,7 +173,7 @@ if (( _max_sec < 600 )); then
 	_max_sec=600
 fi
 _to_iter=$(( _max_sec * 4 ))
-echo "[INFO] SUPERVISION_NEEDED=${NEEDED} interval=${SUPERVISION_INTERVAL}s wait_max=${_max_sec}s (phase=watchdog)"
+echo "[INFO] SUPERVISION_NEEDED=${NEEDED} (env NEEDED='${SUPERVISION_NEEDED:-}' RESET_CYCLES='${SUPERVISION_RESET_CYCLES:-}') interval=${SUPERVISION_INTERVAL}s wait_max=${_max_sec}s (phase=watchdog)"
 notif_seen=0
 RESULT4="NOK"
 for _w in $(seq 1 "$_to_iter"); do

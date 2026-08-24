@@ -344,8 +344,8 @@ _CONFORMANCE_PER_TEST_SCHEMA: dict[str, dict[str, Any]] = {
             {
                 "key": "supervision_cycles",
                 "label": "Supervision 반복 횟수",
-                "default": "3",
-                "hint": "알림 N회 수신 + watchdog 전송 후 PASS",
+                "default": "30",
+                "hint": "알림+watchdog N회 유지 후 PASS (빈칸이면 상단 SUPERVISION_RESET_CYCLES)",
                 "env_var": "SUPERVISION_NEEDED",
             },
         ],
@@ -355,9 +355,9 @@ _CONFORMANCE_PER_TEST_SCHEMA: dict[str, dict[str, Any]] = {
         "fields": [
             {
                 "key": "supervision_cycles",
-                "label": "초기 Supervision 횟수",
-                "default": "1",
-                "hint": "알림 N회 후 watchdog 중단 → 세션 끊김 확인",
+                "label": "Watchdog 유지 횟수",
+                "default": "30",
+                "hint": "N회 watchdog 후 중단 → RU 세션 실패(EOF) 유도. 빈칸이면 SUPERVISION_RESET_CYCLES",
                 "env_var": "SUPERVISION_NEEDED",
             },
             {
@@ -850,12 +850,22 @@ class ConformanceMixin:
                 pass
         envp = self._conformance_bash_env_exports(opts, fname)
         per_test_envp = self._conformance_per_test_env_exports(fname)
-        if fname == "conformance_3131.sh":
-            _sn = self._conformance_get_per_test_val(fname, "supervision_cycles").strip() or "3"
-            log_line(f"[INFO] 3.1.3.1 SUPERVISION_NEEDED={_sn} (⚙ Supervision 반복 횟수)")
-        if fname == "conformance_3132.sh":
-            _sn = self._conformance_get_per_test_val(fname, "supervision_cycles").strip() or "1"
-            log_line(f"[INFO] 3.1.3.2 SUPERVISION_NEEDED={_sn} (⚙ 초기 Supervision 횟수)")
+        if fname in ("conformance_3131.sh", "conformance_3132.sh"):
+            _sn = self._conformance_resolve_supervision_needed(fname, opts)
+            # 항상 최종 확정값을 다시 export (전역 30 vs 시험⚙ 3 혼선 방지)
+            per_test_envp += f"export SUPERVISION_NEEDED={shlex.quote(_sn)} ; "
+            if fname == "conformance_3131.sh":
+                log_line(
+                    f"[INFO] 3.1.3.1 SUPERVISION_NEEDED={_sn} "
+                    f"(⚙ 반복 횟수 / 없으면 SUPERVISION_RESET_CYCLES) — "
+                    f"N회 watchdog 후 PASS·종료"
+                )
+            else:
+                log_line(
+                    f"[INFO] 3.1.3.2 SUPERVISION_NEEDED={_sn} "
+                    f"(⚙ Watchdog 유지 횟수 / 없으면 SUPERVISION_RESET_CYCLES) — "
+                    f"N회 후 watchdog 중단 → 세션 실패(EOF) 유도"
+                )
         rp_q = shlex.quote(f"{remote_dir}/{fname}")
         cfg_q = shlex.quote(cfg_remote)
         log_q = shlex.quote(host_log_path)
@@ -3574,8 +3584,17 @@ class ConformanceMixin:
         out.append(f"  NETCONF_RPC_TIMEOUT: {opts.netconf_rpc_timeout.strip() or '30'} s")
         out.append(f"  NETCONF_IDLE_TIMEOUT: {opts.netconf_idle_timeout.strip() or '120'} s")
         out.append(f"  SUPERVISION_INTERVAL: {opts.supervision_interval.strip() or '60'} s")
-        out.append(f"  SUPERVISION_RESET_CYCLES: {(opts.supervision_reset_cycles or '').strip() or '30'}")
-        out.append(f"  SUPERVISION_NEGATIVE_FAIL_ON_CYCLE: {(opts.supervision_negative_fail_on_cycle or '').strip() or '3'}")
+        out.append(f"  SUPERVISION_RESET_CYCLES (전역 fallback): {(opts.supervision_reset_cycles or '').strip() or '30'}")
+        if fname in ("conformance_3131.sh", "conformance_3132.sh"):
+            try:
+                _sn = self._conformance_resolve_supervision_needed(fname, opts)
+            except Exception:
+                _sn = "—"
+            out.append(f"  SUPERVISION_NEEDED (실제 반복): {_sn}")
+        out.append(
+            "  SUPERVISION_NEGATIVE_FAIL_ON_CYCLE: "
+            f"{(opts.supervision_negative_fail_on_cycle or '').strip() or '3'} (미사용·무시)"
+        )
         out.append(f"  CONN_DELAY: {opts.conn_delay.strip() or '3'} s")
         out.append(f"  post_listen_wait: {(opts.post_listen_wait_sec or '').strip() or '0'} s")
         out.append("")
@@ -3993,6 +4012,40 @@ class ConformanceMixin:
             if f["key"] == key:
                 return f["default"]
         return ""
+
+    def _conformance_resolve_supervision_needed(
+        self, fname: str, opts: ConformanceRunOptions | None = None
+    ) -> str:
+        """3131/3132 실제 반복 횟수. 시험⚙ → 전역 RESET_CYCLES → 기본 30.
+
+        SUPERVISION_NEGATIVE_FAIL_ON_CYCLE(기본 3)은 과거 잔재로 횟수에 쓰지 않음.
+        """
+        per = (self._conformance_get_per_test_val(fname, "supervision_cycles") or "").strip()
+        if re.fullmatch(r"[0-9]+", per) and int(per) > 0:
+            # 예전 기본값 3 이 남아 있고 전역이 30 이면 전역을 따름 (의도: 지정 횟수=전역 30)
+            if per == "3":
+                g = ""
+                if opts is not None:
+                    g = (opts.supervision_reset_cycles or "").strip()
+                if not g:
+                    try:
+                        g = (self.conformance_run_supervision_reset_cycles_var.get() or "").strip()
+                    except Exception:
+                        g = ""
+                if re.fullmatch(r"[0-9]+", g) and int(g) > 3:
+                    return g
+            return per
+        g = ""
+        if opts is not None:
+            g = (opts.supervision_reset_cycles or "").strip()
+        if not g:
+            try:
+                g = (self.conformance_run_supervision_reset_cycles_var.get() or "").strip()
+            except Exception:
+                g = ""
+        if re.fullmatch(r"[0-9]+", g) and int(g) > 0:
+            return g
+        return "30"
 
     def _conformance_per_test_env_exports(self, fname: str) -> str:
         pre = getattr(_conf_manifest, "CONFORMANCE_SCRIPT_PRE_3180", "")
